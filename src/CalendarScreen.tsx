@@ -1,118 +1,76 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { CalendarList } from 'react-native-calendars';
+import type { DateData } from 'react-native-calendars';
+import CalendarDay, { DAY_CELL_HEIGHT } from './CalendarDay';
+import { BACKGROUND, BORDER, MONTH_TEXT_COLOR, TEXT, TEXT_DIM } from './theme';
 
 const STORAGE_KEY = 'dripp-bled-dates';
-const INITIAL_MONTHS = 4;
-const MONTHS_PER_LOAD = 3;
-const MAX_MONTHS = 60;
-const NEAR_TOP_THRESHOLD = 300;
+const PAST_SCROLL_RANGE = 60;
 
-const BACKGROUND = '#18171b';
-const TEXT = '#f2efe9';
-const TEXT_DIM = 'rgba(242,239,233,0.4)';
-const TEXT_DIMMER = 'rgba(242,239,233,0.25)';
-const BORDER = 'rgba(255,255,255,0.08)';
-const CELL_BORDER = 'rgba(255,255,255,0.07)';
-const CELL_BG = 'rgba(255,255,255,0.025)';
-const CORAL = '#ec5b57';
-const TEAL = '#00b7c1';
-const TEAL_TINT = 'rgba(0,183,193,0.08)';
+const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-const WEEKDAY_LABELS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+const CALENDAR_HEADER_HEIGHT = 36;
+const CALENDAR_HEIGHT = CALENDAR_HEADER_HEIGHT + 6 * (DAY_CELL_HEIGHT);
 
-function fmtDate(y: number, m: number, d: number) {
-  return `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+const calendarTheme = {
+  calendarBackground: BACKGROUND,
+  monthTextColor: MONTH_TEXT_COLOR,
+  textMonthFontSize: 13,
+  textMonthFontWeight: '600',
+  weekVerticalMargin: 0,
+  'stylesheet.calendar.header': {
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'flex-start',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      marginTop: 10,
+      marginBottom: 6,
+    },
+    monthText: {
+      margin: 0,
+      fontSize: 13,
+      fontWeight: '600',
+      color: MONTH_TEXT_COLOR,
+    },
+  },
+  'stylesheet.calendar.main': {
+    container: {
+      paddingLeft: 0,
+      paddingRight: 0,
+      backgroundColor: BACKGROUND,
+    },
+    dayContainer: {
+      flex: 1,
+      alignItems: 'stretch',
+    },
+  },
+  'stylesheet.calendar-list.main': {
+    calendar: {
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
+  },
+} as any;
+
+function pad(n: number) {
+  return String(n).padStart(2, '0');
 }
 
 function todayStr() {
   const d = new Date();
-  return fmtDate(d.getFullYear(), d.getMonth(), d.getDate());
-}
-
-type Day = {
-  key: string;
-  hasContent: boolean;
-  num?: number;
-  dateStr?: string;
-  isToday?: boolean;
-  isFuture?: boolean;
-  isBled?: boolean;
-};
-
-type Month = {
-  key: string;
-  label: string;
-  weeks: Day[][];
-};
-
-function buildMonth(year: number, monthIdx: number, bledDates: Set<string>, today: string): Month {
-  const first = new Date(year, monthIdx, 1);
-  const daysInMonth = new Date(year, monthIdx + 1, 0).getDate();
-  const firstWeekday = (first.getDay() + 6) % 7;
-
-  const cells: (number | null)[] = [];
-  for (let i = 0; i < firstWeekday; i++) cells.push(null);
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d);
-  while (cells.length % 7 !== 0) cells.push(null);
-
-  const weeks: Day[][] = [];
-  for (let i = 0; i < cells.length; i += 7) {
-    const week = cells.slice(i, i + 7).map((d, idx): Day => {
-      if (d === null) {
-        return { key: `${year}-${monthIdx}-blank-${i}-${idx}`, hasContent: false };
-      }
-      const dateStr = fmtDate(year, monthIdx, d);
-      return {
-        key: dateStr,
-        hasContent: true,
-        num: d,
-        dateStr,
-        isToday: dateStr === today,
-        isFuture: dateStr > today,
-        isBled: bledDates.has(dateStr),
-      };
-    });
-    weeks.push(week);
-  }
-
-  return {
-    key: `${year}-${monthIdx}`,
-    label: first.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }),
-    weeks,
-  };
-}
-
-function buildMonths(count: number, bledDates: Set<string>, today: string): Month[] {
-  const now = new Date();
-  const months: Month[] = [];
-  for (let i = count - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    months.push(buildMonth(d.getFullYear(), d.getMonth(), bledDates, today));
-  }
-  return months;
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
 export default function CalendarScreen() {
   const insets = useSafeAreaInsets();
   const [bledDates, setBledDates] = useState<Set<string>>(new Set());
-  const [monthsToShow, setMonthsToShow] = useState(INITIAL_MONTHS);
   const [loaded, setLoaded] = useState(false);
-
-  const scrollRef = useRef<ScrollView>(null);
-  const scrolledInitially = useRef(false);
-  const prevContentHeight = useRef(0);
-  const shouldAdjustScroll = useRef(false);
-  const lastScrollY = useRef(0);
+  const [calendarAreaHeight, setCalendarAreaHeight] = useState(0);
+  const calendarRef = useRef<any>(null);
 
   useEffect(() => {
     (async () => {
@@ -140,55 +98,26 @@ export default function CalendarScreen() {
   }, [persist]);
 
   const today = todayStr();
-  const months = buildMonths(monthsToShow, bledDates, today);
 
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const y = e.nativeEvent.contentOffset.y;
-    lastScrollY.current = y;
-    if (y < NEAR_TOP_THRESHOLD && monthsToShow < MAX_MONTHS) {
-      prevContentHeight.current = e.nativeEvent.contentSize.height;
-      shouldAdjustScroll.current = true;
-      setMonthsToShow((m) => Math.min(m + MONTHS_PER_LOAD, MAX_MONTHS));
-    }
-  };
+  const markedDates = useMemo(() => {
+    const marks: Record<string, { marked: boolean }> = {};
+    bledDates.forEach((d) => {
+      marks[d] = { marked: true };
+    });
+    return marks;
+  }, [bledDates]);
 
-  const handleContentSizeChange = (_w: number, height: number) => {
-    if (!scrolledInitially.current) {
-      if (height <= 0) return;
-      scrolledInitially.current = true;
-      requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: false }));
-      return;
-    }
-    if (shouldAdjustScroll.current) {
-      shouldAdjustScroll.current = false;
-      const delta = height - prevContentHeight.current;
-      if (delta > 0) {
-        scrollRef.current?.scrollTo({ y: lastScrollY.current + delta, animated: false });
-      }
-    }
-  };
+  const handleDayPress = useCallback(
+    (day: DateData) => {
+      if (day.dateString > today) return;
+      toggleBled(day.dateString);
+    },
+    [today, toggleBled]
+  );
 
-  const stickyHeaderIndices: number[] = [];
-  const children: React.ReactNode[] = [];
-  months.forEach((month) => {
-    stickyHeaderIndices.push(children.length);
-    children.push(
-      <View key={`h-${month.key}`} style={styles.monthHeader}>
-        <Text style={styles.monthHeaderText}>{month.label}</Text>
-      </View>
-    );
-    children.push(
-      <View key={`g-${month.key}`}>
-        {month.weeks.map((week, wi) => (
-          <View key={wi} style={styles.weekRow}>
-            {week.map((day) => (
-              <DayCell key={day.key} day={day} onToggle={toggleBled} />
-            ))}
-          </View>
-        ))}
-      </View>
-    );
-  });
+  const scrollToToday = useCallback(() => {
+    calendarRef.current?.scrollToDay(today, 0, true);
+  }, [today]);
 
   if (!loaded) {
     return <View style={[styles.root, { paddingTop: insets.top }]} />;
@@ -197,7 +126,18 @@ export default function CalendarScreen() {
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Dripp</Text>
+        <View style={styles.headerTitleRow}>
+          <Image source={require('../assets/icon.png')} style={styles.headerIcon} />
+          <Text style={styles.headerTitle}>Dripp</Text>
+        </View>
+        <Pressable
+          style={styles.todayButton}
+          onPress={scrollToToday}
+          hitSlop={8}
+          accessibilityLabel="Scroll to today"
+        >
+          <Image source={require('../assets/calendar-arrow-down.png')} style={styles.headerIcon} />
+        </Pressable>
       </View>
 
       <View style={styles.weekdayRow}>
@@ -206,57 +146,31 @@ export default function CalendarScreen() {
         ))}
       </View>
 
-      <ScrollView
-        ref={scrollRef}
-        style={styles.scroll}
-        contentContainerStyle={{ paddingTop: 16, paddingBottom: insets.bottom + 16 }}
-        stickyHeaderIndices={stickyHeaderIndices}
-        onScroll={handleScroll}
-        onContentSizeChange={handleContentSizeChange}
-        scrollEventThrottle={32}
-      >
-        {children}
-      </ScrollView>
-    </View>
-  );
-}
-
-function DayCell({ day, onToggle }: { day: Day; onToggle: (dateStr: string) => void }) {
-  if (!day.hasContent) {
-    return <View style={styles.dayWrap} />;
-  }
-  const { dateStr, num, isToday, isFuture, isBled } = day;
-  return (
-    <Pressable
-      disabled={isFuture}
-      onPress={() => dateStr && onToggle(dateStr)}
-      style={[
-        styles.dayWrap,
-        {
-          borderWidth: isToday ? 2 : 1,
-          borderColor: isToday ? TEAL : CELL_BORDER,
-          backgroundColor: isToday ? TEAL_TINT : CELL_BG,
-        },
-      ]}
-    >
       <View
-        style={[
-          styles.dayCircle,
-          isBled && { backgroundColor: CORAL },
-        ]}
+        style={styles.calendarArea}
+        onLayout={(e) => setCalendarAreaHeight(e.nativeEvent.layout.height)}
       >
-        <Text
-          style={[
-            styles.dayNum,
-            isToday && styles.dayNumToday,
-            isFuture && { color: TEXT_DIMMER },
-            isBled && { color: BACKGROUND },
-          ]}
-        >
-          {num}
-        </Text>
+        {calendarAreaHeight > 0 && (
+          <CalendarList
+            ref={calendarRef}
+            current={today}
+            firstDay={0}
+            pastScrollRange={PAST_SCROLL_RANGE}
+            futureScrollRange={0}
+            maxDate={today}
+            hideDayNames
+            showScrollIndicator={false}
+            calendarHeight={CALENDAR_HEIGHT}
+            theme={calendarTheme}
+            markedDates={markedDates}
+            dayComponent={CalendarDay}
+            onDayPress={handleDayPress}
+            style={{ height: calendarAreaHeight }}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+          />
+        )}
       </View>
-    </Pressable>
+    </View>
   );
 }
 
@@ -270,9 +184,19 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
     borderBottomWidth: 1,
     borderBottomColor: BORDER,
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerIcon: {
+    width: 26,
+    height: 26,
+    borderRadius: 7,
   },
   headerTitle: {
     fontSize: 21,
@@ -280,10 +204,17 @@ const styles = StyleSheet.create({
     color: TEXT,
     letterSpacing: -0.2,
   },
+  todayButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   weekdayRow: {
     flexDirection: 'row',
     paddingTop: 10,
-    paddingBottom: 6,
+    paddingBottom: 10,
   },
   weekdayLabel: {
     flex: 1,
@@ -293,43 +224,7 @@ const styles = StyleSheet.create({
     color: TEXT_DIM,
     letterSpacing: 0.5,
   },
-  scroll: {
+  calendarArea: {
     flex: 1,
-  },
-  monthHeader: {
-    backgroundColor: BACKGROUND,
-    paddingHorizontal: 20,
-    paddingTop: 10,
-    paddingBottom: 6,
-  },
-  monthHeaderText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: 'rgba(242,239,233,0.55)',
-  },
-  weekRow: {
-    flexDirection: 'row',
-  },
-  dayWrap: {
-    flex: 1,
-    aspectRatio: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  dayNum: {
-    fontSize: 15,
-    fontWeight: '400',
-    color: TEXT,
-    lineHeight: 15,
-  },
-  dayNumToday: {
-    fontWeight: '700',
   },
 });
