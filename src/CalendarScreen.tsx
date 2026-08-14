@@ -24,11 +24,9 @@ const calendarTheme = {
   'stylesheet.calendar.header': {
     header: {
       flexDirection: 'row',
-      justifyContent: 'flex-start',
+      justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 20,
-      marginTop: 10,
-      marginBottom: 6,
+      paddingBottom: 30,
     },
     monthText: {
       margin: 0,
