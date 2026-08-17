@@ -1,19 +1,19 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CalendarList } from 'react-native-calendars';
 import type { DateData } from 'react-native-calendars';
+import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../db/queries';
+import type { Category, Task, TrackedDates } from '../db/queries';
 import CalendarDay, { DAY_CELL_HEIGHT } from './CalendarDay';
-import { BACKGROUND, BORDER, MONTH_TEXT_COLOR, TEXT, TEXT_DIM } from './theme';
+import { BACKGROUND, BORDER, CELL_BG, CELL_BORDER, MONTH_TEXT_COLOR, TEXT, TEXT_DIM } from './theme';
 
-const STORAGE_KEY = 'dripp-bled-dates';
 const PAST_SCROLL_RANGE = 60;
 
 const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const CALENDAR_HEADER_HEIGHT = 36;
-const CALENDAR_HEIGHT = CALENDAR_HEADER_HEIGHT + 6 * (DAY_CELL_HEIGHT);
+const CALENDAR_HEIGHT = CALENDAR_HEADER_HEIGHT + 6 * DAY_CELL_HEIGHT;
 
 const calendarTheme = {
   calendarBackground: BACKGROUND,
@@ -65,7 +65,11 @@ function todayStr() {
 
 export default function CalendarScreen() {
   const insets = useSafeAreaInsets();
-  const [bledDates, setBledDates] = useState<Set<string>>(new Set());
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [trackedDates, setTrackedDates] = useState<TrackedDates>({});
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [calendarAreaHeight, setCalendarAreaHeight] = useState(0);
   const calendarRef = useRef<any>(null);
@@ -73,44 +77,73 @@ export default function CalendarScreen() {
   useEffect(() => {
     (async () => {
       try {
-        const raw = await AsyncStorage.getItem(STORAGE_KEY);
-        if (raw) setBledDates(new Set(JSON.parse(raw)));
+        const [loadedCategories, loadedTasks, loadedTrackedDates] = await Promise.all([
+          loadCategories(),
+          loadTasks(),
+          loadTrackedDates(),
+        ]);
+        setCategories(loadedCategories);
+        setTasks(loadedTasks);
+        setTrackedDates(loadedTrackedDates);
+        const firstCategory = loadedCategories[0];
+        setSelectedCategoryId(firstCategory?.id ?? null);
+        setSelectedTaskId(
+          loadedTasks.find((task) => task.categoryId === firstCategory?.id)?.id ?? null
+        );
+      } catch (e) {
+        console.error('[CalendarScreen] load failed', e);
       } finally {
         setLoaded(true);
       }
     })();
   }, []);
 
-  const persist = useCallback((next: Set<string>) => {
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(next))).catch(() => {});
+  const toggleTaskDate = useCallback((taskId: number, dateStr: string) => {
+    setTrackedDates((prev) => {
+      const current = prev[taskId] ?? new Set<string>();
+      const wasMarked = current.has(dateStr);
+      const next = new Set(current);
+      if (wasMarked) next.delete(dateStr);
+      else next.add(dateStr);
+      setTrackedDate(taskId, dateStr, !wasMarked).catch(() => {});
+      return { ...prev, [taskId]: next };
+    });
   }, []);
 
-  const toggleBled = useCallback((dateStr: string) => {
-    setBledDates((prev) => {
-      const next = new Set(prev);
-      if (next.has(dateStr)) next.delete(dateStr);
-      else next.add(dateStr);
-      persist(next);
-      return next;
-    });
-  }, [persist]);
+  const tasksForCategory = useCallback(
+    (categoryId: number | null) => tasks.filter((task) => task.categoryId === categoryId),
+    [tasks]
+  );
+
+  const selectCategory = useCallback(
+    (categoryId: number) => {
+      setSelectedCategoryId(categoryId);
+      setSelectedTaskId(tasks.find((task) => task.categoryId === categoryId)?.id ?? null);
+    },
+    [tasks]
+  );
 
   const today = todayStr();
 
   const markedDates = useMemo(() => {
-    const marks: Record<string, { marked: boolean }> = {};
-    bledDates.forEach((d) => {
-      marks[d] = { marked: true };
-    });
+    const marks: Record<string, { items: { id: number; color: string }[] }> = {};
+    for (const task of tasks) {
+      const dates = trackedDates[task.id];
+      if (!dates) continue;
+      dates.forEach((d) => {
+        if (!marks[d]) marks[d] = { items: [] };
+        marks[d].items.push({ id: task.id, color: task.color });
+      });
+    }
     return marks;
-  }, [bledDates]);
+  }, [tasks, trackedDates]);
 
   const handleDayPress = useCallback(
     (day: DateData) => {
-      if (day.dateString > today) return;
-      toggleBled(day.dateString);
+      if (day.dateString > today || selectedTaskId == null) return;
+      toggleTaskDate(selectedTaskId, day.dateString);
     },
-    [today, toggleBled]
+    [today, selectedTaskId, toggleTaskDate]
   );
 
   const scrollToToday = useCallback(() => {
@@ -138,6 +171,49 @@ export default function CalendarScreen() {
         </Pressable>
       </View>
 
+      <View style={styles.categoryRow}>
+        {categories.map((category) => {
+          const active = category.id === selectedCategoryId;
+          return (
+            <Pressable
+              key={category.id}
+              onPress={() => selectCategory(category.id)}
+              style={[styles.categoryTab, active && styles.categoryTabActive]}
+            >
+              <Text style={[styles.categoryTabText, active && styles.categoryTabTextActive]}>
+                {category.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={styles.itemRow}
+        contentContainerStyle={styles.itemRowContent}
+      >
+        {tasksForCategory(selectedCategoryId).map((task) => {
+          const active = task.id === selectedTaskId;
+          return (
+            <Pressable
+              key={task.id}
+              onPress={() => setSelectedTaskId(task.id)}
+              style={[
+                styles.itemChip,
+                { borderColor: task.color },
+                active && { backgroundColor: task.color },
+              ]}
+            >
+              <Text style={[styles.itemChipText, active && styles.itemChipTextActive]}>
+                {task.name}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </ScrollView>
+
       <View style={styles.weekdayRow}>
         {WEEKDAY_LABELS.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>{wd}</Text>
@@ -160,7 +236,7 @@ export default function CalendarScreen() {
             showScrollIndicator={false}
             calendarHeight={CALENDAR_HEIGHT}
             theme={calendarTheme}
-            markedDates={markedDates}
+            markedDates={markedDates as any}
             dayComponent={CalendarDay}
             onDayPress={handleDayPress}
             style={{ height: calendarAreaHeight }}
@@ -208,6 +284,55 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  categoryRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 10,
+    paddingTop: 10,
+    gap: 8,
+  },
+  categoryTab: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: CELL_BG,
+    borderWidth: 1,
+    borderColor: CELL_BORDER,
+  },
+  categoryTabActive: {
+    backgroundColor: TEXT,
+    borderColor: TEXT,
+  },
+  categoryTabText: {
+    fontSize: 12.5,
+    fontWeight: '600',
+    color: TEXT_DIM,
+  },
+  categoryTabTextActive: {
+    color: BACKGROUND,
+  },
+  itemRow: {
+    marginTop: 8,
+    flexGrow: 0,
+  },
+  itemRowContent: {
+    paddingHorizontal: 10,
+    gap: 8,
+  },
+  itemChip: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  itemChipText: {
+    fontSize: 11.5,
+    fontWeight: '600',
+    color: TEXT_DIM,
+  },
+  itemChipTextActive: {
+    color: BACKGROUND,
+    fontWeight: '700',
   },
   weekdayRow: {
     flexDirection: 'row',

@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { CELL_BG, CELL_BORDER, CORAL, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from './theme';
+import { CELL_BG, CELL_BORDER, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from './theme';
 
 export const DAY_CELL_HEIGHT = 56;
 
@@ -12,13 +12,13 @@ export default function CalendarDay({
 }: {
   date?: DateData;
   state?: string;
-  marking?: { marked?: boolean };
+  marking?: any;
   onPress?: (date: DateData) => void;
 }) {
   if (!date) return null;
   const isToday = state === 'today';
   const isDisabled = state === 'disabled';
-  const isBled = !!marking?.marked;
+  const items: { id: number; color: string }[] = marking?.items ?? [];
   return (
     <Pressable
       disabled={isDisabled}
@@ -42,7 +42,11 @@ export default function CalendarDay({
         >
           {date.day}
         </Text>
-        <View style={[styles.markedDayBar, isBled && { backgroundColor: CORAL }]} />
+        <View style={styles.markRow}>
+          {items.map((item) => (
+            <View key={item.id} style={[styles.markSquare, { backgroundColor: item.color }]} />
+          ))}
+        </View>
       </View>
     </Pressable>
   );
@@ -58,11 +62,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  markedDayBar: {
+  markRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    height: 6,
     marginTop: 5,
-    width: 18,
-    height: 3,
-    borderRadius: 1.5,
+    gap: 2,
+    maxWidth: 34,
+  },
+  markSquare: {
+    width: 4,
+    height: 4,
+    borderRadius: 1,
   },
   dayNum: {
     fontSize: 15,
