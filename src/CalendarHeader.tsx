@@ -1,0 +1,163 @@
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import type { Category } from '../db/queries';
+import { BORDER, CELL_BG, CELL_BORDER, CORAL, TEXT, TEXT_DIM } from './theme';
+
+type Props = {
+  categories: Category[];
+  selectedCategoryId: number | null;
+  selectedCategoryLabel: string | undefined;
+  filterVisible: boolean;
+  onToggleFilter: () => void;
+  onCloseFilter: () => void;
+  onSelectCategory: (categoryId: number | null) => void;
+};
+
+export default function CalendarHeader({
+  categories,
+  selectedCategoryId,
+  selectedCategoryLabel,
+  filterVisible,
+  onToggleFilter,
+  onCloseFilter,
+  onSelectCategory,
+}: Props) {
+  return (
+    <>
+      <View style={styles.header}>
+        <View style={styles.headerTitleRow}>
+          <Image source={require('../assets/icon.png')} style={{ width: 32, height: 32 }} />
+          <Text style={styles.headerTitle}>Dripp</Text>
+        </View>
+        <Pressable
+          style={[styles.filterButton]}
+          onPress={onToggleFilter}
+          hitSlop={8}
+          accessibilityLabel="Filter by category"
+        >
+          <Text style={[styles.filterButtonText]}>{selectedCategoryLabel ?? 'all'}</Text>
+          <Text style={{ fontSize: 20, fontWeight: '800', color: TEXT_DIM }}>▾</Text>
+        </Pressable>
+      </View>
+
+      {filterVisible && (
+        <>
+          <Pressable onPress={onCloseFilter} />
+          <View style={styles.filterDropdownCard}>
+            <Pressable style={styles.filterDropdownRow} onPress={() => onSelectCategory(null)}>
+              <Text
+                style={[
+                  styles.filterDropdownRowText,
+                  selectedCategoryId == null && styles.filterDropdownRowTextActive,
+                ]}
+              >
+                all
+              </Text>
+              {selectedCategoryId == null && <Text style={styles.filterDropdownCheck}>✓</Text>}
+            </Pressable>
+            {categories.map((category) => {
+              const active = category.id === selectedCategoryId;
+              return (
+                <Pressable
+                  key={category.id}
+                  style={styles.filterDropdownRow}
+                  onPress={() => onSelectCategory(category.id)}
+                >
+                  <Text
+                    style={[
+                      styles.filterDropdownRowText,
+                      active && styles.filterDropdownRowTextActive,
+                    ]}
+                  >
+                    {category.name}
+                  </Text>
+                  {active && <Text style={styles.filterDropdownCheck}>✓</Text>}
+                </Pressable>
+              );
+            })}
+          </View>
+        </>
+      )}
+    </>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    height: '10%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: BORDER,
+  },
+  headerTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  headerTitle: {
+    fontSize: 21,
+    fontWeight: '600',
+    color: TEXT,
+    letterSpacing: -0.2,
+  },
+  filterButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 15,
+    borderRadius: 17,
+    justifyContent: 'center',
+    backgroundColor: CELL_BG,
+    borderWidth: 1,
+    borderColor: CELL_BORDER,
+  },
+  filterButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: TEXT,
+    textTransform: 'lowercase',
+  },
+  filterDropdownCard: {
+    position: 'absolute',
+    top: 120,
+    right: 20,
+    minWidth: 170,
+    borderRadius: 14,
+    paddingVertical: 6,
+    backgroundColor: '#26252b',
+    borderWidth: 1,
+    borderColor: BORDER,
+    zIndex: 21,
+    elevation: 21,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.35,
+    shadowRadius: 12,
+  },
+  filterDropdownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+  },
+  filterDropdownRowText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: TEXT_DIM,
+    textTransform: 'lowercase',
+  },
+  filterDropdownRowTextActive: {
+    color: TEXT,
+    fontWeight: '700',
+  },
+  filterDropdownCheck: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: CORAL,
+    marginLeft: 12,
+  },
+});
