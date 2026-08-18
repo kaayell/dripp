@@ -20,11 +20,28 @@ export default function App() {
   return (
     <SafeAreaProvider>
       {status.error ? (
-        <View style={{ flex: 1, backgroundColor: BACKGROUND, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-          <Text style={{ color: CORAL, textAlign: 'center' }}>Database migration failed: {status.error.message}</Text>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: BACKGROUND,
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: 20,
+          }}
+        >
+          <Text style={{ color: CORAL, textAlign: 'center' }}>
+            Database migration failed: {status.error.message}
+          </Text>
         </View>
       ) : !status.success ? (
-        <View style={{ flex: 1, backgroundColor: BACKGROUND, alignItems: 'center', justifyContent: 'center' }}>
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: BACKGROUND,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
           <Text style={{ color: TEXT }}>Loading…</Text>
         </View>
       ) : (

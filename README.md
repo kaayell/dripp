@@ -31,7 +31,7 @@ If Metro and the app get out of sync (stale bundle, weird cache errors),
 kill Metro and restart with a clean cache:
 
 ```bash
-npx expo prebuild --clean 
+npx expo prebuild --clean
 npx expo start --clear
 ```
 

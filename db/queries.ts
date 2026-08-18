@@ -26,11 +26,7 @@ export async function loadTrackedDates(): Promise<TrackedDates> {
   return data;
 }
 
-export async function setTrackedDate(
-  taskId: number,
-  date: string,
-  marked: boolean
-): Promise<void> {
+export async function setTrackedDate(taskId: number, date: string, marked: boolean): Promise<void> {
   if (marked) {
     const [existing] = await db
       .select()
