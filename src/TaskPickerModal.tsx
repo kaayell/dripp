@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Task, TrackedDates } from '../db/queries';
-import { BACKGROUND, BORDER, CELL_BG, CELL_BORDER, TEXT } from './theme';
+import { BACKGROUND, BORDER, CORAL, TEXT, TEXT_DIM } from './theme';
 
 type Props = {
   pickerDate: string | null;
@@ -10,6 +10,15 @@ type Props = {
   onToggleTask: (taskId: number, dateStr: string) => void;
   onClose: () => void;
 };
+
+function formatPickerDate(dateStr: string): string {
+  const date = new Date(`${dateStr}T00:00:00`);
+  return date.toLocaleDateString(undefined, {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
 export default function TaskPickerModal({
   pickerDate,
@@ -24,6 +33,16 @@ export default function TaskPickerModal({
       <Pressable style={styles.modalBackdrop} onPress={onClose}>
         <View style={[styles.modalPanel, { paddingBottom: bottomInset + 18 }]}>
           <View style={styles.modalHandle} />
+
+          {pickerDate != null && (
+            <View style={styles.modalHeaderRow}>
+              <Text style={styles.modalTitle}>{formatPickerDate(pickerDate)}</Text>
+              <Pressable onPress={onClose} hitSlop={8}>
+                <Text style={styles.modalDoneText}>Done</Text>
+              </Pressable>
+            </View>
+          )}
+
           {pickerDate != null &&
             tasks.map((task) => {
               const checked = trackedDates[task.id]?.has(pickerDate) ?? false;
@@ -31,24 +50,18 @@ export default function TaskPickerModal({
                 <Pressable
                   key={task.id}
                   onPress={() => onToggleTask(task.id, pickerDate)}
-                  style={styles.modalTaskRow}
+                  style={[styles.modalTaskRow, checked && { backgroundColor: BORDER }]}
                 >
-                  <View
-                    style={[
-                      styles.modalCheckbox,
-                      { borderColor: task.color },
-                      checked && { backgroundColor: task.color },
-                    ]}
-                  >
-                    {checked && <Text style={styles.modalCheckmark}>✓</Text>}
+                  <View style={styles.modalTaskLabelRow}>
+                    <View style={[styles.modalDot, { backgroundColor: task.color }]} />
+                    <Text style={[styles.modalTaskLabel, checked && styles.modalTaskLabelActive]}>
+                      {task.name}
+                    </Text>
                   </View>
-                  <Text style={styles.modalTaskLabel}>{task.name}</Text>
+                  {checked && <Text style={[styles.modalCheckmark, { color: task.color }]}>✓</Text>}
                 </Pressable>
               );
             })}
-          <Pressable style={styles.modalDoneButton} onPress={onClose}>
-            <Text style={styles.modalDoneText}>Done</Text>
-          </Pressable>
         </View>
       </Pressable>
     </Modal>
@@ -67,7 +80,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BORDER,
     backgroundColor: BACKGROUND,
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     paddingTop: 10,
   },
   modalHandle: {
@@ -75,46 +88,59 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: CELL_BORDER,
-    marginBottom: 12,
+    backgroundColor: BORDER,
+    marginBottom: 16,
+  },
+  modalHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    paddingHorizontal: 4,
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: TEXT,
+  },
+  modalDoneText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: CORAL,
   },
   modalTaskRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
+    justifyContent: 'space-between',
+    backgroundColor: BACKGROUND,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: BORDER,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    marginBottom: 10,
   },
-  modalCheckbox: {
-    width: 22,
-    height: 22,
-    borderRadius: 6,
-    borderWidth: 2,
+  modalTaskLabelRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: 10,
   },
-  modalCheckmark: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: BACKGROUND,
+  modalDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   modalTaskLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: TEXT,
+    fontSize: 16,
+    fontWeight: '500',
+    color: TEXT_DIM,
   },
-  modalDoneButton: {
-    marginTop: 12,
-    alignSelf: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 8,
-    borderRadius: 14,
-    backgroundColor: CELL_BG,
-    borderWidth: 1,
-    borderColor: CELL_BORDER,
-  },
-  modalDoneText: {
-    fontSize: 13,
+  modalTaskLabelActive: {
     fontWeight: '700',
     color: TEXT,
+  },
+  modalCheckmark: {
+    fontSize: 15,
+    fontWeight: '700',
   },
 });
