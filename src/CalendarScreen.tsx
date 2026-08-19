@@ -8,45 +8,33 @@ import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../
 import CalendarDay from './CalendarDay';
 import CalendarHeader from './CalendarHeader';
 import TaskPickerModal from './TaskPickerModal';
-import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM } from './theme';
-
-const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM, TEXT_DIMMER } from './theme';
 
 const calendarTheme = {
   calendarBackground: BACKGROUND,
-  monthTextColor: MONTH_TEXT_COLOR,
-  textMonthFontSize: 13,
-  textMonthFontWeight: '600',
-  weekVerticalMargin: 0,
+  weekVerticalMargin: 2,
   'stylesheet.calendar.header': {
     header: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      paddingBottom: 30,
+      paddingTop: 20,
+      paddingBottom: 5,
+      borderBottomWidth: 1,
+      borderBottomColor: TEXT_DIMMER,
+      marginBottom: 15,
     },
     monthText: {
-      margin: 0,
-      fontSize: 13,
+      fontSize: 16,
       fontWeight: '600',
       color: MONTH_TEXT_COLOR,
     },
   },
   'stylesheet.calendar.main': {
-    container: {
-      paddingLeft: 0,
-      paddingRight: 0,
-      backgroundColor: BACKGROUND,
-    },
     dayContainer: {
       flex: 1,
-      alignItems: 'stretch',
     },
   },
   'stylesheet.calendar-list.main': {
     calendar: {
-      paddingLeft: 0,
-      paddingRight: 0,
+      paddingVertical: 0,
     },
   },
 } as any;
@@ -100,7 +88,8 @@ export default function CalendarScreen() {
   }, []);
 
   const tasksForCategory = useCallback(
-    (categoryId: number | null) => tasks.filter((task) => task.categoryId === categoryId),
+    (categoryId: number | null) =>
+      categoryId == null ? tasks : tasks.filter((task) => task.categoryId === categoryId),
     [tasks],
   );
 
@@ -115,7 +104,7 @@ export default function CalendarScreen() {
 
   const selectedCategoryLabel =
     selectedCategoryId == null
-      ? 'All'
+      ? 'all'
       : categories.find((category) => category.id === selectedCategoryId)?.name;
 
   const markedDates = useMemo(() => {
@@ -162,8 +151,8 @@ export default function CalendarScreen() {
         onSelectCategory={selectCategory}
       />
 
-      <View style={{ flexDirection: 'row', paddingTop: 10, paddingBottom: 10 }}>
-        {WEEKDAY_LABELS.map((wd) => (
+      <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
+        {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
             {wd}
           </Text>

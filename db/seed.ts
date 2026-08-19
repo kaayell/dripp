@@ -20,11 +20,12 @@ async function seed(): Promise<void> {
 
   const [categoryHouse] = await db.insert(categories).values({ name: 'house' }).returning();
   const houseTasks = [
-    { name: 'litterbox', color: '#3987e5' },
-    { name: 'sheets', color: '#d95926' },
-    { name: 'vacuum', color: '#199e70' },
-    { name: 'laundry', color: '#c98500' },
-    { name: 'mop', color: '#d55181' },
+    { name: 'litter box', color: '#daa932' },
+    { name: 'vacuum', color: '#5ec386' },
+    { name: 'mop', color: '#64a1ee' },
+    { name: 'sheets', color: '#b386e4' },
+    { name: 'laundry', color: '#da85b6' },
+    { name: 'towels', color: '#50bfbe' },
   ].map((task) => ({ ...task, categoryId: categoryHouse.id }));
 
   await db.insert(tasks).values([...bodTasks, ...houseTasks]);

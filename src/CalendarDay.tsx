@@ -1,8 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { CELL_BG, CELL_BORDER, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from './theme';
-
-export const DAY_CELL_HEIGHT = 56;
+import { CELL_BG, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from './theme';
 
 export default function CalendarDay({
   date,
@@ -23,30 +21,25 @@ export default function CalendarDay({
     <Pressable
       disabled={isDisabled}
       onPress={() => onPress?.(date)}
-      style={[
-        styles.dayWrap,
-        {
-          borderWidth: isToday ? 2 : 1,
-          borderColor: isToday ? TEAL : CELL_BORDER,
-          backgroundColor: isToday ? TEAL_TINT : CELL_BG,
-        },
-      ]}
+      style={[styles.dayWrap, isToday ? styles.dayCellToday : styles.dayCell]}
     >
-      <View style={styles.dayContent}>
-        <Text
-          style={[
-            styles.dayNum,
-            isToday && styles.dayNumToday,
-            isDisabled && { color: TEXT_DIMMER },
-          ]}
-        >
-          {date.day}
-        </Text>
-        <View style={styles.markRow}>
-          {items.map((item) => (
-            <View key={item.id} style={[styles.markSquare, { backgroundColor: item.color }]} />
-          ))}
-        </View>
+      <Text
+        style={[
+          styles.dayNum,
+          isToday && { fontWeight: '700' },
+          isDisabled && { color: TEXT_DIMMER },
+        ]}
+      >
+        {date.day}
+      </Text>
+      <View style={styles.markBarWrap}>
+        {items.length > 0 && (
+          <View style={styles.markBar}>
+            {items.map((item) => (
+              <View key={item.id} style={{ flex: 1, backgroundColor: item.color }} />
+            ))}
+          </View>
+        )}
       </View>
     </Pressable>
   );
@@ -54,35 +47,42 @@ export default function CalendarDay({
 
 const styles = StyleSheet.create({
   dayWrap: {
-    height: DAY_CELL_HEIGHT,
+    height: 56,
+    marginHorizontal: 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  dayContent: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  markRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-    height: 6,
-    marginTop: 5,
-    gap: 2,
-    maxWidth: 34,
-  },
-  markSquare: {
-    width: 4,
-    height: 4,
-    borderRadius: 1,
   },
   dayNum: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
     fontSize: 15,
     fontWeight: '400',
     color: TEXT,
     lineHeight: 15,
   },
-  dayNumToday: {
-    fontWeight: '700',
+  dayCell: {
+    borderWidth: 0,
+    backgroundColor: CELL_BG,
+  },
+  dayCellToday: {
+    borderWidth: 2,
+    borderRadius: 2,
+    borderColor: TEAL,
+    backgroundColor: TEAL_TINT,
+  },
+  markBarWrap: {
+    height: 6,
+    paddingTop: 10,
+    width: 34,
+    alignSelf: 'center',
+    justifyContent: 'center',
+  },
+  markBar: {
+    flexDirection: 'row',
+    height: 5,
+    width: '100%',
+    borderRadius: 3,
+    overflow: 'hidden',
   },
 });
