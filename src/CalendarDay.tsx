@@ -23,6 +23,13 @@ export default function CalendarDay({
       onPress={() => onPress?.(date)}
       style={[styles.dayWrap, isToday ? styles.dayCellToday : styles.dayCell]}
     >
+      {items.length > 0 && (
+        <View style={styles.fillWrap}>
+          {items.map((item) => (
+            <View key={item.id} style={{ flex: 1, backgroundColor: item.color }} />
+          ))}
+        </View>
+      )}
       <Text
         style={[
           styles.dayNum,
@@ -32,15 +39,6 @@ export default function CalendarDay({
       >
         {date.day}
       </Text>
-      <View style={styles.markBarWrap}>
-        {items.length > 0 && (
-          <View style={styles.markBar}>
-            {items.map((item) => (
-              <View key={item.id} style={{ flex: 1, backgroundColor: item.color }} />
-            ))}
-          </View>
-        )}
-      </View>
     </Pressable>
   );
 }
@@ -51,15 +49,32 @@ const styles = StyleSheet.create({
     marginHorizontal: 2,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 4,
+    overflow: 'hidden',
+  },
+  fillWrap: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    flexDirection: 'row',
   },
   dayNum: {
     position: 'absolute',
-    top: 6,
-    right: 6,
+    top: 0,
+    right: 0,
+    width: 28,
+    height: 28,
+    backgroundColor: CELL_BG,
     fontSize: 15,
     fontWeight: '400',
     color: TEXT,
     lineHeight: 15,
+    textAlign: 'right',
+    textAlignVertical: 'center',
+    borderRadius: 2,
+    paddingRight: 6,
   },
   dayCell: {
     borderWidth: 0,
@@ -67,22 +82,8 @@ const styles = StyleSheet.create({
   },
   dayCellToday: {
     borderWidth: 2,
-    borderRadius: 2,
+    borderRadius: 4,
     borderColor: TEAL,
     backgroundColor: TEAL_TINT,
-  },
-  markBarWrap: {
-    height: 6,
-    paddingTop: 10,
-    width: 34,
-    alignSelf: 'center',
-    justifyContent: 'center',
-  },
-  markBar: {
-    flexDirection: 'row',
-    height: 5,
-    width: '100%',
-    borderRadius: 3,
-    overflow: 'hidden',
   },
 });
