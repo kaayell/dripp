@@ -7,6 +7,7 @@ import type { Category, Task, TrackedDates } from '../db/queries';
 import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../db/queries';
 import CalendarDay from './CalendarDay';
 import CalendarHeader from './CalendarHeader';
+import CalendarLegend from './CalendarLegend';
 import TaskPickerModal from './TaskPickerModal';
 import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM, TEXT_DIMMER } from './theme';
 
@@ -175,6 +176,8 @@ export default function CalendarScreen() {
           contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
         />
       </View>
+
+      <CalendarLegend tasks={tasksForCategory(selectedCategoryId)} bottomInset={insets.bottom} />
 
       <TaskPickerModal
         pickerDate={pickerDate}
