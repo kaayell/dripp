@@ -3,7 +3,7 @@ import { BORDER, TEXT } from './theme';
 
 export const APP_HEADER_HEIGHT = 56;
 
-export default function AppHeader() {
+export default function Header() {
   return (
     <View style={styles.header}>
       <View style={styles.headerTitleRow}>

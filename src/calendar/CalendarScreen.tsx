@@ -3,13 +3,13 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DateData } from 'react-native-calendars';
 import { CalendarList } from 'react-native-calendars';
-import type { Category, Task, TrackedDates } from '../db/queries';
-import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../db/queries';
+import type { Category, Task, TrackedDates } from '../../db/queries';
+import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../../db/queries';
 import CalendarDay from './CalendarDay';
 import CalendarLegend from './CalendarLegend';
 import CategoryFilter from './CategoryFilter';
 import TaskPickerModal from './TaskPickerModal';
-import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM, TEXT_DIMMER } from './theme';
+import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM, TEXT_DIMMER } from '../theme';
 
 const calendarTheme = {
   calendarBackground: BACKGROUND,

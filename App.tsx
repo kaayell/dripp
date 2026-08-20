@@ -4,9 +4,9 @@ import { View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { runMigrations } from './db/client';
 import { ensureSeeded } from './db/seed';
-import AppHeader from './src/AppHeader';
-import AppFooter from './src/AppFooter';
-import CalendarScreen from './src/CalendarScreen';
+import Header from './src/Header';
+import Footer from './src/Footer';
+import CalendarScreen from './src/calendar/CalendarScreen';
 import ErrorScreen from './src/ErrorScreen';
 import LoadingScreen from './src/LoadingScreen';
 import { BACKGROUND } from './src/theme';
@@ -32,13 +32,13 @@ function AppContent() {
 
   return (
     <View style={{ flex: 1, backgroundColor: BACKGROUND, paddingTop: insets.top }}>
-      <AppHeader />
+      <Header />
 
       <View style={{ flex: 1 }}>
         <CalendarScreen />
       </View>
 
-      <AppFooter />
+      <Footer />
     </View>
   );
 }

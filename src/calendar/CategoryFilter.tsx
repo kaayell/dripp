@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Category } from '../db/queries';
-import { APP_HEADER_HEIGHT } from './AppHeader';
-import { BORDER, CELL_BG, CELL_BORDER, CORAL, TEXT, TEXT_DIM } from './theme';
+import type { Category } from '../../db/queries';
+import { APP_HEADER_HEIGHT } from '../Header';
+import { BORDER, CELL_BG, CELL_BORDER, CORAL, TEXT, TEXT_DIM } from '../theme';
 
 type Props = {
   categories: Category[];

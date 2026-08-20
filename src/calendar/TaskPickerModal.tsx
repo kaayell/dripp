@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Task, TrackedDates } from '../db/queries';
-import { BACKGROUND, BORDER, CORAL, TEXT, TEXT_DIM } from './theme';
+import type { Task, TrackedDates } from '../../db/queries';
+import { BACKGROUND, BORDER, CORAL, TEXT, TEXT_DIM } from '../theme';
 
 type Props = {
   pickerDate: string | null;

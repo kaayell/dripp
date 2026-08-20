@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BORDER } from './theme';
 
-export default function AppFooter() {
+export default function Footer() {
   const insets = useSafeAreaInsets();
 
   return (

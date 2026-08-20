@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import type { Task } from '../db/queries';
-import { BORDER, TEXT_DIM } from './theme';
+import type { Task } from '../../db/queries';
+import { BORDER, TEXT_DIM } from '../theme';
 
 type Props = {
   tasks: Task[];

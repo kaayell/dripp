@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { CELL_BG, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from './theme';
+import { CELL_BG, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from '../theme';
 
 export default function CalendarDay({
   date,
