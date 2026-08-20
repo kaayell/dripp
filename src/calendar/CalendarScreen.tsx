@@ -9,7 +9,7 @@ import CalendarDay from './CalendarDay';
 import CalendarLegend from './CalendarLegend';
 import CategoryFilter from './CategoryFilter';
 import TaskPickerModal from './TaskPickerModal';
-import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM, TEXT_DIMMER } from '../theme';
+import { BACKGROUND, BORDER, MONTH_TEXT_COLOR, TEXT_DIM } from '../theme';
 
 const calendarTheme = {
   calendarBackground: BACKGROUND,
@@ -19,7 +19,7 @@ const calendarTheme = {
       paddingTop: 20,
       paddingBottom: 5,
       borderBottomWidth: 1,
-      borderBottomColor: TEXT_DIMMER,
+      borderBottomColor: BORDER,
       marginBottom: 15,
     },
     monthText: {
@@ -46,7 +46,6 @@ export default function CalendarScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [trackedDates, setTrackedDates] = useState<TrackedDates>({});
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [filterVisible, setFilterVisible] = useState(false);
   const [pickerDate, setPickerDate] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const today = new Date().toLocaleDateString('sv');
@@ -96,13 +95,7 @@ export default function CalendarScreen() {
 
   const selectCategory = useCallback((categoryId: number | null) => {
     setSelectedCategoryId(categoryId);
-    setFilterVisible(false);
   }, []);
-
-  const selectedCategoryLabel =
-    selectedCategoryId == null
-      ? 'all'
-      : categories.find((category) => category.id === selectedCategoryId)?.name;
 
   const markedDates = useMemo(() => {
     const marks: Record<string, { items: { id: number; color: string }[] }> = {};
@@ -140,10 +133,6 @@ export default function CalendarScreen() {
       <CategoryFilter
         categories={categories}
         selectedCategoryId={selectedCategoryId}
-        selectedCategoryLabel={selectedCategoryLabel}
-        filterVisible={filterVisible}
-        onToggleFilter={() => setFilterVisible((prev) => !prev)}
-        onCloseFilter={() => setFilterVisible(false)}
         onSelectCategory={selectCategory}
       />
 
