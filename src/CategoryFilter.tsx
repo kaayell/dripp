@@ -1,5 +1,6 @@
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Category } from '../db/queries';
+import { APP_HEADER_HEIGHT } from './AppHeader';
 import { BORDER, CELL_BG, CELL_BORDER, CORAL, TEXT, TEXT_DIM } from './theme';
 
 type Props = {
@@ -12,7 +13,7 @@ type Props = {
   onSelectCategory: (categoryId: number | null) => void;
 };
 
-export default function CalendarHeader({
+export default function CategoryFilter({
   categories,
   selectedCategoryId,
   selectedCategoryLabel,
@@ -23,25 +24,21 @@ export default function CalendarHeader({
 }: Props) {
   return (
     <>
-      <View style={styles.header}>
-        <View style={styles.headerTitleRow}>
-          <Image source={require('../assets/icon.png')} style={{ width: 32, height: 32 }} />
-          <Text style={styles.headerTitle}>Dripp</Text>
-        </View>
+      <View style={styles.filterButtonSlot}>
         <Pressable
-          style={[styles.filterButton]}
+          style={styles.filterButton}
           onPress={onToggleFilter}
           hitSlop={8}
           accessibilityLabel="Filter by category"
         >
-          <Text style={[styles.filterButtonText]}>{selectedCategoryLabel ?? 'all'}</Text>
-          <Text style={{ fontSize: 20, fontWeight: '800', color: TEXT_DIM }}>▾</Text>
+          <Text style={styles.filterButtonText}>{selectedCategoryLabel ?? 'all'}</Text>
+          <Text style={styles.filterButtonChevron}>▾</Text>
         </Pressable>
       </View>
 
       {filterVisible && (
         <>
-          <Pressable onPress={onCloseFilter} />
+          <Pressable style={styles.filterBackdrop} onPress={onCloseFilter} />
           <View style={styles.filterDropdownCard}>
             <Pressable style={styles.filterDropdownRow} onPress={() => onSelectCategory(null)}>
               <Text
@@ -82,25 +79,14 @@ export default function CalendarHeader({
 }
 
 const styles = StyleSheet.create({
-  header: {
-    height: '10%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: BORDER,
-  },
-  headerTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  headerTitle: {
-    fontSize: 21,
-    fontWeight: '600',
-    color: TEXT,
-    letterSpacing: -0.2,
+  filterButtonSlot: {
+    position: 'absolute',
+    top: -APP_HEADER_HEIGHT,
+    right: 20,
+    height: APP_HEADER_HEIGHT,
+    justifyContent: 'center',
+    zIndex: 22,
+    elevation: 22,
   },
   filterButton: {
     flexDirection: 'row',
@@ -120,9 +106,23 @@ const styles = StyleSheet.create({
     color: TEXT,
     textTransform: 'lowercase',
   },
+  filterButtonChevron: {
+    fontSize: 20,
+    fontWeight: '800',
+    color: TEXT_DIM,
+  },
+  filterBackdrop: {
+    position: 'absolute',
+    top: -APP_HEADER_HEIGHT,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 20,
+    elevation: 20,
+  },
   filterDropdownCard: {
     position: 'absolute',
-    top: 120,
+    top: 8,
     right: 20,
     minWidth: 170,
     borderRadius: 14,

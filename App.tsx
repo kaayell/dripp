@@ -1,13 +1,18 @@
 import { useEffect, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Text, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View } from 'react-native';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { runMigrations } from './db/client';
 import { ensureSeeded } from './db/seed';
+import AppHeader from './src/AppHeader';
+import AppFooter from './src/AppFooter';
 import CalendarScreen from './src/CalendarScreen';
-import { BACKGROUND, CORAL, TEXT } from './src/theme';
+import ErrorScreen from './src/ErrorScreen';
+import LoadingScreen from './src/LoadingScreen';
+import { BACKGROUND } from './src/theme';
 
-export default function App() {
+function AppContent() {
+  const insets = useSafeAreaInsets();
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
 
   useEffect(() => {
@@ -17,36 +22,31 @@ export default function App() {
       .catch((error) => setStatus({ success: false, error }));
   }, []);
 
+  if (status.error) {
+    return <ErrorScreen message={status.error.message} />;
+  }
+
+  if (!status.success) {
+    return <LoadingScreen />;
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: BACKGROUND, paddingTop: insets.top }}>
+      <AppHeader />
+
+      <View style={{ flex: 1 }}>
+        <CalendarScreen />
+      </View>
+
+      <AppFooter />
+    </View>
+  );
+}
+
+export default function App() {
   return (
     <SafeAreaProvider>
-      {status.error ? (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: BACKGROUND,
-            alignItems: 'center',
-            justifyContent: 'center',
-            padding: 20,
-          }}
-        >
-          <Text style={{ color: CORAL, textAlign: 'center' }}>
-            Database migration failed: {status.error.message}
-          </Text>
-        </View>
-      ) : !status.success ? (
-        <View
-          style={{
-            flex: 1,
-            backgroundColor: BACKGROUND,
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Text style={{ color: TEXT }}>Loading…</Text>
-        </View>
-      ) : (
-        <CalendarScreen />
-      )}
+      <AppContent />
       <StatusBar style="light" />
     </SafeAreaProvider>
   );

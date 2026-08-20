@@ -6,8 +6,8 @@ import { CalendarList } from 'react-native-calendars';
 import type { Category, Task, TrackedDates } from '../db/queries';
 import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../db/queries';
 import CalendarDay from './CalendarDay';
-import CalendarHeader from './CalendarHeader';
 import CalendarLegend from './CalendarLegend';
+import CategoryFilter from './CategoryFilter';
 import TaskPickerModal from './TaskPickerModal';
 import { BACKGROUND, MONTH_TEXT_COLOR, TEXT_DIM, TEXT_DIMMER } from './theme';
 
@@ -46,7 +46,6 @@ export default function CalendarScreen() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [trackedDates, setTrackedDates] = useState<TrackedDates>({});
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
   const [filterVisible, setFilterVisible] = useState(false);
   const [pickerDate, setPickerDate] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -63,11 +62,7 @@ export default function CalendarScreen() {
         setCategories(loadedCategories);
         setTasks(loadedTasks);
         setTrackedDates(loadedTrackedDates);
-        const firstCategory = loadedCategories[0];
-        setSelectedCategoryId(firstCategory?.id ?? null);
-        setSelectedTaskId(
-          loadedTasks.find((task) => task.categoryId === firstCategory?.id)?.id ?? null,
-        );
+        setSelectedCategoryId(loadedCategories[0]?.id ?? null);
       } catch (e) {
         console.error('[CalendarScreen] load failed', e);
       } finally {
@@ -94,14 +89,15 @@ export default function CalendarScreen() {
     [tasks],
   );
 
-  const selectCategory = useCallback(
-    (categoryId: number | null) => {
-      setSelectedCategoryId(categoryId);
-      setSelectedTaskId(tasksForCategory(categoryId)[0]?.id ?? null);
-      setFilterVisible(false);
-    },
-    [tasksForCategory],
+  const visibleTasks = useMemo(
+    () => tasksForCategory(selectedCategoryId),
+    [tasksForCategory, selectedCategoryId],
   );
+
+  const selectCategory = useCallback((categoryId: number | null) => {
+    setSelectedCategoryId(categoryId);
+    setFilterVisible(false);
+  }, []);
 
   const selectedCategoryLabel =
     selectedCategoryId == null
@@ -110,7 +106,7 @@ export default function CalendarScreen() {
 
   const markedDates = useMemo(() => {
     const marks: Record<string, { items: { id: number; color: string }[] }> = {};
-    for (const task of tasksForCategory(selectedCategoryId)) {
+    for (const task of visibleTasks) {
       const dates = trackedDates[task.id];
       if (!dates) continue;
       dates.forEach((d) => {
@@ -119,30 +115,29 @@ export default function CalendarScreen() {
       });
     }
     return marks;
-  }, [tasksForCategory, selectedCategoryId, trackedDates]);
+  }, [visibleTasks, trackedDates]);
 
   const handleDayPress = useCallback(
     (day: DateData) => {
       if (day.dateString > today) return;
-      const categoryTasks = tasksForCategory(selectedCategoryId);
-      if (categoryTasks.length > 1) {
+      if (visibleTasks.length > 1) {
         setPickerDate(day.dateString);
         return;
       }
-      const taskId = categoryTasks[0]?.id ?? selectedTaskId;
+      const taskId = visibleTasks[0]?.id;
       if (taskId == null) return;
       toggleTaskDate(taskId, day.dateString);
     },
-    [today, selectedCategoryId, selectedTaskId, tasksForCategory, toggleTaskDate],
+    [today, visibleTasks, toggleTaskDate],
   );
 
   if (!loaded) {
-    return <View style={{ paddingTop: insets.top }} />;
+    return <View style={{ flex: 1, backgroundColor: BACKGROUND }} />;
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: BACKGROUND, paddingTop: insets.top }}>
-      <CalendarHeader
+    <View style={{ flex: 1, backgroundColor: BACKGROUND }}>
+      <CategoryFilter
         categories={categories}
         selectedCategoryId={selectedCategoryId}
         selectedCategoryLabel={selectedCategoryLabel}
@@ -173,15 +168,15 @@ export default function CalendarScreen() {
           markedDates={markedDates as any}
           dayComponent={CalendarDay}
           onDayPress={handleDayPress}
-          contentContainerStyle={{ paddingBottom: insets.bottom + 16 }}
+          contentContainerStyle={{ paddingBottom: 16 }}
         />
       </View>
 
-      <CalendarLegend tasks={tasksForCategory(selectedCategoryId)} bottomInset={insets.bottom} />
+      <CalendarLegend tasks={visibleTasks} />
 
       <TaskPickerModal
         pickerDate={pickerDate}
-        tasks={tasksForCategory(selectedCategoryId)}
+        tasks={visibleTasks}
         trackedDates={trackedDates}
         bottomInset={insets.bottom}
         onToggleTask={toggleTaskDate}
