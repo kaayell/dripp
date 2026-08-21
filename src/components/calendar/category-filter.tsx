@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Category } from '../../db/queries';
-import { BACKGROUND, CELL_BG, CELL_BORDER, TEXT, TEXT_DIM } from '../theme';
+import type { Category } from '../../../db/queries';
+import { Colors } from '@/constants/theme';
 
 type Props = {
   categories: Category[];
@@ -8,7 +8,11 @@ type Props = {
   onSelectCategory: (categoryId: number | null) => void;
 };
 
-export default function CategoryFilter({ categories, selectedCategoryId, onSelectCategory }: Props) {
+export default function CategoryFilter({
+  categories,
+  selectedCategoryId,
+  onSelectCategory,
+}: Props) {
   return (
     <View style={styles.row}>
       <Pressable
@@ -47,22 +51,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 6,
     borderRadius: 14,
-    backgroundColor: CELL_BG,
+    backgroundColor: Colors.cellBg,
     borderWidth: 1,
-    borderColor: CELL_BORDER,
+    borderColor: Colors.border,
   },
   tabActive: {
-    backgroundColor: TEXT,
-    borderColor: TEXT,
+    backgroundColor: Colors.text,
+    borderColor: Colors.text,
   },
   tabText: {
     fontSize: 12.5,
     fontWeight: '600',
-    color: TEXT_DIM,
+    color: Colors.textDim,
     textTransform: 'lowercase',
   },
   tabTextActive: {
-    color: BACKGROUND,
+    color: Colors.background,
     fontWeight: '700',
   },
 });

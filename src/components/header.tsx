@@ -1,5 +1,5 @@
 import { Image, StyleSheet, Text, View } from 'react-native';
-import { BORDER, TEXT } from './theme';
+import { Colors } from '@/constants/theme';
 
 export const APP_HEADER_HEIGHT = 56;
 
@@ -7,7 +7,7 @@ export default function Header() {
   return (
     <View style={styles.header}>
       <View style={styles.headerTitleRow}>
-        <Image source={require('../assets/icon.png')} style={{ width: 32, height: 32 }} />
+        <Image source={require('@/assets/icon.png')} style={{ width: 32, height: 32 }} />
         <Text style={styles.headerTitle}>Dripp</Text>
       </View>
     </View>
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: BORDER,
+    borderBottomColor: Colors.border,
   },
   headerTitleRow: {
     flexDirection: 'row',
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 21,
     fontWeight: '600',
-    color: TEXT,
+    color: Colors.text,
     letterSpacing: -0.2,
   },
 });

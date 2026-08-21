@@ -1,17 +1,17 @@
 import { Text, View } from 'react-native';
-import { BACKGROUND, TEXT } from './theme';
+import { Colors } from '@/constants/theme';
 
-export default function LoadingScreen() {
+export default function Loading() {
   return (
     <View
       style={{
         flex: 1,
-        backgroundColor: BACKGROUND,
+        backgroundColor: Colors.background,
         alignItems: 'center',
         justifyContent: 'center',
       }}
     >
-      <Text style={{ color: TEXT }}>Loading…</Text>
+      <Text style={{ color: Colors.text }}>Loading…</Text>
     </View>
   );
 }

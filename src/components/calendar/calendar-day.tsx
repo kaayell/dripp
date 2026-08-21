@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { CELL_BG, TEAL, TEAL_TINT, TEXT, TEXT_DIMMER } from '../theme';
+import { Colors } from '@/constants/theme';
 
 export default function CalendarDay({
   date,
@@ -34,7 +34,7 @@ export default function CalendarDay({
         style={[
           styles.dayNum,
           isToday && { fontWeight: '700' },
-          isDisabled && { color: TEXT_DIMMER },
+          isDisabled && { color: Colors.textDimmer },
         ]}
       >
         {date.day}
@@ -66,10 +66,10 @@ const styles = StyleSheet.create({
     right: 0,
     width: 28,
     height: 28,
-    backgroundColor: CELL_BG,
+    backgroundColor: Colors.cellBg,
     fontSize: 15,
     fontWeight: '400',
-    color: TEXT,
+    color: Colors.text,
     lineHeight: 15,
     textAlign: 'right',
     textAlignVertical: 'center',
@@ -78,12 +78,12 @@ const styles = StyleSheet.create({
   },
   dayCell: {
     borderWidth: 0,
-    backgroundColor: CELL_BG,
+    backgroundColor: Colors.cellBg,
   },
   dayCellToday: {
     borderWidth: 2,
     borderRadius: 4,
-    borderColor: TEAL,
-    backgroundColor: TEAL_TINT,
+    borderColor: Colors.teal,
+    backgroundColor: Colors.tealTint,
   },
 });

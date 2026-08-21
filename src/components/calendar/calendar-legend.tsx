@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import type { Task } from '../../db/queries';
-import { BORDER, TEXT_DIM } from '../theme';
+import type { Task } from '../../../db/queries';
+import { Colors } from '@/constants/theme';
 
 type Props = {
   tasks: Task[];
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
   legendRow: {
     flexGrow: 0,
     borderTopWidth: 1,
-    borderTopColor: BORDER,
+    borderTopColor: Colors.border,
   },
   legendRowContent: {
     paddingHorizontal: 16,
@@ -51,6 +51,6 @@ const styles = StyleSheet.create({
   legendLabel: {
     fontSize: 12,
     fontWeight: '600',
-    color: TEXT_DIM,
+    color: Colors.textDim,
   },
 });

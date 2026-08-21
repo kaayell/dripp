@@ -1,6 +1,6 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Task, TrackedDates } from '../../db/queries';
-import { BACKGROUND, BORDER, CORAL, TEXT, TEXT_DIM } from '../theme';
+import type { Task, TrackedDates } from '../../../db/queries';
+import { Colors } from '@/constants/theme';
 
 type Props = {
   pickerDate: string | null;
@@ -50,7 +50,7 @@ export default function TaskPickerModal({
                 <Pressable
                   key={task.id}
                   onPress={() => onToggleTask(task.id, pickerDate)}
-                  style={[styles.modalTaskRow, checked && { backgroundColor: BORDER }]}
+                  style={[styles.modalTaskRow, checked && { backgroundColor: Colors.border }]}
                 >
                   <View style={styles.modalTaskLabelRow}>
                     <View style={[styles.modalDot, { backgroundColor: task.color }]} />
@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     borderWidth: 1,
-    borderColor: BORDER,
-    backgroundColor: BACKGROUND,
+    borderColor: Colors.border,
+    backgroundColor: Colors.background,
     paddingHorizontal: 16,
     paddingTop: 10,
   },
@@ -88,7 +88,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 4,
     borderRadius: 2,
-    backgroundColor: BORDER,
+    backgroundColor: Colors.border,
     marginBottom: 16,
   },
   modalHeaderRow: {
@@ -101,21 +101,21 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: TEXT,
+    color: Colors.text,
   },
   modalDoneText: {
     fontSize: 15,
     fontWeight: '700',
-    color: CORAL,
+    color: Colors.coral,
   },
   modalTaskRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: BACKGROUND,
+    backgroundColor: Colors.background,
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: BORDER,
+    borderColor: Colors.border,
     paddingVertical: 14,
     paddingHorizontal: 16,
     marginBottom: 10,
@@ -133,11 +133,11 @@ const styles = StyleSheet.create({
   modalTaskLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: TEXT_DIM,
+    color: Colors.textDim,
   },
   modalTaskLabelActive: {
     fontWeight: '700',
-    color: TEXT,
+    color: Colors.text,
   },
   modalCheckmark: {
     fontSize: 15,

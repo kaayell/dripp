@@ -3,29 +3,31 @@ import { StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DateData } from 'react-native-calendars';
 import { CalendarList } from 'react-native-calendars';
-import type { Category, Task, TrackedDates } from '../../db/queries';
-import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../../db/queries';
-import CalendarDay from './CalendarDay';
-import CalendarLegend from './CalendarLegend';
-import CategoryFilter from './CategoryFilter';
-import TaskPickerModal from './TaskPickerModal';
-import { BACKGROUND, BORDER, MONTH_TEXT_COLOR, TEXT_DIM } from '../theme';
+import type { Category, Task, TrackedDates } from '../../../db/queries';
+import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../../../db/queries';
+import CalendarDay from './calendar-day';
+import CalendarLegend from './calendar-legend';
+import CategoryFilter from './category-filter';
+import TaskPickerModal from './task-picker-modal';
+import { Colors } from '@/constants/theme';
+
+const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
 const calendarTheme = {
-  calendarBackground: BACKGROUND,
+  calendarBackground: Colors.background,
   weekVerticalMargin: 2,
   'stylesheet.calendar.header': {
     header: {
       paddingTop: 20,
       paddingBottom: 5,
       borderBottomWidth: 1,
-      borderBottomColor: BORDER,
+      borderBottomColor: Colors.border,
       marginBottom: 15,
     },
     monthText: {
       fontSize: 16,
       fontWeight: '600',
-      color: MONTH_TEXT_COLOR,
+      color: Colors.textDim,
     },
   },
   'stylesheet.calendar.main': {
@@ -125,11 +127,11 @@ export default function CalendarScreen() {
   );
 
   if (!loaded) {
-    return <View style={{ flex: 1, backgroundColor: BACKGROUND }} />;
+    return <View style={{ flex: 1, backgroundColor: Colors.background }} />;
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: BACKGROUND }}>
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <CategoryFilter
         categories={categories}
         selectedCategoryId={selectedCategoryId}
@@ -137,7 +139,7 @@ export default function CalendarScreen() {
       />
 
       <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
-        {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map((wd) => (
+        {WEEKDAY_LABELS.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
             {wd}
           </Text>
@@ -181,7 +183,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10.5,
     fontWeight: '600',
-    color: TEXT_DIM,
+    color: Colors.textDim,
     letterSpacing: 0.5,
   },
 });

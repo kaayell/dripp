@@ -1,17 +1,16 @@
 import { useEffect, useState } from 'react';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { runMigrations } from './db/client';
-import { ensureSeeded } from './db/seed';
-import Header from './src/Header';
-import Footer from './src/Footer';
-import CalendarScreen from './src/calendar/CalendarScreen';
-import ErrorScreen from './src/ErrorScreen';
-import LoadingScreen from './src/LoadingScreen';
-import { BACKGROUND } from './src/theme';
+import { runMigrations } from '../../db/client';
+import { ensureSeeded } from '../../db/seed';
+import Header from '../components/header';
+import Error from '../components/error';
+import Loading from '../components/loading';
+import { Colors } from '@/constants/theme';
 
-function AppContent() {
+function RootLayoutContent() {
   const insets = useSafeAreaInsets();
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
 
@@ -23,30 +22,28 @@ function AppContent() {
   }, []);
 
   if (status.error) {
-    return <ErrorScreen message={status.error.message} />;
+    return <Error message={status.error.message} />;
   }
 
   if (!status.success) {
-    return <LoadingScreen />;
+    return <Loading />;
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: BACKGROUND, paddingTop: insets.top }}>
+    <View style={{ flex: 1, backgroundColor: Colors.background, paddingTop: insets.top }}>
       <Header />
 
       <View style={{ flex: 1 }}>
-        <CalendarScreen />
+        <Stack screenOptions={{ headerShown: false }} />
       </View>
-
-      <Footer />
     </View>
   );
 }
 
-export default function App() {
+export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <AppContent />
+      <RootLayoutContent />
       <StatusBar style="light" />
     </SafeAreaProvider>
   );
