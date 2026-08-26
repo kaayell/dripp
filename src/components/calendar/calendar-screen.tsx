@@ -63,7 +63,6 @@ export default function CalendarScreen() {
         setCategories(loadedCategories);
         setTasks(loadedTasks);
         setTrackedDates(loadedTrackedDates);
-        setSelectedCategoryId(loadedCategories[0]?.id ?? null);
       } catch (e) {
         console.error('[CalendarScreen] load failed', e);
       } finally {

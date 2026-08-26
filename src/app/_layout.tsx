@@ -4,7 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { View } from 'react-native';
 import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { runMigrations } from '../../db/client';
-import { ensureSeeded } from '../../db/seed';
 import Header from '../components/header';
 import Error from '../components/error';
 import Loading from '../components/loading';
@@ -16,7 +15,6 @@ function RootLayoutContent() {
 
   useEffect(() => {
     runMigrations()
-      .then(() => ensureSeeded())
       .then(() => setStatus({ success: true }))
       .catch((error) => setStatus({ success: false, error }));
   }, []);
