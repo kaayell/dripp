@@ -10,6 +10,7 @@ import CalendarLegend from './calendar-legend';
 import CategoryFilter from './category-filter';
 import TaskPickerModal from './task-picker-modal';
 import { Colors } from '@/constants/theme';
+import Loading from '@/components/loading';
 
 const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -126,7 +127,7 @@ export default function CalendarScreen() {
   );
 
   if (!loaded) {
-    return <View style={{ flex: 1, backgroundColor: Colors.background }} />;
+    return <Loading />;
   }
 
   return (
@@ -137,7 +138,7 @@ export default function CalendarScreen() {
         onSelectCategory={selectCategory}
       />
 
-      <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
+      <View style={{ flexDirection: 'row', paddingVertical: 15 }}>
         {WEEKDAY_LABELS.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
             {wd}
@@ -149,7 +150,7 @@ export default function CalendarScreen() {
         <CalendarList
           current={today}
           firstDay={0}
-          pastScrollRange={12}
+          pastScrollRange={6}
           futureScrollRange={0}
           maxDate={today}
           hideDayNames

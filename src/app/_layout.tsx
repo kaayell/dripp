@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { View } from 'react-native';
-import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { runMigrations } from '../../db/client';
-import Header from '../components/header';
 import Error from '../components/error';
 import Loading from '../components/loading';
 import { Colors } from '@/constants/theme';
+import { SettingsButton } from '@/components/settings-button';
+import { CloseButton } from '@/components/close-button';
 
 function RootLayoutContent() {
-  const insets = useSafeAreaInsets();
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
 
   useEffect(() => {
@@ -28,13 +27,23 @@ function RootLayoutContent() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background, paddingTop: insets.top }}>
-      <Header />
-
-      <View style={{ flex: 1 }}>
-        <Stack screenOptions={{ headerShown: false }} />
-      </View>
-    </View>
+    <Stack
+      screenOptions={{
+        headerStyle: { backgroundColor: Colors.background },
+        headerShadowVisible: false,
+        headerTitle: '',
+      }}
+    >
+      <Stack.Screen name="(tabs)" options={{ headerRight: () => <SettingsButton /> }} />
+      <Stack.Screen
+        name="settings"
+        options={{
+          presentation: 'modal',
+          animation: 'slide_from_bottom',
+          headerRight: () => <CloseButton />,
+        }}
+      />
+    </Stack>
   );
 }
 

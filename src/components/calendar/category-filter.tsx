@@ -42,8 +42,7 @@ export default function CategoryFilter({
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
+    paddingHorizontal: 10,
     gap: 8,
   },
   tab: {
