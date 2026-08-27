@@ -1,5 +1,5 @@
-import { View } from 'react-native';
+import TaskManagementScreen from '@/components/task-management/task-management-screen';
 
 export default function Settings() {
-  return <View />;
+  return <TaskManagementScreen />;
 }
