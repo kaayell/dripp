@@ -15,6 +15,15 @@ export async function loadTasks(): Promise<Task[]> {
   return db.select().from(tasks);
 }
 
+export async function createTask(task: {
+  name: string;
+  color: string;
+  categoryId: number | null;
+}): Promise<Task> {
+  const [created] = await db.insert(tasks).values(task).returning();
+  return created;
+}
+
 export async function loadTrackedDates(): Promise<TrackedDates> {
   const rows = await db.select().from(trackedTask);
   const data: TrackedDates = {};

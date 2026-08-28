@@ -5,6 +5,7 @@ import { runMigrations } from '../../db/client';
 import Error from '../components/error';
 import Loading from '../components/loading';
 import { Colors } from '@/constants/theme';
+import { AddTaskButton } from '@/components/add-task-button';
 
 export default function Layout() {
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
@@ -32,7 +33,14 @@ export default function Layout() {
           headerTitle: '',
         }}
       >
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(tabs)" options={{ headerRight: () => <AddTaskButton /> }} />
+        <Stack.Screen
+          name="add-task"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
       </Stack>
       <StatusBar style="light" />
     </>

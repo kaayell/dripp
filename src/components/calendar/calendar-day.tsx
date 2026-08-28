@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignContent: 'flex-start',
-    columnGap: 2,
+    columnGap: 3,
     rowGap: 5,
   },
   tile: {
