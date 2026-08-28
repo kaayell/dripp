@@ -3,6 +3,7 @@
     "name": "dripp",
     "slug": "dripp",
     "version": "1.0.0",
+    "scheme": "dripp",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "android": {
