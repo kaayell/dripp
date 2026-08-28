@@ -1,15 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { runMigrations } from '../../db/client';
 import Error from '../components/error';
 import Loading from '../components/loading';
 import { Colors } from '@/constants/theme';
-import { SettingsButton } from '@/components/settings-button';
-import { CloseButton } from '@/components/close-button';
 
-function RootLayoutContent() {
+export default function Layout() {
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
 
   useEffect(() => {
@@ -27,31 +24,17 @@ function RootLayoutContent() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerStyle: { backgroundColor: Colors.background },
-        headerShadowVisible: false,
-        headerTitle: '',
-      }}
-    >
-      <Stack.Screen name="(tabs)" options={{ headerRight: () => <SettingsButton /> }} />
-      <Stack.Screen
-        name="settings"
-        options={{
-          presentation: 'modal',
-          animation: 'slide_from_bottom',
-          headerRight: () => <CloseButton />,
+    <>
+      <Stack
+        screenOptions={{
+          headerStyle: { backgroundColor: Colors.background },
+          headerShadowVisible: false,
+          headerTitle: '',
         }}
-      />
-    </Stack>
-  );
-}
-
-export default function RootLayout() {
-  return (
-    <SafeAreaProvider>
-      <RootLayoutContent />
+      >
+        <Stack.Screen name="(tabs)" />
+      </Stack>
       <StatusBar style="light" />
-    </SafeAreaProvider>
+    </>
   );
 }

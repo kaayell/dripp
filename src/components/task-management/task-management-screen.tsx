@@ -41,10 +41,8 @@ export default function TaskManagementScreen() {
             <View key={task.id} style={styles.row}>
               <View style={styles.taskLabelRow}>
                 <View style={[styles.dot, { backgroundColor: task.color }]} />
-                <View>
-                  <Text style={styles.rowLabel}>{task.name}</Text>
-                  <Text style={styles.rowSubLabel}>{categoryName(task.categoryId)}</Text>
-                </View>
+                <Text style={styles.rowLabel}>{task.name}</Text>
+                <Text style={styles.rowSubLabel}>{categoryName(task.categoryId)}</Text>
               </View>
             </View>
           ))}
