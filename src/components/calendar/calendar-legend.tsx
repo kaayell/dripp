@@ -1,6 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Task } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
+import Drop from '../drop';
 
 type Props = {
   tasks: Task[];
@@ -19,7 +20,7 @@ export default function CalendarLegend({ tasks, bottomInset = 0 }: Props) {
     >
       {tasks.map((task) => (
         <View key={task.id} style={styles.legendItem}>
-          <View style={[styles.legendDot, { backgroundColor: task.color }]} />
+          <Drop color={task.color} size={8} />
           <Text style={styles.legendLabel}>{task.name}</Text>
         </View>
       ))}
@@ -40,13 +41,8 @@ const styles = StyleSheet.create({
   },
   legendItem: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
     gap: 6,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
   legendLabel: {
     fontSize: 12,

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Colors } from '@/constants/theme';
+import Drop from '../drop';
 
 const COLS = 3;
 const TILE_SIZE = 10;
@@ -42,9 +43,9 @@ export default function CalendarDay({
         <View style={styles.tilesWrap}>
           {buildTiles(markings).map((mark, i) =>
             mark.spacer ? (
-              <View key={`spacer-${i}`} style={styles.tile} />
+              <Drop key={`spacer-${i}`} size={TILE_SIZE} />
             ) : (
-              <View key={mark.id} style={[styles.tile, { backgroundColor: mark.color }]} />
+              <Drop key={mark.id} color={mark.color} size={TILE_SIZE} />
             ),
           )}
         </View>
@@ -76,15 +77,6 @@ const styles = StyleSheet.create({
     alignContent: 'flex-start',
     columnGap: 3,
     rowGap: 5,
-  },
-  tile: {
-    width: TILE_SIZE,
-    height: TILE_SIZE,
-    borderTopLeftRadius: TILE_SIZE / 2,
-    borderTopRightRadius: TILE_SIZE / 2,
-    borderBottomRightRadius: TILE_SIZE / 2,
-    borderBottomLeftRadius: 0,
-    transform: [{ rotate: '135deg' }],
   },
   dayNum: {
     position: 'absolute',

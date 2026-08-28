@@ -1,6 +1,7 @@
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { Task, TrackedDates } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
+import Drop from '@/components/drop';
 
 type Props = {
   pickerDate: string | null;
@@ -53,7 +54,7 @@ export default function TaskPickerModal({
                   style={[styles.modalTaskRow, checked && { backgroundColor: Colors.border }]}
                 >
                   <View style={styles.modalTaskLabelRow}>
-                    <View style={[styles.modalDot, { backgroundColor: task.color }]} />
+                    <Drop size={8} color={task.color} />
                     <Text style={[styles.modalTaskLabel, checked && styles.modalTaskLabelActive]}>
                       {task.name}
                     </Text>
@@ -122,13 +123,8 @@ const styles = StyleSheet.create({
   },
   modalTaskLabelRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
     gap: 10,
-  },
-  modalDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
   modalTaskLabel: {
     fontSize: 16,

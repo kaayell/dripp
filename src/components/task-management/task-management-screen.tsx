@@ -5,6 +5,7 @@ import type { Category, Task } from '../../../db/queries';
 import { loadCategories, loadTasks } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/loading';
+import Drop from '@/components/drop';
 
 export default function TaskManagementScreen() {
   const insets = useSafeAreaInsets();
@@ -40,7 +41,7 @@ export default function TaskManagementScreen() {
           {tasks.map((task) => (
             <View key={task.id} style={styles.row}>
               <View style={styles.taskLabelRow}>
-                <View style={[styles.dot, { backgroundColor: task.color }]} />
+                <Drop size={10} color={task.color} />
                 <Text style={styles.rowLabel}>{task.name}</Text>
                 <Text style={styles.rowSubLabel}>{categoryName(task.categoryId)}</Text>
               </View>
@@ -67,13 +68,8 @@ const styles = StyleSheet.create({
   },
   taskLabelRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'baseline',
     gap: 10,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
   },
   rowLabel: {
     fontSize: 15,
