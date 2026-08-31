@@ -14,6 +14,8 @@ export const tasks = sqliteTable('tasks', {
 
 export const trackedTask = sqliteTable('tracked_task', {
   id: integer().primaryKey({ autoIncrement: true }),
-  task_id: integer('task_id').references(() => tasks.id),
+  task_id: integer('task_id')
+    .references(() => tasks.id)
+    .notNull(),
   date: text().notNull(),
 });
