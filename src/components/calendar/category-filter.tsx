@@ -15,21 +15,13 @@ export default function CategoryFilter({
 }: Props) {
   return (
     <View style={styles.row}>
-      <Pressable
-        style={[styles.tab, selectedCategoryId == null && styles.tabActive]}
-        onPress={() => onSelectCategory(null)}
-      >
-        <Text style={[styles.tabText, selectedCategoryId == null && styles.tabTextActive]}>
-          all
-        </Text>
-      </Pressable>
       {categories.map((category) => {
         const active = category.id === selectedCategoryId;
         return (
           <Pressable
             key={category.id}
             style={[styles.tab, active && styles.tabActive]}
-            onPress={() => onSelectCategory(category.id)}
+            onPress={() => onSelectCategory(active ? null : category.id)}
           >
             <Text style={[styles.tabText, active && styles.tabTextActive]}>{category.name}</Text>
           </Pressable>
