@@ -6,6 +6,10 @@ export type Category = typeof categories.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
 export type TrackedTask = typeof trackedTask.$inferSelect;
 export type TrackedTasks = TrackedTask & { task: Task };
+export type TaskHistory = Task & {
+  category: Category | null;
+  mostRecentTrackedTask: TrackedTask | null;
+};
 
 export async function loadCategories(): Promise<Category[]> {
   return db.select().from(categories);
@@ -13,6 +17,17 @@ export async function loadCategories(): Promise<Category[]> {
 
 export async function loadTasks(): Promise<Task[]> {
   return db.select().from(tasks);
+}
+
+export async function loadTasksWithHistory(): Promise<TaskHistory[]> {
+  return await db.query.tasks.findMany({
+    with: {
+      category: true,
+      mostRecentTrackedTask: {
+        orderBy: { date: 'desc' },
+      },
+    },
+  });
 }
 
 export async function createTask(task: {

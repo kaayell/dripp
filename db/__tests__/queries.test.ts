@@ -5,6 +5,7 @@ import {
   createTask,
   createTrackedTask,
   loadCategories,
+  loadTasksWithHistory,
   loadTasks,
   loadTrackedTasks,
   loadTrackedTasksForDay,
@@ -44,6 +45,55 @@ describe('loadTasks', () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('drip');
+  });
+});
+
+describe('loadTasksWithHistory', () => {
+  it('returns empty array when no tasks exist', async () => {
+    expect(await loadTasksWithHistory()).toEqual([]);
+  });
+
+  it('returns all tasks with category', async () => {
+    const [category] = await db
+      .insert(categories)
+      .values([{ name: 'bod' }])
+      .returning();
+
+    await db.insert(tasks).values([
+      { name: 'mop', color: '#000000', categoryId: null },
+      { name: 'drip', color: '#ffffff', categoryId: category.id },
+    ]);
+
+    const result = await loadTasksWithHistory();
+    expect(result).toHaveLength(2);
+    expect(result[0].category).toBe(null);
+    expect(result[1].category).toEqual({ id: category.id, name: category.name });
+  });
+
+  it('includes each task with its most recent tracked task', async () => {
+    const [dripTask] = await db
+      .insert(tasks)
+      .values({ name: 'drip', color: '#ffffff', categoryId: null })
+      .returning();
+
+    await db.insert(trackedTask).values([
+      { task_id: dripTask.id, date: '2026-01-01' },
+      { task_id: dripTask.id, date: '2026-01-03' },
+      { task_id: dripTask.id, date: '2026-01-02' },
+    ]);
+
+    const [mopTask] = await db
+      .insert(tasks)
+      .values({ name: 'mop', color: '#000000', categoryId: null })
+      .returning();
+
+    const result = await loadTasksWithHistory();
+    expect(result).toHaveLength(2);
+    expect(result[0].mostRecentTrackedTask).toMatchObject({
+      task_id: dripTask.id,
+      date: '2026-01-03',
+    });
+    expect(result[1].mostRecentTrackedTask).toBe(null);
   });
 });
 

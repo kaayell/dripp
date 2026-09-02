@@ -8,6 +8,10 @@ export default function TabsLayout() {
         <NativeTabs.Trigger.Icon sf="calendar" md="calendar_month" />
         <NativeTabs.Trigger.Label hidden />
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="task-list-history">
+        <NativeTabs.Trigger.Icon sf="clock.arrow.circlepath" md="history" />
+        <NativeTabs.Trigger.Label hidden />
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="settings">
         <NativeTabs.Trigger.Icon sf="gearshape" md="settings" />
         <NativeTabs.Trigger.Label hidden />

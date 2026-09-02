@@ -21,7 +21,19 @@ export const trackedTask = sqliteTable('tracked_task', {
   date: text().notNull(),
 });
 
-export const relations = defineRelations({ trackedTask, tasks }, (r) => ({
+export const relations = defineRelations({ categories, tasks, trackedTask }, (r) => ({
+  tasks: {
+    category: r.one.categories({
+      from: r.tasks.categoryId,
+      to: r.categories.id,
+      optional: true,
+    }),
+    mostRecentTrackedTask: r.one.trackedTask({
+      from: r.tasks.id,
+      to: r.trackedTask.task_id,
+      optional: true,
+    }),
+  },
   trackedTask: {
     task: r.one.tasks({
       from: r.trackedTask.task_id,
