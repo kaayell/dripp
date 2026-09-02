@@ -1,16 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { DateData } from 'react-native-calendars';
 import { CalendarList } from 'react-native-calendars';
-import type { Category, Task, TrackedDates } from '../../../db/queries';
-import { loadCategories, loadTasks, loadTrackedDates, setTrackedDate } from '../../../db/queries';
+import {
+  Category,
+  loadCategories,
+  loadTasks,
+  loadTrackedTasks,
+  Task,
+  TrackedTasks,
+} from '../../../db/queries';
 import CalendarDay from './calendar-day';
 import CalendarLegend from './calendar-legend';
 import CategoryFilter from './category-filter';
-import TaskPickerModal from './task-picker-modal';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/loading';
+import { router, useFocusEffect } from 'expo-router';
 
 const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -44,45 +49,31 @@ const calendarTheme = {
 } as any;
 
 export default function CalendarScreen() {
-  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [trackedDates, setTrackedDates] = useState<TrackedDates>({});
+  const [trackedTasks, setTrackedTasks] = useState<TrackedTasks[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [pickerDate, setPickerDate] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const today = new Date().toLocaleDateString('sv');
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [loadedCategories, loadedTasks, loadedTrackedDates] = await Promise.all([
-          loadCategories(),
-          loadTasks(),
-          loadTrackedDates(),
-        ]);
-        setCategories(loadedCategories);
-        setTasks(loadedTasks);
-        setTrackedDates(loadedTrackedDates);
-      } catch (e) {
-        console.error('[CalendarScreen] load failed', e);
-      } finally {
-        setLoaded(true);
-      }
-    })();
+  const refresh = useCallback(async () => {
+    const [loadedCategories, loadedTasks, loadedTrackedTasks] = await Promise.all([
+      loadCategories(),
+      loadTasks(),
+      loadTrackedTasks(),
+    ]);
+    setCategories(loadedCategories);
+    setTasks(loadedTasks);
+    setTrackedTasks(loadedTrackedTasks);
   }, []);
 
-  const toggleTaskDate = useCallback((taskId: number, dateStr: string) => {
-    setTrackedDates((prev) => {
-      const current = prev[taskId] ?? new Set<string>();
-      const wasMarked = current.has(dateStr);
-      const next = new Set(current);
-      if (wasMarked) next.delete(dateStr);
-      else next.add(dateStr);
-      setTrackedDate(taskId, dateStr, !wasMarked).catch(() => {});
-      return { ...prev, [taskId]: next };
-    });
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      refresh()
+        .catch((e) => console.error('[CalendarScreen] load failed', e))
+        .finally(() => setLoaded(true));
+    }, [refresh]),
+  );
 
   const tasksForCategory = useCallback(
     (categoryId: number | null) =>
@@ -100,30 +91,30 @@ export default function CalendarScreen() {
   }, []);
 
   const markedDates = useMemo(() => {
+    const visibleTaskIds = new Set(visibleTasks.map((task) => task.id));
     const marks: Record<string, { items: { id: number; color: string }[] }> = {};
-    for (const task of visibleTasks) {
-      const dates = trackedDates[task.id];
-      if (!dates) continue;
-      dates.forEach((d) => {
-        if (!marks[d]) marks[d] = { items: [] };
-        marks[d].items.push({ id: task.id, color: task.color });
-      });
-    }
+
+    trackedTasks.forEach(({ date, task }) => {
+      if (!visibleTaskIds.has(task.id)) return;
+
+      if (!marks[date]) marks[date] = { items: [] };
+      marks[date].items.push({ id: task.id, color: task.color });
+    });
     return marks;
-  }, [visibleTasks, trackedDates]);
+  }, [visibleTasks, trackedTasks]);
 
   const handleDayPress = useCallback(
     (day: DateData) => {
       if (day.dateString > today) return;
-      if (visibleTasks.length > 1) {
-        setPickerDate(day.dateString);
-        return;
-      }
-      const taskId = visibleTasks[0]?.id;
-      if (taskId == null) return;
-      toggleTaskDate(taskId, day.dateString);
+      router.push({
+        pathname: '/task-picker',
+        params: {
+          date: day.dateString,
+          categoryId: selectedCategoryId,
+        },
+      });
     },
-    [today, visibleTasks, toggleTaskDate],
+    [today, visibleTasks],
   );
 
   if (!loaded) {
@@ -164,15 +155,6 @@ export default function CalendarScreen() {
       </View>
 
       <CalendarLegend tasks={visibleTasks} />
-
-      <TaskPickerModal
-        pickerDate={pickerDate}
-        tasks={visibleTasks}
-        trackedDates={trackedDates}
-        bottomInset={insets.bottom}
-        onToggleTask={toggleTaskDate}
-        onClose={() => setPickerDate(null)}
-      />
     </View>
   );
 }

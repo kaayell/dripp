@@ -41,6 +41,15 @@ export default function Layout() {
             animation: 'slide_from_bottom',
           }}
         />
+        <Stack.Screen
+          name="task-picker"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: [0.25, 0.5, 1],
+            sheetInitialDetentIndex: 1,
+            sheetCornerRadius: 20,
+          }}
+        />
       </Stack>
       <StatusBar style="light" />
     </>

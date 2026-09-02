@@ -3,10 +3,12 @@ jest.mock('../client', () => require('./__fixtures__/client'));
 import { db } from '../client';
 import {
   createTask,
+  createTrackedTask,
   loadCategories,
   loadTasks,
-  loadTrackedDates,
-  setTrackedDate,
+  loadTrackedTasks,
+  loadTrackedTasksForDay,
+  removeTrackedTask,
 } from '../queries';
 import { categories, tasks, trackedTask } from '../schema';
 
@@ -63,73 +65,86 @@ describe('createTask', () => {
   });
 });
 
-describe('loadTrackedDates', () => {
+describe('loadTrackedTasks', () => {
   it('returns empty object when no tracked dates exist', async () => {
-    expect(await loadTrackedDates()).toEqual({});
+    expect(await loadTrackedTasks()).toEqual([]);
   });
 
-  it('groups dates by task id', async () => {
-    const [task] = await db
+  it('loads all tracked tasks', async () => {
+    const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
-    await db.insert(trackedTask).values([
-      { task_id: task.id, date: '2026-01-01' },
-      { task_id: task.id, date: '2026-01-02' },
+    const [trackedTaskOne, trackedTaskTwo] = await db
+      .insert(trackedTask)
+      .values([
+        { task_id: dripTask.id, date: '2026-01-01' },
+        { task_id: dripTask.id, date: '2026-01-02' },
+      ])
+      .returning();
+
+    const result = await loadTrackedTasks();
+    expect(result).toHaveLength(2);
+    expect([...result]).toEqual([
+      { date: trackedTaskOne.date, id: trackedTaskOne.id, task_id: dripTask.id, task: dripTask },
+      { date: trackedTaskTwo.date, id: trackedTaskTwo.id, task_id: dripTask.id, task: dripTask },
     ]);
-
-    const result = await loadTrackedDates();
-
-    expect(result[task.id]).toEqual(new Set(['2026-01-01', '2026-01-02']));
   });
 });
 
-describe('setTrackedDate', () => {
-  it('marks a date as tracked when it is not already tracked', async () => {
-    const [task] = await db
-      .insert(tasks)
-      .values({ name: 'drip', color: '#ffffff', categoryId: null })
-      .returning();
-
-    await setTrackedDate(task.id, '2026-01-01', true);
-
-    const result = await loadTrackedDates();
-    expect(result[task.id]).toEqual(new Set(['2026-01-01']));
+describe('loadTrackedTasksForDay', () => {
+  it('returns empty object when no tracked dates exist', async () => {
+    expect(await loadTrackedTasksForDay('2026-01-01')).toEqual([]);
   });
 
-  it('does not duplicate an already tracked date', async () => {
-    const [task] = await db
+  it('loads all tracked tasks using date', async () => {
+    const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
-    await setTrackedDate(task.id, '2026-01-01', true);
-    await setTrackedDate(task.id, '2026-01-01', true);
+    let date = '2026-01-01';
+    await db.insert(trackedTask).values([
+      { task_id: dripTask.id, date: date },
+      { task_id: dripTask.id, date: '2026-01-02' },
+    ]);
 
-    const rows = await db.select().from(trackedTask);
-    expect(rows).toHaveLength(1);
+    const result = await loadTrackedTasksForDay(date);
+    expect(result).toHaveLength(1);
+    expect(result[0].date).toEqual(date);
+    expect(result[0].task_id).toEqual(dripTask.id);
   });
+});
 
-  it('unmarks a tracked date', async () => {
-    const [task] = await db
+describe('createTrackedTask', () => {
+  it('inserts and returns the created tracked task', async () => {
+    const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
-    await setTrackedDate(task.id, '2026-01-01', true);
 
-    await setTrackedDate(task.id, '2026-01-01', false);
-
-    expect(await loadTrackedDates()).toEqual({});
+    const created = await createTrackedTask(dripTask.id, '2026-01-01');
+    expect(created).toMatchObject({});
+    expect(created.id).toEqual(expect.any(Number));
+    expect(await loadTrackedTasks()).toHaveLength(1);
   });
+});
 
-  it('is a no-op when unmarking a date that was never tracked', async () => {
-    const [task] = await db
+describe('removeTrackedTask', () => {
+  it('removes tracked task', async () => {
+    const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
-    await expect(setTrackedDate(task.id, '2026-01-01', false)).resolves.toBeUndefined();
-    expect(await loadTrackedDates()).toEqual({});
+    const [createdTrackedTask] = await db
+      .insert(trackedTask)
+      .values([{ task_id: dripTask.id, date: '2026-01-01' }])
+      .returning();
+
+    await removeTrackedTask(createdTrackedTask.id);
+
+    expect(await loadTrackedTasks()).toHaveLength(0);
   });
 });

@@ -1,4 +1,5 @@
 import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { defineRelations } from 'drizzle-orm';
 
 export const categories = sqliteTable('categories', {
   id: integer().primaryKey({ autoIncrement: true }),
@@ -19,3 +20,13 @@ export const trackedTask = sqliteTable('tracked_task', {
     .notNull(),
   date: text().notNull(),
 });
+
+export const relations = defineRelations({ trackedTask, tasks }, (r) => ({
+  trackedTask: {
+    task: r.one.tasks({
+      from: r.trackedTask.task_id,
+      to: r.tasks.id,
+      optional: false,
+    }),
+  },
+}));
