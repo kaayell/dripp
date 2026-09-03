@@ -45,8 +45,15 @@ export default function Layout() {
           name="task-picker"
           options={{
             presentation: 'formSheet',
-            sheetAllowedDetents: [0.25, 0.5, 1],
-            sheetInitialDetentIndex: 1,
+            sheetAllowedDetents: 'fitToContents',
+            sheetCornerRadius: 20,
+          }}
+        />
+        <Stack.Screen
+          name="add-category"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: 'fitToContents',
             sheetCornerRadius: 20,
           }}
         />

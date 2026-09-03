@@ -10,6 +10,7 @@ import {
   loadTrackedTasks,
   loadTrackedTasksForDay,
   removeTrackedTask,
+  createCategory,
 } from '../queries';
 import { categories, tasks, trackedTask } from '../schema';
 
@@ -30,6 +31,16 @@ describe('loadCategories', () => {
     const result = await loadCategories();
 
     expect(result.map((c) => c.name).sort()).toEqual(['bod', 'hoose']);
+  });
+});
+
+describe('createCategory', () => {
+  it('inserts and returns the created category', async () => {
+    const created = await createCategory('bod');
+
+    expect(created).toMatchObject({ name: 'bod' });
+    expect(created.id).toEqual(expect.any(Number));
+    expect(await loadCategories()).toHaveLength(1);
   });
 });
 
@@ -81,11 +92,6 @@ describe('loadTasksWithHistory', () => {
       { task_id: dripTask.id, date: '2026-01-03' },
       { task_id: dripTask.id, date: '2026-01-02' },
     ]);
-
-    const [mopTask] = await db
-      .insert(tasks)
-      .values({ name: 'mop', color: '#000000', categoryId: null })
-      .returning();
 
     const result = await loadTasksWithHistory();
     expect(result).toHaveLength(2);

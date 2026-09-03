@@ -15,6 +15,11 @@ export async function loadCategories(): Promise<Category[]> {
   return db.select().from(categories);
 }
 
+export async function createCategory(name: string): Promise<Category> {
+  const [created] = await db.insert(categories).values({ name }).returning();
+  return created;
+}
+
 export async function loadTasks(): Promise<Task[]> {
   return db.select().from(tasks);
 }

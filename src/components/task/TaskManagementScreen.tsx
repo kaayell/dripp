@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Category, Task } from '../../../db/queries';
@@ -6,6 +6,7 @@ import { loadCategories, loadTasks } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/Loading';
 import Drop from '@/components/Drop';
+import { useFocusEffect } from 'expo-router';
 
 export default function TaskManagementScreen() {
   const insets = useSafeAreaInsets();
@@ -19,11 +20,13 @@ export default function TaskManagementScreen() {
     setTasks(loadedTasks);
   }, []);
 
-  useEffect(() => {
-    refresh()
-      .catch((e) => console.error('[TaskManagementScreen] load failed', e))
-      .finally(() => setLoaded(true));
-  }, [refresh]);
+  useFocusEffect(
+    useCallback(() => {
+      refresh()
+        .catch((e) => console.error('[TaskManagementScreen] load failed', e))
+        .finally(() => setLoaded(true));
+    }, [refresh]),
+  );
 
   const categoryName = useCallback(
     (categoryId: number | null) => categories.find((c) => c.id === categoryId)?.name ?? 'none',

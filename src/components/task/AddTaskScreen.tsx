@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Category } from '../../../db/queries';
 import { createTask, loadCategories } from '../../../db/queries';
@@ -12,7 +12,9 @@ const SWATCHES = [
   '#e18b60',
   '#daa932',
   '#e1d660',
+  '#bce160',
   '#8be160',
+  '#60e165',
   '#5ec386',
   '#50bfbe',
   '#00b7c1',
@@ -21,10 +23,12 @@ const SWATCHES = [
   '#b386e4',
   '#e160e1',
   '#da85b6',
+  '#dc7492',
 ];
 
 export default function AddTaskScreen() {
   const insets = useSafeAreaInsets();
+  const { categoryId: newCategoryIdParam } = useLocalSearchParams<{ categoryId?: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState('');
   const [color, setColor] = useState(SWATCHES[0]);
@@ -32,10 +36,13 @@ export default function AddTaskScreen() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    if (newCategoryIdParam) {
+      setCategoryId(Number(newCategoryIdParam));
+    }
     loadCategories()
       .then(setCategories)
       .catch((e) => console.error('[AddTaskScreen] load categories failed', e));
-  }, []);
+  }, [newCategoryIdParam]);
 
   const canSubmit = name.trim().length > 0 && !submitting;
 
@@ -56,11 +63,6 @@ export default function AddTaskScreen() {
       <Stack.Screen
         options={{
           headerLeft: () => <CloseButton />,
-          headerRight: () => (
-            <Pressable onPress={handleSubmit} hitSlop={8} disabled={!canSubmit}>
-              <Text style={[styles.addText, !canSubmit && styles.addTextDisabled]}>Add</Text>
-            </Pressable>
-          ),
         }}
       />
       <ScrollView
@@ -95,23 +97,13 @@ export default function AddTaskScreen() {
 
         <Text style={styles.sectionLabel}>Category</Text>
         <View style={styles.categoryRow}>
-          <Pressable
-            style={[styles.categoryChip, categoryId == null && styles.categoryChipActive]}
-            onPress={() => setCategoryId(null)}
-          >
-            <Text
-              style={[styles.categoryChipText, categoryId == null && styles.categoryChipTextActive]}
-            >
-              none
-            </Text>
-          </Pressable>
           {categories.map((category) => {
             const active = category.id === categoryId;
             return (
               <Pressable
                 key={category.id}
                 style={[styles.categoryChip, active && styles.categoryChipActive]}
-                onPress={() => setCategoryId(category.id)}
+                onPress={() => setCategoryId(active ? null : category.id)}
               >
                 <Text style={[styles.categoryChipText, active && styles.categoryChipTextActive]}>
                   {category.name}
@@ -119,7 +111,21 @@ export default function AddTaskScreen() {
               </Pressable>
             );
           })}
+          <Pressable style={styles.categoryChip} onPress={() => router.push('/add-category')}>
+            <Text style={[styles.categoryChipText]}>+ new category</Text>
+          </Pressable>
         </View>
+
+        <Pressable
+          onPress={handleSubmit}
+          hitSlop={8}
+          disabled={!canSubmit}
+          style={[styles.saveButton, !canSubmit && styles.saveButtonDisabled]}
+        >
+          <Text style={[styles.saveButtonText, !canSubmit && styles.saveButtonTextDisabled]}>
+            Save
+          </Text>
+        </Pressable>
       </ScrollView>
     </>
   );
@@ -132,12 +138,23 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: 20,
   },
-  addText: {
+  saveButton: {
+    backgroundColor: Colors.coral,
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 8,
+  },
+  saveButtonDisabled: {
+    backgroundColor: Colors.cellBg,
+  },
+  saveButtonText: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.coral,
+    color: Colors.background,
   },
-  addTextDisabled: {
+  saveButtonTextDisabled: {
     color: Colors.textDimmer,
   },
   input: {
