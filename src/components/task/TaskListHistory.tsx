@@ -6,7 +6,7 @@ import Drop from '@/components/Drop';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-import CategoryFilter from '@/components/CategoryFilter';
+import CategoryFilter from '@/components/category/CategoryFilter';
 
 function timeSince(dateString: string): string {
   const today = format(new Date(), 'yyyy-MM-dd');
