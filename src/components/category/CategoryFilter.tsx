@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import type { Category } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 
@@ -14,7 +14,12 @@ export default function CategoryFilter({
   onSelectCategory,
 }: Props) {
   return (
-    <View style={styles.row}>
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.row}
+      contentContainerStyle={styles.rowContent}
+    >
       {categories.map((category) => {
         const active = category.id === selectedCategoryId;
         return (
@@ -27,20 +32,24 @@ export default function CategoryFilter({
           </Pressable>
         );
       })}
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
+    flexGrow: 0,
+  },
+  rowContent: {
     paddingHorizontal: 10,
     gap: 8,
   },
   tab: {
-    flex: 1,
     alignItems: 'center',
+    justifyContent: 'center',
     paddingVertical: 6,
+    paddingHorizontal: 10,
+    minWidth: 64,
     borderRadius: 14,
     backgroundColor: Colors.cellBg,
     borderWidth: 1,
