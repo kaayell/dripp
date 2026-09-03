@@ -6,6 +6,7 @@ import type { Category } from '../../../db/queries';
 import { createTask, loadCategories } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { CloseButton } from '@/components/CloseButton';
+import { SaveButton } from '@/components/SaveButton';
 
 const SWATCHES = [
   '#ec5b57',
@@ -116,16 +117,7 @@ export default function AddTaskScreen() {
           </Pressable>
         </View>
 
-        <Pressable
-          onPress={handleSubmit}
-          hitSlop={8}
-          disabled={!canSubmit}
-          style={[styles.saveButton, !canSubmit && styles.saveButtonDisabled]}
-        >
-          <Text style={[styles.saveButtonText, !canSubmit && styles.saveButtonTextDisabled]}>
-            Save
-          </Text>
-        </Pressable>
+        <SaveButton onPress={handleSubmit} disabled={!canSubmit} />
       </ScrollView>
     </>
   );
@@ -137,25 +129,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.text,
     marginBottom: 20,
-  },
-  saveButton: {
-    backgroundColor: Colors.coral,
-    borderRadius: 14,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  saveButtonDisabled: {
-    backgroundColor: Colors.cellBg,
-  },
-  saveButtonText: {
-    fontSize: 15,
-    fontWeight: '700',
-    color: Colors.background,
-  },
-  saveButtonTextDisabled: {
-    color: Colors.textDimmer,
   },
   input: {
     backgroundColor: Colors.cellBg,

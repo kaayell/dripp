@@ -11,6 +11,7 @@ import {
 } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/Drop';
+import { FormSheet } from '@/components/FormSheet';
 
 function formatPickerDate(dateStr: string): string {
   const date = new Date(`${dateStr}T00:00:00`);
@@ -56,49 +57,36 @@ export default function TaskPicker() {
     [date],
   );
   return (
-    <>
-      <View style={{ flex: 1, backgroundColor: Colors.background, padding: 16 }}>
-        <View style={styles.handle} />
-        <View style={styles.headerRow}>
-          <Text style={styles.title}>{formatPickerDate(date)}</Text>
-          <Pressable onPress={() => router.back()} hitSlop={8}>
-            <Text style={styles.doneText}>Done</Text>
-          </Pressable>
-        </View>
-
-        {visibleTasks.map((task) => {
-          const existingId = trackedTasks.find((t) => t.task_id === task.id)?.id;
-          const checked = existingId != undefined;
-          return (
-            <Pressable
-              key={task.id}
-              onPress={() => toggleTask(task.id, existingId)}
-              style={[styles.taskRow, checked && { backgroundColor: Colors.border }]}
-            >
-              <View style={styles.taskLabelRow}>
-                <Drop size={8} color={task.color} />
-                <Text style={[styles.taskLabel, checked && styles.taskLabelActive]}>
-                  {task.name}
-                </Text>
-              </View>
-              {checked && <Text style={[styles.checkmark, { color: task.color }]}>✓</Text>}
-            </Pressable>
-          );
-        })}
+    <FormSheet>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>{formatPickerDate(date)}</Text>
+        <Pressable onPress={() => router.back()} hitSlop={8}>
+          <Text style={styles.doneText}>Done</Text>
+        </Pressable>
       </View>
-    </>
+
+      {visibleTasks.map((task) => {
+        const existingId = trackedTasks.find((t) => t.task_id === task.id)?.id;
+        const checked = existingId != undefined;
+        return (
+          <Pressable
+            key={task.id}
+            onPress={() => toggleTask(task.id, existingId)}
+            style={[styles.taskRow, checked && { backgroundColor: Colors.border }]}
+          >
+            <View style={styles.taskLabelRow}>
+              <Drop size={8} color={task.color} />
+              <Text style={[styles.taskLabel, checked && styles.taskLabelActive]}>{task.name}</Text>
+            </View>
+            {checked && <Text style={[styles.checkmark, { color: task.color }]}>✓</Text>}
+          </Pressable>
+        );
+      })}
+    </FormSheet>
   );
 }
 
 const styles = StyleSheet.create({
-  handle: {
-    alignSelf: 'center',
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.border,
-    marginBottom: 16,
-  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
