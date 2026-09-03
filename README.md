@@ -52,6 +52,22 @@ npx eas-cli login
 npx eas-cli build --platform android --profile preview
 ```
 
+### Manual build (plain Gradle, no EAS)
+
+**One-time setup:** pull down the real Android signing keystore. This writes
+`credentials.json` and `credentials/android/keystore.jks` — both gitignored,
+never commit them.
+
+```bash
+npx eas-cli credentials:configure-build -p android -e preview
+```
+
+Then build and install the release APK directly:
+
+```bash
+./scripts/build-release.sh
+```
+
 ## Database (Drizzle + op-sqlite)
 
 ### Changing the schema
