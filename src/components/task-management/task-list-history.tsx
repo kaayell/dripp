@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { loadTasksWithHistory, TaskHistory } from '../../../db/queries';
+import { Category, loadCategories, loadTasksWithHistory, TaskHistory } from '../../../db/queries';
 import { ColorOpacityAlphas, Colors, OpacityPercent } from '@/constants/theme';
 import Drop from '@/components/drop';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
+import CategoryFilter from '@/components/category-filter';
 
 function timeSince(dateString: string): string {
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -28,21 +30,49 @@ function sortByMostOverdue(tasks: TaskHistory[]): TaskHistory[] {
 
 export default function TaskListHistory() {
   const insets = useSafeAreaInsets();
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [tasks, setTasks] = useState<TaskHistory[]>([]);
 
-  useEffect(() => {
-    loadTasksWithHistory()
-      .then((loadedTasks) => setTasks(sortByMostOverdue(loadedTasks)))
-      .catch((e) => console.error('[TaskListHistory] load failed', e));
+  useFocusEffect(
+    useCallback(() => {
+      Promise.all([loadCategories(), loadTasksWithHistory()])
+        .then(([loadedCategories, loadedTasks]) => {
+          setCategories(loadedCategories);
+          setTasks(sortByMostOverdue(loadedTasks));
+        })
+        .catch((e) => console.error('[TaskListHistory] load failed', e));
+    }, []),
+  );
+
+  const selectCategory = useCallback((categoryId: number | null) => {
+    setSelectedCategoryId(categoryId);
   }, []);
+
+  const tasksForCategory = useCallback(
+    (categoryId: number | null) =>
+      categoryId == null ? tasks : tasks.filter((task) => task.categoryId === categoryId),
+    [tasks],
+  );
+
+  const visibleTasks = useMemo(
+    () => tasksForCategory(selectedCategoryId),
+    [tasksForCategory, selectedCategoryId],
+  );
 
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: Colors.background }}
       contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
     >
-      <Text style={[styles.taskSubLabel, { paddingBottom: 20 }]}>Most overdue first</Text>
-      {tasks.map((task) => {
+      <CategoryFilter
+        categories={categories}
+        selectedCategoryId={selectedCategoryId}
+        onSelectCategory={selectCategory}
+      />
+
+      <Text style={[styles.taskSubLabel, { paddingVertical: 20 }]}>Most overdue first</Text>
+      {visibleTasks.map((task) => {
         const mostRecentTrackedTask = task.mostRecentTrackedTask;
         return (
           <View

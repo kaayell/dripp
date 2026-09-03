@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import type { Category } from '../../../db/queries';
+import type { Category } from '../../db/queries';
 import { Colors } from '@/constants/theme';
 
 type Props = {

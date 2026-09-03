@@ -12,7 +12,7 @@ import {
 } from '../../../db/queries';
 import CalendarDay from './calendar-day';
 import CalendarLegend from './calendar-legend';
-import CategoryFilter from './category-filter';
+import CategoryFilter from '../category-filter';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/loading';
 import { router, useFocusEffect } from 'expo-router';
