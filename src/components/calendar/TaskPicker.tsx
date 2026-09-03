@@ -10,8 +10,8 @@ import {
   TrackedTask,
 } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import Drop from '@/components/Drop';
-import { FormSheet } from '@/components/FormSheet';
+import Drop from '@/components/ui/Drop';
+import { FormSheet } from '@/components/ui/FormSheet';
 
 function formatPickerDate(dateStr: string): string {
   const date = new Date(`${dateStr}T00:00:00`);

@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Category, loadCategories, loadTasksWithHistory, TaskHistory } from '../../../db/queries';
 import { ColorOpacityAlphas, Colors, OpacityPercent } from '@/constants/theme';
-import Drop from '@/components/Drop';
+import Drop from '@/components/ui/Drop';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';

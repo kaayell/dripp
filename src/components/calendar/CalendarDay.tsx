@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Colors } from '@/constants/theme';
-import Drop from '../Drop';
+import Drop from '@/components/ui/Drop';
 
 const COLS = 3;
 const TILE_SIZE = 10;

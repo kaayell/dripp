@@ -3,8 +3,8 @@ import { StyleSheet, Text, TextInput } from 'react-native';
 import { router } from 'expo-router';
 import { createCategory } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import { FormSheet } from '@/components/FormSheet';
-import { SaveButton } from '@/components/SaveButton';
+import { FormSheet } from '@/components/ui/FormSheet';
+import { SaveButton } from '@/components/ui/SaveButton';
 
 export default function AddCategoryScreen() {
   const [name, setName] = useState('');

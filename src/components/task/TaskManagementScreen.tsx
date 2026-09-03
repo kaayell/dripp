@@ -4,8 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Category, Task } from '../../../db/queries';
 import { loadCategories, loadTasks } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import Loading from '@/components/Loading';
-import Drop from '@/components/Drop';
+import Loading from '@/components/ui/Loading';
+import Drop from '@/components/ui/Drop';
 import { useFocusEffect } from 'expo-router';
 
 export default function TaskManagementScreen() {

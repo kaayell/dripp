@@ -5,8 +5,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Category } from '../../../db/queries';
 import { createTask, loadCategories } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import { CloseButton } from '@/components/CloseButton';
-import { SaveButton } from '@/components/SaveButton';
+import { CloseButton } from '@/components/ui/CloseButton';
+import { SaveButton } from '@/components/ui/SaveButton';
 
 const SWATCHES = [
   '#ec5b57',
