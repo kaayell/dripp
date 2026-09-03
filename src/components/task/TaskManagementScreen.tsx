@@ -4,8 +4,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Category, Task } from '../../../db/queries';
 import { loadCategories, loadTasks } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import Loading from '@/components/loading';
-import Drop from '@/components/drop';
+import Loading from '@/components/Loading';
+import Drop from '@/components/Drop';
 
 export default function TaskManagementScreen() {
   const insets = useSafeAreaInsets();

@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { runMigrations } from '../../db/client';
-import Error from '../components/error';
-import Loading from '../components/loading';
+import Error from '../components/Error';
+import Loading from '../components/Loading';
 import { Colors } from '@/constants/theme';
-import { AddTaskButton } from '@/components/add-task-button';
+import { AddTaskButton } from '@/components/AddTaskButton';
 
 export default function Layout() {
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });

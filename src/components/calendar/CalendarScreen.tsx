@@ -10,11 +10,11 @@ import {
   Task,
   TrackedTasks,
 } from '../../../db/queries';
-import CalendarDay from './calendar-day';
-import CalendarLegend from './calendar-legend';
-import CategoryFilter from '../category-filter';
+import CalendarDay from './CalendarDay';
+import CalendarLegend from './CalendarLegend';
+import CategoryFilter from '../CategoryFilter';
 import { Colors } from '@/constants/theme';
-import Loading from '@/components/loading';
+import Loading from '@/components/Loading';
 import { router, useFocusEffect } from 'expo-router';
 
 const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];

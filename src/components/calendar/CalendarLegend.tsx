@@ -1,7 +1,7 @@
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Task } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import Drop from '../drop';
+import Drop from '../Drop';
 
 type Props = {
   tasks: Task[];

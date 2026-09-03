@@ -1,1 +1,1 @@
-export { default } from '@/components/task-management/task-management-screen';
+export { default } from '@/components/task/TaskManagementScreen';

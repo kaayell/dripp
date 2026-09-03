@@ -2,11 +2,11 @@ import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Category, loadCategories, loadTasksWithHistory, TaskHistory } from '../../../db/queries';
 import { ColorOpacityAlphas, Colors, OpacityPercent } from '@/constants/theme';
-import Drop from '@/components/drop';
+import Drop from '@/components/Drop';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from 'expo-router';
-import CategoryFilter from '@/components/category-filter';
+import CategoryFilter from '@/components/CategoryFilter';
 
 function timeSince(dateString: string): string {
   const today = format(new Date(), 'yyyy-MM-dd');

@@ -1,1 +1,1 @@
-export { default } from '@/components/task-management/task-list-history';
+export { default } from '@/components/task/TaskListHistory';
