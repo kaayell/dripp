@@ -4,21 +4,21 @@ import { db } from '../client';
 import {
   createCategory,
   createTask,
-  createTrackedTask,
+  createTaskLog,
   loadCategories,
   loadTask,
   loadTasks,
   loadTasksWithHistory,
   loadTaskWithDetails,
-  loadTrackedTasks,
-  loadTrackedTasksForDay,
-  removeTrackedTask,
+  loadTaskLogs,
+  loadTaskLogsForDay,
+  removeTaskLog,
   updateTask,
 } from '../queries';
-import { categories, tasks, trackedTask } from '../schema';
+import { categories, tasks, taskLog } from '../schema';
 
 afterEach(async () => {
-  await db.delete(trackedTask);
+  await db.delete(taskLog);
   await db.delete(tasks);
   await db.delete(categories);
 });
@@ -68,14 +68,14 @@ describe('loadTaskWithDetails', () => {
     expect(await loadTaskWithDetails(12)).toEqual(undefined);
   });
 
-  it('returns task with tracked tasks', async () => {
+  it('returns task with task logs', async () => {
     const [task] = await db
       .insert(tasks)
       .values([{ name: 'drip', color: '#ffffff', categoryId: null }])
       .returning();
 
-    const [trackedOne, trackedTwo] = await db
-      .insert(trackedTask)
+    const [logOne, logTwo] = await db
+      .insert(taskLog)
       .values([
         { task_id: task.id, date: '2026-01-01' },
         { task_id: task.id, date: '2026-01-02' },
@@ -83,7 +83,7 @@ describe('loadTaskWithDetails', () => {
       .returning();
 
     const result = await loadTaskWithDetails(task.id);
-    expect(result?.trackedTasks).toEqual([trackedOne, trackedTwo]);
+    expect(result?.taskLogs).toEqual([logOne, logTwo]);
   });
 
   it('returns task with category', async () => {
@@ -139,7 +139,7 @@ describe('loadTasksWithHistory', () => {
     expect(result[1].category).toEqual({ id: category.id, name: category.name });
   });
 
-  it('includes each task with its most recent tracked task', async () => {
+  it('includes each task with its most recent task log', async () => {
     const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
@@ -147,7 +147,7 @@ describe('loadTasksWithHistory', () => {
 
     await db.insert(tasks).values({ name: 'mop', color: '#000000', categoryId: null });
 
-    await db.insert(trackedTask).values([
+    await db.insert(taskLog).values([
       { task_id: dripTask.id, date: '2026-01-01' },
       { task_id: dripTask.id, date: '2026-01-03' },
       { task_id: dripTask.id, date: '2026-01-02' },
@@ -155,11 +155,11 @@ describe('loadTasksWithHistory', () => {
 
     const result = await loadTasksWithHistory();
     expect(result).toHaveLength(2);
-    expect(result[0].mostRecentTrackedTask).toMatchObject({
+    expect(result[0].mostRecentTaskLog).toMatchObject({
       task_id: dripTask.id,
       date: '2026-01-03',
     });
-    expect(result[1].mostRecentTrackedTask).toBe(null);
+    expect(result[1].mostRecentTaskLog).toBe(null);
   });
 });
 
@@ -204,86 +204,86 @@ describe('updateTask', () => {
   });
 });
 
-describe('loadTrackedTasks', () => {
+describe('loadTaskLogs', () => {
   it('returns empty object when no tracked dates exist', async () => {
-    expect(await loadTrackedTasks()).toEqual([]);
+    expect(await loadTaskLogs()).toEqual([]);
   });
 
-  it('loads all tracked tasks', async () => {
+  it('loads all task logs', async () => {
     const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
-    const [trackedTaskOne, trackedTaskTwo] = await db
-      .insert(trackedTask)
+    const [logOne, logTwo] = await db
+      .insert(taskLog)
       .values([
         { task_id: dripTask.id, date: '2026-01-01' },
         { task_id: dripTask.id, date: '2026-01-02' },
       ])
       .returning();
 
-    const result = await loadTrackedTasks();
+    const result = await loadTaskLogs();
     expect(result).toHaveLength(2);
     expect([...result]).toEqual([
-      { date: trackedTaskOne.date, id: trackedTaskOne.id, task_id: dripTask.id, task: dripTask },
-      { date: trackedTaskTwo.date, id: trackedTaskTwo.id, task_id: dripTask.id, task: dripTask },
+      { date: logOne.date, id: logOne.id, task_id: dripTask.id, task: dripTask },
+      { date: logTwo.date, id: logTwo.id, task_id: dripTask.id, task: dripTask },
     ]);
   });
 });
 
-describe('loadTrackedTasksForDay', () => {
+describe('loadTaskLogsForDay', () => {
   it('returns empty object when no tracked dates exist', async () => {
-    expect(await loadTrackedTasksForDay('2026-01-01')).toEqual([]);
+    expect(await loadTaskLogsForDay('2026-01-01')).toEqual([]);
   });
 
-  it('loads all tracked tasks using date', async () => {
+  it('loads all task logs using date', async () => {
     const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
     let date = '2026-01-01';
-    await db.insert(trackedTask).values([
+    await db.insert(taskLog).values([
       { task_id: dripTask.id, date: date },
       { task_id: dripTask.id, date: '2026-01-02' },
     ]);
 
-    const result = await loadTrackedTasksForDay(date);
+    const result = await loadTaskLogsForDay(date);
     expect(result).toHaveLength(1);
     expect(result[0].date).toEqual(date);
     expect(result[0].task_id).toEqual(dripTask.id);
   });
 });
 
-describe('createTrackedTask', () => {
-  it('inserts and returns the created tracked task', async () => {
+describe('createTaskLog', () => {
+  it('inserts and returns the created task log', async () => {
     const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
-    const created = await createTrackedTask(dripTask.id, '2026-01-01');
+    const created = await createTaskLog(dripTask.id, '2026-01-01');
     expect(created).toMatchObject({});
     expect(created.id).toEqual(expect.any(Number));
-    expect(await loadTrackedTasks()).toHaveLength(1);
+    expect(await loadTaskLogs()).toHaveLength(1);
   });
 });
 
-describe('removeTrackedTask', () => {
-  it('removes tracked task', async () => {
+describe('removeTaskLog', () => {
+  it('removes task log', async () => {
     const [dripTask] = await db
       .insert(tasks)
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
-    const [createdTrackedTask] = await db
-      .insert(trackedTask)
+    const [createdTaskLog] = await db
+      .insert(taskLog)
       .values([{ task_id: dripTask.id, date: '2026-01-01' }])
       .returning();
 
-    await removeTrackedTask(createdTrackedTask.id);
+    await removeTaskLog(createdTaskLog.id);
 
-    expect(await loadTrackedTasks()).toHaveLength(0);
+    expect(await loadTaskLogs()).toHaveLength(0);
   });
 });

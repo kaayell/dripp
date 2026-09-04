@@ -1,16 +1,16 @@
 import { eq } from 'drizzle-orm';
 import { db } from './client';
-import { categories, tasks, trackedTask } from './schema';
+import { categories, tasks, taskLog } from './schema';
 
 export type Category = typeof categories.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
-export type TaskWithDetails = Task & { category?: Category | null; trackedTasks: TrackedTask[] };
+export type TaskWithDetails = Task & { category?: Category | null; taskLogs: TaskLog[] };
 
-export type TrackedTask = typeof trackedTask.$inferSelect;
-export type TrackedTasks = TrackedTask & { task: Task };
+export type TaskLog = typeof taskLog.$inferSelect;
+export type TaskLogWithTask = TaskLog & { task: Task };
 export type TaskHistory = Task & {
   category: Category | null;
-  mostRecentTrackedTask: TrackedTask | null;
+  mostRecentTaskLog: TaskLog | null;
 };
 
 export async function loadCategories(): Promise<Category[]> {
@@ -30,7 +30,7 @@ export async function loadTask(taskId: number): Promise<Task | undefined> {
 export async function loadTaskWithDetails(taskId: number): Promise<TaskWithDetails | undefined> {
   return await db.query.tasks.findFirst({
     where: { id: taskId },
-    with: { trackedTasks: true, category: true },
+    with: { taskLogs: true, category: true },
   });
 }
 
@@ -42,7 +42,7 @@ export async function loadTasksWithHistory(): Promise<TaskHistory[]> {
   return await db.query.tasks.findMany({
     with: {
       category: true,
-      mostRecentTrackedTask: {
+      mostRecentTaskLog: {
         orderBy: { date: 'desc' },
       },
     },
@@ -66,24 +66,21 @@ export async function updateTask(
   return updated;
 }
 
-export async function loadTrackedTasks() {
-  return await db.query.trackedTask.findMany({
+export async function loadTaskLogs() {
+  return await db.query.taskLog.findMany({
     with: { task: true },
   });
 }
 
-export async function loadTrackedTasksForDay(date: string): Promise<TrackedTask[]> {
-  return await db.select().from(trackedTask).where(eq(trackedTask.date, date));
+export async function loadTaskLogsForDay(date: string): Promise<TaskLog[]> {
+  return await db.select().from(taskLog).where(eq(taskLog.date, date));
 }
 
-export async function createTrackedTask(taskId: number, date: string): Promise<TrackedTask> {
-  const [created] = await db
-    .insert(trackedTask)
-    .values({ task_id: taskId, date: date })
-    .returning();
+export async function createTaskLog(taskId: number, date: string): Promise<TaskLog> {
+  const [created] = await db.insert(taskLog).values({ task_id: taskId, date: date }).returning();
   return created;
 }
 
-export async function removeTrackedTask(trackedTaskId: number) {
-  await db.delete(trackedTask).where(eq(trackedTask.id, trackedTaskId));
+export async function removeTaskLog(taskLogId: number) {
+  await db.delete(taskLog).where(eq(taskLog.id, taskLogId));
 }

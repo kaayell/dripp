@@ -19,8 +19,8 @@ function dimmed(color: string, opacity: OpacityPercent = 50): string {
 
 function sortByMostOverdue(tasks: TaskHistory[]): TaskHistory[] {
   return [...tasks].sort((a, b) => {
-    const aDate = a.mostRecentTrackedTask?.date;
-    const bDate = b.mostRecentTrackedTask?.date;
+    const aDate = a.mostRecentTaskLog?.date;
+    const bDate = b.mostRecentTaskLog?.date;
     // never-tracked tasks sort last
     if (!aDate) return bDate ? 1 : 0;
     if (!bDate) return -1;
@@ -73,7 +73,7 @@ export default function TaskListHistory() {
 
       <Text style={[styles.taskSubLabel, { paddingVertical: 20 }]}>Most overdue first</Text>
       {visibleTasks.map((task) => {
-        const mostRecentTrackedTask = task.mostRecentTrackedTask;
+        const mostRecentTaskLog = task.mostRecentTaskLog;
         return (
           <View
             key={task.id}
@@ -88,7 +88,7 @@ export default function TaskListHistory() {
                 <View style={styles.taskDetailRow}>
                   <Text style={styles.taskLabel}>{task.name}</Text>
                   <Text style={[styles.taskLabel, { color: dimmed(task.color, 80) }]}>
-                    {mostRecentTrackedTask ? timeSince(mostRecentTrackedTask.date) : 'Never'}
+                    {mostRecentTaskLog ? timeSince(mostRecentTaskLog.date) : 'Never'}
                   </Text>
                 </View>
                 <View style={[styles.hr, { backgroundColor: dimmed(task.color, 70) }]} />
@@ -96,8 +96,8 @@ export default function TaskListHistory() {
                   <Text style={styles.taskSubLabel}>{task.category?.name}</Text>
 
                   <Text style={styles.taskSubLabel}>
-                    {mostRecentTrackedTask
-                      ? format(parseISO(mostRecentTrackedTask.date), 'MMM dd')
+                    {mostRecentTaskLog
+                      ? format(parseISO(mostRecentTaskLog.date), 'MMM dd')
                       : 'Nope'}
                   </Text>
                 </View>

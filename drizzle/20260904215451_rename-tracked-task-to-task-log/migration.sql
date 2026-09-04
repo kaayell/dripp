@@ -1,0 +1,1 @@
+ALTER TABLE `tracked_task` RENAME TO `task_log`;

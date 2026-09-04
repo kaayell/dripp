@@ -2,12 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import {
-  createTrackedTask,
+  createTaskLog,
   loadTasks,
-  loadTrackedTasksForDay,
-  removeTrackedTask,
+  loadTaskLogsForDay,
+  removeTaskLog,
   Task,
-  TrackedTask,
+  TaskLog,
 } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
@@ -25,13 +25,13 @@ function formatPickerDate(dateStr: string): string {
 export default function TaskPicker() {
   const { date, categoryId } = useLocalSearchParams<{ date: string; categoryId?: string }>();
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [trackedTasks, setTrackedTasks] = useState<TrackedTask[]>([]);
+  const [taskLogs, setTaskLogs] = useState<TaskLog[]>([]);
 
   useEffect(() => {
-    Promise.all([loadTasks(), loadTrackedTasksForDay(date)])
-      .then(([loadedTasks, loadedTrackedTasks]) => {
+    Promise.all([loadTasks(), loadTaskLogsForDay(date)])
+      .then(([loadedTasks, loadedTaskLogs]) => {
         setTasks(loadedTasks);
-        setTrackedTasks(loadedTrackedTasks);
+        setTaskLogs(loadedTaskLogs);
       })
       .catch((e) => console.error('[TaskPicker] load failed', e));
   }, []);
@@ -41,16 +41,16 @@ export default function TaskPicker() {
     : tasks;
 
   const toggleTask = useCallback(
-    (taskId: number, trackedTaskId: number | undefined) => {
-      if (trackedTaskId) {
-        removeTrackedTask(trackedTaskId)
+    (taskId: number, taskLogId: number | undefined) => {
+      if (taskLogId) {
+        removeTaskLog(taskLogId)
           .then(() => {
-            setTrackedTasks((prev) => prev.filter((t) => t.id !== trackedTaskId));
+            setTaskLogs((prev) => prev.filter((t) => t.id !== taskLogId));
           })
           .catch(() => {});
       } else {
-        createTrackedTask(taskId, date).then((created) => {
-          setTrackedTasks((prev) => [...prev, created]);
+        createTaskLog(taskId, date).then((created) => {
+          setTaskLogs((prev) => [...prev, created]);
         });
       }
     },
@@ -66,7 +66,7 @@ export default function TaskPicker() {
       </View>
 
       {visibleTasks.map((task) => {
-        const existingId = trackedTasks.find((t) => t.task_id === task.id)?.id;
+        const existingId = taskLogs.find((t) => t.task_id === task.id)?.id;
         const checked = existingId != undefined;
         return (
           <Pressable

@@ -6,9 +6,9 @@ import {
   Category,
   loadCategories,
   loadTasks,
-  loadTrackedTasks,
+  loadTaskLogs,
   Task,
-  TrackedTasks,
+  TaskLogWithTask,
 } from '../../../db/queries';
 import CalendarDay from './CalendarDay';
 import CalendarLegend from './CalendarLegend';
@@ -51,20 +51,20 @@ const calendarTheme = {
 export default function CalendarScreen() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [trackedTasks, setTrackedTasks] = useState<TrackedTasks[]>([]);
+  const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const today = new Date().toLocaleDateString('sv');
 
   const refresh = useCallback(async () => {
-    const [loadedCategories, loadedTasks, loadedTrackedTasks] = await Promise.all([
+    const [loadedCategories, loadedTasks, loadedTaskLogs] = await Promise.all([
       loadCategories(),
       loadTasks(),
-      loadTrackedTasks(),
+      loadTaskLogs(),
     ]);
     setCategories(loadedCategories);
     setTasks(loadedTasks);
-    setTrackedTasks(loadedTrackedTasks);
+    setTaskLogs(loadedTaskLogs);
   }, []);
 
   useFocusEffect(
@@ -94,14 +94,14 @@ export default function CalendarScreen() {
     const visibleTaskIds = new Set(visibleTasks.map((task) => task.id));
     const marks: Record<string, { items: { id: number; color: string }[] }> = {};
 
-    trackedTasks.forEach(({ date, task }) => {
+    taskLogs.forEach(({ date, task }) => {
       if (!visibleTaskIds.has(task.id)) return;
 
       if (!marks[date]) marks[date] = { items: [] };
       marks[date].items.push({ id: task.id, color: task.color });
     });
     return marks;
-  }, [visibleTasks, trackedTasks]);
+  }, [visibleTasks, taskLogs]);
 
   const handleDayPress = useCallback(
     (day: DateData) => {

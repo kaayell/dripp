@@ -52,7 +52,7 @@ export default function TaskDetailScreen() {
 
         <View style={styles.statsRow}>
           <View style={[styles.statBlock, { borderColor: Colors.border }]}>
-            <Text style={styles.statValue}>{task.trackedTasks.length}</Text>
+            <Text style={styles.statValue}>{task.taskLogs.length}</Text>
             <Text style={styles.statLabel}>times done</Text>
           </View>
         </View>

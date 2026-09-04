@@ -13,7 +13,7 @@ export const tasks = sqliteTable('tasks', {
   categoryId: integer('category_id').references(() => categories.id),
 });
 
-export const trackedTask = sqliteTable('tracked_task', {
+export const taskLog = sqliteTable('task_log', {
   id: integer().primaryKey({ autoIncrement: true }),
   task_id: integer('task_id')
     .references(() => tasks.id)
@@ -21,26 +21,26 @@ export const trackedTask = sqliteTable('tracked_task', {
   date: text().notNull(),
 });
 
-export const relations = defineRelations({ categories, tasks, trackedTask }, (r) => ({
+export const relations = defineRelations({ categories, tasks, taskLog }, (r) => ({
   tasks: {
     category: r.one.categories({
       from: r.tasks.categoryId,
       to: r.categories.id,
       optional: true,
     }),
-    mostRecentTrackedTask: r.one.trackedTask({
+    mostRecentTaskLog: r.one.taskLog({
       from: r.tasks.id,
-      to: r.trackedTask.task_id,
+      to: r.taskLog.task_id,
       optional: true,
     }),
-    trackedTasks: r.many.trackedTask({
+    taskLogs: r.many.taskLog({
       from: r.tasks.id,
-      to: r.trackedTask.task_id,
+      to: r.taskLog.task_id,
     }),
   },
-  trackedTask: {
+  taskLog: {
     task: r.one.tasks({
-      from: r.trackedTask.task_id,
+      from: r.taskLog.task_id,
       to: r.tasks.id,
       optional: false,
     }),
