@@ -1,1 +1,1 @@
-export { default } from '@/components/calendar/TaskPicker';
+export { default } from '@/components/task/TaskPicker';
