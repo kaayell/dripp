@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: 20,
+    paddingVertical: 20,
   },
   input: {
     backgroundColor: Colors.cellBg,

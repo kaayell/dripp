@@ -21,7 +21,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.background,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
   },
   handle: {
     alignSelf: 'center',

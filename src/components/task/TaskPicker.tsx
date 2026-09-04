@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'space-between',
     paddingHorizontal: 4,
-    marginBottom: 16,
+    paddingVertical: 16,
   },
   title: {
     fontSize: 18,
