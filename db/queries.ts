@@ -4,6 +4,8 @@ import { categories, tasks, trackedTask } from './schema';
 
 export type Category = typeof categories.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
+export type TaskWithDetails = Task & { category?: Category | null; trackedTasks: TrackedTask[] };
+
 export type TrackedTask = typeof trackedTask.$inferSelect;
 export type TrackedTasks = TrackedTask & { task: Task };
 export type TaskHistory = Task & {
@@ -23,6 +25,13 @@ export async function createCategory(name: string): Promise<Category> {
 export async function loadTask(taskId: number): Promise<Task | undefined> {
   const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId));
   return task;
+}
+
+export async function loadTaskWithDetails(taskId: number): Promise<TaskWithDetails | undefined> {
+  return await db.query.tasks.findFirst({
+    where: { id: taskId },
+    with: { trackedTasks: true, category: true },
+  });
 }
 
 export async function loadTasks(): Promise<Task[]> {

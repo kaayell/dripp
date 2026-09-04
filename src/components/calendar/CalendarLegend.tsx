@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { router } from 'expo-router';
 import type { Task } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
@@ -19,10 +20,16 @@ export default function CalendarLegend({ tasks, bottomInset = 0 }: Props) {
       contentContainerStyle={[styles.legendRowContent, { paddingBottom: bottomInset + 12 }]}
     >
       {tasks.map((task) => (
-        <View key={task.id} style={styles.legendItem}>
+        <Pressable
+          key={task.id}
+          style={styles.legendItem}
+          onPress={() =>
+            router.push({ pathname: '/task-detail', params: { taskId: String(task.id) } })
+          }
+        >
           <Drop color={task.color} size={8} />
           <Text style={styles.legendLabel}>{task.name}</Text>
-        </View>
+        </Pressable>
       ))}
     </ScrollView>
   );

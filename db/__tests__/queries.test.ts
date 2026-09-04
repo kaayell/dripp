@@ -9,6 +9,7 @@ import {
   loadTask,
   loadTasks,
   loadTasksWithHistory,
+  loadTaskWithDetails,
   loadTrackedTasks,
   loadTrackedTasksForDay,
   removeTrackedTask,
@@ -59,6 +60,45 @@ describe('loadTask', () => {
 
     const result = await loadTask(task.id);
     expect(result).toEqual(task);
+  });
+});
+
+describe('loadTaskWithDetails', () => {
+  it('returns empty array when no task exist', async () => {
+    expect(await loadTaskWithDetails(12)).toEqual(undefined);
+  });
+
+  it('returns task with tracked tasks', async () => {
+    const [task] = await db
+      .insert(tasks)
+      .values([{ name: 'drip', color: '#ffffff', categoryId: null }])
+      .returning();
+
+    const [trackedOne, trackedTwo] = await db
+      .insert(trackedTask)
+      .values([
+        { task_id: task.id, date: '2026-01-01' },
+        { task_id: task.id, date: '2026-01-02' },
+      ])
+      .returning();
+
+    const result = await loadTaskWithDetails(task.id);
+    expect(result?.trackedTasks).toEqual([trackedOne, trackedTwo]);
+  });
+
+  it('returns task with category', async () => {
+    const [category] = await db
+      .insert(categories)
+      .values([{ name: 'bod' }])
+      .returning();
+
+    const [task] = await db
+      .insert(tasks)
+      .values([{ name: 'drip', color: '#ffffff', categoryId: category.id }])
+      .returning();
+
+    const result = await loadTaskWithDetails(task.id);
+    expect(result?.category).toEqual(category);
   });
 });
 

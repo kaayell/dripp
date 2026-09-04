@@ -42,6 +42,13 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
+          name="task-detail"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
           name="task-picker"
           options={{
             presentation: 'formSheet',

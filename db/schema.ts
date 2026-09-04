@@ -33,6 +33,10 @@ export const relations = defineRelations({ categories, tasks, trackedTask }, (r)
       to: r.trackedTask.task_id,
       optional: true,
     }),
+    trackedTasks: r.many.trackedTask({
+      from: r.tasks.id,
+      to: r.trackedTask.task_id,
+    }),
   },
   trackedTask: {
     task: r.one.tasks({
