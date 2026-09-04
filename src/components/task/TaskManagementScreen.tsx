@@ -1,12 +1,12 @@
 import { useCallback, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { Category, Task } from '../../../db/queries';
 import { loadCategories, loadTasks } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import Drop from '@/components/ui/Drop';
-import { useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 
 export default function TaskManagementScreen() {
   const insets = useSafeAreaInsets();
@@ -42,13 +42,19 @@ export default function TaskManagementScreen() {
       <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}>
         <>
           {tasks.map((task) => (
-            <View key={task.id} style={styles.row}>
+            <Pressable
+              key={task.id}
+              style={styles.row}
+              onPress={() =>
+                router.push({ pathname: '/edit-task', params: { taskId: String(task.id) } })
+              }
+            >
               <View style={styles.taskLabelRow}>
                 <Drop size={10} color={task.color} />
                 <Text style={styles.rowLabel}>{task.name}</Text>
                 <Text style={styles.rowSubLabel}>{categoryName(task.categoryId)}</Text>
               </View>
-            </View>
+            </Pressable>
           ))}
         </>
       </ScrollView>

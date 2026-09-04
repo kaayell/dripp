@@ -2,15 +2,17 @@ jest.mock('../client', () => require('./__fixtures__/client'));
 
 import { db } from '../client';
 import {
+  createCategory,
   createTask,
   createTrackedTask,
   loadCategories,
-  loadTasksWithHistory,
+  loadTask,
   loadTasks,
+  loadTasksWithHistory,
   loadTrackedTasks,
   loadTrackedTasksForDay,
   removeTrackedTask,
-  createCategory,
+  updateTask,
 } from '../queries';
 import { categories, tasks, trackedTask } from '../schema';
 
@@ -41,6 +43,22 @@ describe('createCategory', () => {
     expect(created).toMatchObject({ name: 'bod' });
     expect(created.id).toEqual(expect.any(Number));
     expect(await loadCategories()).toHaveLength(1);
+  });
+});
+
+describe('loadTask', () => {
+  it('returns empty array when no tasks exist', async () => {
+    expect(await loadTask(12)).toEqual(undefined);
+  });
+
+  it('returns task for id', async () => {
+    const [task] = await db
+      .insert(tasks)
+      .values([{ name: 'drip', color: '#ffffff', categoryId: null }])
+      .returning();
+
+    const result = await loadTask(task.id);
+    expect(result).toEqual(task);
   });
 });
 
@@ -87,6 +105,8 @@ describe('loadTasksWithHistory', () => {
       .values({ name: 'drip', color: '#ffffff', categoryId: null })
       .returning();
 
+    await db.insert(tasks).values({ name: 'mop', color: '#000000', categoryId: null });
+
     await db.insert(trackedTask).values([
       { task_id: dripTask.id, date: '2026-01-01' },
       { task_id: dripTask.id, date: '2026-01-03' },
@@ -118,6 +138,29 @@ describe('createTask', () => {
     const created = await createTask({ name: 'mop', color: '#000000', categoryId: category.id });
 
     expect(created.categoryId).toBe(category.id);
+  });
+});
+
+describe('updateTask', () => {
+  it('updates and returns the task', async () => {
+    const [category] = await db
+      .insert(categories)
+      .values([{ name: 'house' }])
+      .returning();
+    const [task] = await db
+      .insert(tasks)
+      .values([{ name: 'drip', color: '#ffffff', categoryId: null }])
+      .returning();
+
+    const updated = await updateTask(task.id, {
+      name: 'mop',
+      color: '#000000',
+      categoryId: category.id,
+    });
+
+    expect(updated).toMatchObject({ name: 'mop', color: '#000000', categoryId: category.id });
+    expect(updated.id).toEqual(task.id);
+    expect(await loadTasks()).toHaveLength(1);
   });
 });
 

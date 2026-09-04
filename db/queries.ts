@@ -20,6 +20,11 @@ export async function createCategory(name: string): Promise<Category> {
   return created;
 }
 
+export async function loadTask(taskId: number): Promise<Task | undefined> {
+  const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId));
+  return task;
+}
+
 export async function loadTasks(): Promise<Task[]> {
   return db.select().from(tasks);
 }
@@ -42,6 +47,14 @@ export async function createTask(task: {
 }): Promise<Task> {
   const [created] = await db.insert(tasks).values(task).returning();
   return created;
+}
+
+export async function updateTask(
+  taskId: number,
+  task: { name: string; color: string; categoryId: number | null },
+): Promise<Task> {
+  const [updated] = await db.update(tasks).set(task).where(eq(tasks.id, taskId)).returning();
+  return updated;
 }
 
 export async function loadTrackedTasks() {
