@@ -16,6 +16,7 @@ import CategoryFilter from '../category/CategoryFilter';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
@@ -49,6 +50,7 @@ const calendarTheme = {
 } as any;
 
 export default function CalendarScreen() {
+  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
@@ -122,7 +124,9 @@ export default function CalendarScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <View
+      style={{ flex: 1, backgroundColor: Colors.background, paddingBottom: insets.bottom + 24 }}
+    >
       <CategoryFilter
         categories={categories}
         selectedCategoryId={selectedCategoryId}

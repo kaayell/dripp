@@ -3,7 +3,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import type { Task } from '../../../db/queries';
 import { loadTask, updateTask } from '../../../db/queries';
 import Loading from '@/components/ui/Loading';
-import TaskScreen, { TaskFormValues } from '@/components/task/TaskScreen';
+import TaskFormScreen, { TaskFormValues } from '@/components/task/TaskFormScreen';
 
 export default function EditTaskScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
@@ -32,7 +32,7 @@ export default function EditTaskScreen() {
   };
 
   return (
-    <TaskScreen
+    <TaskFormScreen
       title="Edit Task"
       task={task}
       onSubmit={handleSubmit}

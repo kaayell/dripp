@@ -4,12 +4,7 @@ import type { Task } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 
-type Props = {
-  tasks: Task[];
-  bottomInset?: number;
-};
-
-export default function CalendarLegend({ tasks, bottomInset = 0 }: Props) {
+export default function CalendarLegend({ tasks }: { tasks: Task[] }) {
   if (tasks.length === 0) return null;
 
   return (
@@ -17,7 +12,7 @@ export default function CalendarLegend({ tasks, bottomInset = 0 }: Props) {
       horizontal
       showsHorizontalScrollIndicator={false}
       style={styles.legendRow}
-      contentContainerStyle={[styles.legendRowContent, { paddingBottom: bottomInset + 12 }]}
+      contentContainerStyle={[styles.legendRowContent]}
     >
       {tasks.map((task) => (
         <Pressable
@@ -28,7 +23,7 @@ export default function CalendarLegend({ tasks, bottomInset = 0 }: Props) {
           }
         >
           <Drop color={task.color} size={8} />
-          <Text style={styles.legendLabel}>{task.name}</Text>
+          <Text style={[styles.legendLabel]}>{task.name}</Text>
         </Pressable>
       ))}
     </ScrollView>
@@ -52,7 +47,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   legendLabel: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
     color: Colors.textDim,
   },

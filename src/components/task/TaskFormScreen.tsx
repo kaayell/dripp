@@ -36,7 +36,7 @@ type TaskScreenProps = {
   newCategoryReturnTo: { pathname: '/add-task' | '/edit-task'; taskId?: number };
 };
 
-export default function TaskScreen({
+export default function TaskFormScreen({
   title,
   task,
   onSubmit,
@@ -56,7 +56,7 @@ export default function TaskScreen({
     }
     loadCategories()
       .then(setCategories)
-      .catch((e) => console.error('[TaskScreen] load categories failed', e));
+      .catch((e) => console.error('[TaskFormScreen] load categories failed', e));
   }, [newCategoryIdParam]);
 
   const canSubmit = name.trim().length > 0 && !submitting;
@@ -68,7 +68,7 @@ export default function TaskScreen({
       await onSubmit({ name: name.trim(), color, categoryId });
       router.back();
     } catch (e) {
-      console.error('[TaskScreen] save task failed', e);
+      console.error('[TaskFormScreen] save task failed', e);
       setSubmitting(false);
     }
   }, [canSubmit, onSubmit, name, color, categoryId]);

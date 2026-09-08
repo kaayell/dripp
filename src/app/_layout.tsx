@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { runMigrations } from '../../db/client';
@@ -6,6 +7,7 @@ import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
 import { Colors } from '@/constants/theme';
 import { AddTaskButton } from '@/components/ui/AddTaskButton';
+import { OverdueTaskButton } from '@/components/ui/OverdueTaskButton';
 
 export default function Layout() {
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
@@ -33,9 +35,26 @@ export default function Layout() {
           headerTitle: '',
         }}
       >
-        <Stack.Screen name="(tabs)" options={{ headerRight: () => <AddTaskButton /> }} />
+        <Stack.Screen
+          name="index"
+          options={{
+            headerRight: () => (
+              <View style={{ flexDirection: 'row', gap: 16 }}>
+                <OverdueTaskButton />
+                <AddTaskButton />
+              </View>
+            ),
+          }}
+        />
         <Stack.Screen
           name="add-task"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="overdue-tasks"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',

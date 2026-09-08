@@ -5,8 +5,9 @@ import { ColorOpacityAlphas, Colors, OpacityPercent } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useFocusEffect } from 'expo-router';
+import { Stack, useFocusEffect } from 'expo-router';
 import CategoryFilter from '@/components/category/CategoryFilter';
+import { CloseButton } from '@/components/ui/CloseButton';
 
 function timeSince(dateString: string): string {
   const today = format(new Date(), 'yyyy-MM-dd');
@@ -28,7 +29,7 @@ function sortByMostOverdue(tasks: TaskHistory[]): TaskHistory[] {
   });
 }
 
-export default function TaskListHistory() {
+export default function OverdueTasks() {
   const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
@@ -41,7 +42,7 @@ export default function TaskListHistory() {
           setCategories(loadedCategories);
           setTasks(sortByMostOverdue(loadedTasks));
         })
-        .catch((e) => console.error('[TaskListHistory] load failed', e));
+        .catch((e) => console.error('[OverdueTasks] load failed', e));
     }, []),
   );
 
@@ -61,52 +62,59 @@ export default function TaskListHistory() {
   );
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: Colors.background }}
-      contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
-    >
-      <CategoryFilter
-        categories={categories}
-        selectedCategoryId={selectedCategoryId}
-        onSelectCategory={selectCategory}
+    <>
+      <Stack.Screen
+        options={{
+          headerLeft: () => <CloseButton />,
+        }}
       />
+      <ScrollView
+        style={{ flex: 1, backgroundColor: Colors.background }}
+        contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
+      >
+        <CategoryFilter
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          onSelectCategory={selectCategory}
+        />
 
-      <Text style={[styles.taskSubLabel, { paddingVertical: 20 }]}>Most overdue first</Text>
-      {visibleTasks.map((task) => {
-        const mostRecentTaskLog = task.mostRecentTaskLog;
-        return (
-          <View
-            key={task.id}
-            style={[
-              styles.taskContainer,
-              { borderColor: dimmed(task.color, 30), backgroundColor: dimmed(task.color, 5) },
-            ]}
-          >
-            <View style={styles.taskContentContainer}>
-              <Drop size={16} color={dimmed(task.color, 70)} />
-              <View style={styles.taskDetailsContainer}>
-                <View style={styles.taskDetailRow}>
-                  <Text style={styles.taskLabel}>{task.name}</Text>
-                  <Text style={[styles.taskLabel, { color: dimmed(task.color, 80) }]}>
-                    {mostRecentTaskLog ? timeSince(mostRecentTaskLog.date) : 'Never'}
-                  </Text>
-                </View>
-                <View style={[styles.hr, { backgroundColor: dimmed(task.color, 70) }]} />
-                <View style={styles.taskDetailRow}>
-                  <Text style={styles.taskSubLabel}>{task.category?.name}</Text>
+        <Text style={[styles.taskSubLabel, { paddingVertical: 20 }]}>Most overdue first</Text>
+        {visibleTasks.map((task) => {
+          const mostRecentTaskLog = task.mostRecentTaskLog;
+          return (
+            <View
+              key={task.id}
+              style={[
+                styles.taskContainer,
+                { borderColor: dimmed(task.color, 30), backgroundColor: dimmed(task.color, 5) },
+              ]}
+            >
+              <View style={styles.taskContentContainer}>
+                <Drop size={16} color={dimmed(task.color, 70)} />
+                <View style={styles.taskDetailsContainer}>
+                  <View style={styles.taskDetailRow}>
+                    <Text style={styles.taskLabel}>{task.name}</Text>
+                    <Text style={[styles.taskLabel, { color: dimmed(task.color, 80) }]}>
+                      {mostRecentTaskLog ? timeSince(mostRecentTaskLog.date) : 'Never'}
+                    </Text>
+                  </View>
+                  <View style={[styles.hr, { backgroundColor: dimmed(task.color, 70) }]} />
+                  <View style={styles.taskDetailRow}>
+                    <Text style={styles.taskSubLabel}>{task.category?.name}</Text>
 
-                  <Text style={styles.taskSubLabel}>
-                    {mostRecentTaskLog
-                      ? format(parseISO(mostRecentTaskLog.date), 'MMM dd')
-                      : 'Nope'}
-                  </Text>
+                    <Text style={styles.taskSubLabel}>
+                      {mostRecentTaskLog
+                        ? format(parseISO(mostRecentTaskLog.date), 'MMM dd')
+                        : 'Nope'}
+                    </Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        );
-      })}
-    </ScrollView>
+          );
+        })}
+      </ScrollView>
+    </>
   );
 }
 
