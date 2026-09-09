@@ -1,20 +1,21 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { Category, loadCategories, loadTasksWithHistory, TaskHistory } from '../../../db/queries';
+import {
+  Category,
+  loadCategories,
+  loadTasksWithMostRecentLog,
+  TaskWithMostRecentLog,
+} from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
+import { timeSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
-import { format, formatDistance, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Stack, useFocusEffect } from 'expo-router';
 import CategoryFilter from '@/components/category/CategoryFilter';
 import { CloseButton } from '@/components/ui/CloseButton';
 
-function timeSince(dateString: string): string {
-  const today = format(new Date(), 'yyyy-MM-dd');
-  return formatDistance(parseISO(dateString), parseISO(today), { addSuffix: true });
-}
-
-function sortByMostOverdue(tasks: TaskHistory[]): TaskHistory[] {
+function sortByMostOverdue(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[] {
   return [...tasks].sort((a, b) => {
     const aDate = a.mostRecentTaskLog?.date;
     const bDate = b.mostRecentTaskLog?.date;
@@ -29,11 +30,11 @@ export default function OverdueTasks() {
   const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [tasks, setTasks] = useState<TaskHistory[]>([]);
+  const [tasks, setTasks] = useState<TaskWithMostRecentLog[]>([]);
 
   useFocusEffect(
     useCallback(() => {
-      Promise.all([loadCategories(), loadTasksWithHistory()])
+      Promise.all([loadCategories(), loadTasksWithMostRecentLog()])
         .then(([loadedCategories, loadedTasks]) => {
           setCategories(loadedCategories);
           setTasks(sortByMostOverdue(loadedTasks));

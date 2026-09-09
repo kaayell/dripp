@@ -4,6 +4,7 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
+import { timeSince } from '@/constants/dates';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { EditTaskButton } from '@/components/ui/EditTaskButton';
 import Drop from '@/components/ui/Drop';
@@ -52,6 +53,12 @@ export default function TaskDetailScreen() {
 
         <View style={styles.statsRow}>
           <View style={[styles.statBlock, { borderColor: Colors.border }]}>
+            <Text style={styles.statValue}>
+              {task.taskLogs[0] ? timeSince(task.taskLogs[0]!.date) : 'never'}
+            </Text>
+            <Text style={styles.statLabel}>last done</Text>
+          </View>
+          <View style={styles.statBlock}>
             <Text style={styles.statValue}>{task.taskLogs.length}</Text>
             <Text style={styles.statLabel}>times done</Text>
           </View>
@@ -94,6 +101,7 @@ const styles = StyleSheet.create({
   statBlock: {
     flex: 1,
     backgroundColor: Colors.cellBg,
+    borderColor: Colors.border,
     borderRadius: 14,
     borderWidth: 1,
     paddingVertical: 16,

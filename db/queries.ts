@@ -8,7 +8,7 @@ export type TaskWithDetails = Task & { category?: Category | null; taskLogs: Tas
 
 export type TaskLog = typeof taskLog.$inferSelect;
 export type TaskLogWithTask = TaskLog & { task: Task };
-export type TaskHistory = Task & {
+export type TaskWithMostRecentLog = Task & {
   category: Category | null;
   mostRecentTaskLog: TaskLog | null;
 };
@@ -30,7 +30,7 @@ export async function loadTask(taskId: number): Promise<Task | undefined> {
 export async function loadTaskWithDetails(taskId: number): Promise<TaskWithDetails | undefined> {
   return await db.query.tasks.findFirst({
     where: { id: taskId },
-    with: { taskLogs: true, category: true },
+    with: { taskLogs: { orderBy: { date: 'desc' } }, category: true },
   });
 }
 
@@ -38,7 +38,7 @@ export async function loadTasks(): Promise<Task[]> {
   return db.select().from(tasks);
 }
 
-export async function loadTasksWithHistory(): Promise<TaskHistory[]> {
+export async function loadTasksWithMostRecentLog(): Promise<TaskWithMostRecentLog[]> {
   return await db.query.tasks.findMany({
     with: {
       category: true,

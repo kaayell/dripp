@@ -8,7 +8,7 @@ import {
   loadCategories,
   loadTask,
   loadTasks,
-  loadTasksWithHistory,
+  loadTasksWithMostRecentLog,
   loadTaskWithDetails,
   loadTaskLogs,
   loadTaskLogsForDay,
@@ -68,7 +68,7 @@ describe('loadTaskWithDetails', () => {
     expect(await loadTaskWithDetails(12)).toEqual(undefined);
   });
 
-  it('returns task with task logs', async () => {
+  it('returns task with sorted task logs', async () => {
     const [task] = await db
       .insert(tasks)
       .values([{ name: 'drip', color: '#ffffff', categoryId: null }])
@@ -83,7 +83,7 @@ describe('loadTaskWithDetails', () => {
       .returning();
 
     const result = await loadTaskWithDetails(task.id);
-    expect(result?.taskLogs).toEqual([logOne, logTwo]);
+    expect(result?.taskLogs).toEqual([logTwo, logOne]);
   });
 
   it('returns task with category', async () => {
@@ -117,9 +117,9 @@ describe('loadTasks', () => {
   });
 });
 
-describe('loadTasksWithHistory', () => {
+describe('loadTasksWithMostRecentLog', () => {
   it('returns empty array when no tasks exist', async () => {
-    expect(await loadTasksWithHistory()).toEqual([]);
+    expect(await loadTasksWithMostRecentLog()).toEqual([]);
   });
 
   it('returns all tasks with category', async () => {
@@ -133,7 +133,7 @@ describe('loadTasksWithHistory', () => {
       { name: 'drip', color: '#ffffff', categoryId: category.id },
     ]);
 
-    const result = await loadTasksWithHistory();
+    const result = await loadTasksWithMostRecentLog();
     expect(result).toHaveLength(2);
     expect(result[0].category).toBe(null);
     expect(result[1].category).toEqual({ id: category.id, name: category.name });
@@ -153,7 +153,7 @@ describe('loadTasksWithHistory', () => {
       { task_id: dripTask.id, date: '2026-01-02' },
     ]);
 
-    const result = await loadTasksWithHistory();
+    const result = await loadTasksWithMostRecentLog();
     expect(result).toHaveLength(2);
     expect(result[0].mostRecentTaskLog).toMatchObject({
       task_id: dripTask.id,
