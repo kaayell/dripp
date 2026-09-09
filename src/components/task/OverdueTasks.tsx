@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Category, loadCategories, loadTasksWithHistory, TaskHistory } from '../../../db/queries';
-import { ColorOpacityAlphas, Colors, OpacityPercent } from '@/constants/theme';
+import { Colors, dimmed } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 import { format, formatDistance, parseISO } from 'date-fns';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -12,10 +12,6 @@ import { CloseButton } from '@/components/ui/CloseButton';
 function timeSince(dateString: string): string {
   const today = format(new Date(), 'yyyy-MM-dd');
   return formatDistance(parseISO(dateString), parseISO(today), { addSuffix: true });
-}
-
-function dimmed(color: string, opacity: OpacityPercent = 50): string {
-  return `${color}${ColorOpacityAlphas[opacity]}`;
 }
 
 function sortByMostOverdue(tasks: TaskHistory[]): TaskHistory[] {

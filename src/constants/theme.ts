@@ -29,3 +29,7 @@ export const ColorOpacityAlphas = {
 } as const;
 
 export type OpacityPercent = keyof typeof ColorOpacityAlphas;
+
+export function dimmed(color: string, opacity: OpacityPercent = 50): string {
+  return `${color}${ColorOpacityAlphas[opacity]}`;
+}
