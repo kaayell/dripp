@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   doneText: {
     fontSize: 15,
     fontWeight: '700',
-    color: Colors.coral,
+    color: Colors.teal,
   },
   taskRow: {
     flexDirection: 'row',

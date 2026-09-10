@@ -1,14 +1,14 @@
 import { useRouter } from 'expo-router';
-import { Pressable } from 'react-native';
 import { X } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
+import { IconButton } from '@/components/ui/IconButton';
 
 export function CloseButton() {
   const router = useRouter();
 
   return (
-    <Pressable onPress={() => router.back()} hitSlop={8}>
-      <X color={Colors.coral} size={22} strokeWidth={2.25} />
-    </Pressable>
+    <IconButton onPress={() => router.back()}>
+      <X color={Colors.textDim} size={20} strokeWidth={2.25} />
+    </IconButton>
   );
 }

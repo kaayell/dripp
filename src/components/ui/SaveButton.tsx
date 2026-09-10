@@ -23,7 +23,7 @@ export function SaveButton({
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: Colors.coral,
+    backgroundColor: Colors.teal,
     borderRadius: 14,
     paddingVertical: 14,
     alignItems: 'center',
