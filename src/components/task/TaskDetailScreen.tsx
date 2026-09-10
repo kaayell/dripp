@@ -65,7 +65,7 @@ export default function TaskDetailScreen() {
           </View>
         </View>
         <View style={styles.calendarCard}>
-          <TaskCalendar color={task.color} taskLogs={task.taskLogs} />
+          <TaskCalendar taskId={task.id} color={task.color} taskLogs={task.taskLogs} />
         </View>
       </View>
     </>

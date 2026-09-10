@@ -1,19 +1,59 @@
-import { useCallback, useMemo, useState } from 'react';
-import { Calendar, type DateData } from 'react-native-calendars';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useWindowDimensions } from 'react-native';
+import { CalendarList, type DateData } from 'react-native-calendars';
 import { Colors, dimmed } from '@/constants/theme';
-import { TaskLog } from '../../../db/queries';
+import { createTaskLog, removeTaskLog, TaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
 
+type CalendarListRef = { scrollToMonth: (date: string) => void };
+
+const calendarTheme = {
+  calendarBackground: Colors.cellBg,
+  dayTextColor: Colors.text,
+  textDisabledColor: Colors.textDimmer,
+  monthTextColor: Colors.text,
+  weekVerticalMargin: 2,
+  'stylesheet.calendar.header': {
+    header: {
+      paddingVertical: 12,
+      paddingHorizontal: 14,
+    },
+    monthText: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: Colors.text,
+    },
+    dayHeader: {
+      marginTop: 2,
+      marginBottom: 7,
+      width: 38,
+      fontSize: 13,
+      textAlign: 'center',
+      textTransform: 'uppercase',
+      color: Colors.textDim,
+    },
+  },
+};
+
 type TaskCalendarProps = {
+  taskId: number;
   color: string;
   taskLogs: TaskLog[];
 };
 
-export function TaskCalendar({ color, taskLogs }: TaskCalendarProps) {
+export function TaskCalendar({ taskId, color, taskLogs: taskLogsProp }: TaskCalendarProps) {
   const now = new Date();
   const today = now.toLocaleDateString('sv');
   const currentYearMonth = { year: now.getFullYear(), month: now.getMonth() + 1 };
   const [visibleMonth, setVisibleMonth] = useState(currentYearMonth);
+  const [taskLogs, setTaskLogs] = useState(taskLogsProp);
+  const { width: windowWidth } = useWindowDimensions();
+  const width = Math.round(windowWidth) - 34;
+  const calendarRef = useRef<CalendarListRef>(null);
+
+  useEffect(() => {
+    setTaskLogs(taskLogsProp);
+  }, [taskLogsProp]);
 
   const markedDates = useMemo(() => {
     return Object.fromEntries(
@@ -25,55 +65,47 @@ export function TaskCalendar({ color, taskLogs }: TaskCalendarProps) {
     );
   }, [taskLogs, color, visibleMonth]);
 
-  const calendarTheme = useMemo(
-    () => ({
-      calendarBackground: Colors.cellBg,
-      dayTextColor: Colors.text,
-      textDisabledColor: Colors.textDimmer,
-      'stylesheet.calendar.header': {
-        header: {
-          paddingVertical: 12,
-          paddingHorizontal: 14,
-        },
-        monthText: {
-          fontSize: 16,
-          fontWeight: '700',
-          color: Colors.text,
-        },
-        dayHeader: {
-          marginTop: 2,
-          marginBottom: 7,
-          width: 32,
-          fontSize: 12,
-          textAlign: 'center' as const,
-          textTransform: 'uppercase' as const,
-          color: Colors.textDim,
-        },
-      },
-    }),
-    [color],
-  );
-
   const handleMonthChange = useCallback(({ year, month }: { year: number; month: number }) => {
-    const isFuture =
-      year > currentYearMonth.year ||
-      (year === currentYearMonth.year && month > currentYearMonth.month);
-    if (isFuture) {
-      return;
-    }
     setVisibleMonth({ year, month });
   }, []);
 
-  const handleDayPress = useCallback((day: DateData) => {
-    if (day.dateString > today) return;
-  }, []);
+  const handleDayPress = useCallback(
+    (day: DateData) => {
+      if (day.dateString > today) return;
+      const isDifferentMonth = day.year !== visibleMonth.year || day.month !== visibleMonth.month;
+      if (isDifferentMonth) {
+        calendarRef.current?.scrollToMonth(day.dateString);
+      }
+      const existing = taskLogs.find((t) => t.date === day.dateString);
+      if (existing) {
+        removeTaskLog(existing.id)
+          .then(() => {
+            setTaskLogs((prev) => prev.filter((t) => t.id !== existing.id));
+          })
+          .catch(() => {});
+      } else {
+        createTaskLog(taskId, day.dateString).then((created) => {
+          setTaskLogs((prev) => [...prev, created]);
+        });
+      }
+    },
+    [taskId, taskLogs, today, visibleMonth],
+  );
 
   return (
-    <Calendar
+    <CalendarList
+      ref={calendarRef}
       theme={calendarTheme}
-      enableSwipeMonths
+      horizontal
+      pagingEnabled
+      animateScroll
+      calendarWidth={width}
+      calendarHeight={400}
       hideArrows
       showSixWeeks
+      futureScrollRange={0}
+      showScrollIndicator={false}
+      hideExtraDays={false}
       maxDate={today}
       markedDates={markedDates}
       dayComponent={TaskCalendarDay}

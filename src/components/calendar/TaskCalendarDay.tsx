@@ -19,17 +19,18 @@ export default function TaskCalendarDay({
   if (!date) return null;
   const isToday = state === 'today';
   const isDisabled = state === 'disabled';
+  const isFuture = date.dateString > new Date().toLocaleDateString('sv');
   const marked = !!marking?.color;
 
   return (
     <Pressable
-      disabled={isDisabled}
+      disabled={isFuture}
       onPress={() => onPress?.(date)}
       style={[styles.cell, isToday && styles.cellToday]}
     >
       {marked && (
         <View style={styles.dropWrap}>
-          <Drop color={marking!.color} size={30} />
+          <Drop color={marking!.color} size={32} />
         </View>
       )}
       <Text
@@ -47,8 +48,8 @@ export default function TaskCalendarDay({
 
 const styles = StyleSheet.create({
   cell: {
-    width: '95%' as const,
-    height: 40,
+    width: 48,
+    height: 48,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -59,7 +60,7 @@ const styles = StyleSheet.create({
   },
   dropWrap: {
     position: 'absolute',
-    top: 2,
+    top: 5,
     left: 0,
     right: 0,
     bottom: 0,
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayNum: {
-    fontSize: 16,
+    fontSize: 15,
     color: Colors.text,
   },
 });
