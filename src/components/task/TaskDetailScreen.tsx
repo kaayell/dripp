@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
-import { Colors } from '@/constants/theme';
+import { Colors, dimmed } from '@/constants/theme';
 import { timeSince } from '@/constants/dates';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { EditTaskButton } from '@/components/ui/EditTaskButton';
@@ -46,22 +46,29 @@ export default function TaskDetailScreen() {
       />
       <View style={[styles.container, { paddingBottom: insets.bottom + 24 }]}>
         <View style={styles.header}>
-          <Drop color={task.color} size={20} />
-          <Text style={styles.title}>{task.name}</Text>
-        </View>
-
-        <Text style={styles.category}>{task.category?.name ?? 'no category'}</Text>
-
-        <View style={styles.statsRow}>
-          <View style={[styles.statBlock, { borderColor: Colors.border }]}>
-            <Text style={styles.statValue}>
-              {task.taskLogs[0] ? timeSince(task.taskLogs[0]!.date) : 'never'}
-            </Text>
-            <Text style={styles.statLabel}>last done</Text>
-          </View>
-          <View style={styles.statBlock}>
-            <Text style={styles.statValue}>{task.taskLogs.length}</Text>
-            <Text style={styles.statLabel}>times done</Text>
+          <View style={styles.metaContainer}>
+            <Drop color={task.color} size={32} />
+            <View>
+              <Text style={styles.title}>{task.name}</Text>
+              <View style={styles.metaRow}>
+                <Text style={styles.category}>{task.category?.name ?? 'no category'}</Text>
+                {task.taskLogs[0] && (
+                  <View
+                    style={[
+                      styles.lastDonePill,
+                      {
+                        backgroundColor: dimmed(task.color, 20),
+                        borderColor: dimmed(task.color, 40),
+                      },
+                    ]}
+                  >
+                    <Text style={styles.lastDoneText}>
+                      {`${timeSince(task.taskLogs[0]!.date)}`}
+                    </Text>
+                  </View>
+                )}
+              </View>
+            </View>
           </View>
         </View>
         <View style={styles.calendarCard}>
@@ -80,49 +87,43 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    paddingBottom: 24,
+  },
+  metaContainer: {
+    flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    marginBottom: 6,
+    gap: 14,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: '700',
     color: Colors.text,
   },
+  metaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
   category: {
-    fontSize: 13,
+    fontSize: 15,
     fontWeight: '600',
     color: Colors.textDim,
     textTransform: 'lowercase',
-    marginBottom: 24,
-    marginLeft: 30,
   },
-  statsRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 28,
-  },
-  statBlock: {
-    flex: 1,
-    backgroundColor: Colors.cellBg,
-    borderColor: Colors.border,
-    borderRadius: 14,
-    borderWidth: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 14,
+  lastDonePill: {
     alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 50,
+    paddingVertical: 2,
+    paddingHorizontal: 8,
   },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 11,
+  lastDoneText: {
+    fontSize: 12,
     fontWeight: '600',
-    color: Colors.textDim,
-    textTransform: 'uppercase',
+    color: Colors.text,
+    textTransform: 'lowercase',
   },
   calendarCard: {
     backgroundColor: Colors.cellBg,
