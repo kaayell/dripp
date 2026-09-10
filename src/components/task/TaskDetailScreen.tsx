@@ -9,6 +9,7 @@ import { CloseButton } from '@/components/ui/CloseButton';
 import { EditTaskButton } from '@/components/ui/EditTaskButton';
 import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
+import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 
 export default function TaskDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -62,6 +63,9 @@ export default function TaskDetailScreen() {
             <Text style={styles.statValue}>{task.taskLogs.length}</Text>
             <Text style={styles.statLabel}>times done</Text>
           </View>
+        </View>
+        <View style={styles.calendarCard}>
+          <TaskCalendar color={task.color} taskLogs={task.taskLogs} />
         </View>
       </View>
     </>
@@ -119,5 +123,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.textDim,
     textTransform: 'uppercase',
+  },
+  calendarCard: {
+    backgroundColor: Colors.cellBg,
+    borderColor: Colors.border,
+    borderRadius: 14,
+    borderWidth: 1,
+    overflow: 'hidden',
   },
 });
