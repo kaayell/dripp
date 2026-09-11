@@ -10,6 +10,7 @@ import { EditTaskButton } from '@/components/ui/EditTaskButton';
 import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
+import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
 
 export default function TaskDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -71,8 +72,13 @@ export default function TaskDetailScreen() {
             </View>
           </View>
         </View>
-        <View style={styles.calendarCard}>
-          <TaskCalendar taskId={task.id} color={task.color} taskLogs={task.taskLogs} />
+        <View style={styles.calendarsContainer}>
+          <View style={styles.calendarCard}>
+            <TaskCalendarHeatmap color={task.color} taskLogs={task.taskLogs} />
+          </View>
+          <View style={styles.calendarCard}>
+            <TaskCalendar taskId={task.id} color={task.color} taskLogs={task.taskLogs} />
+          </View>
         </View>
       </View>
     </>
@@ -125,11 +131,14 @@ const styles = StyleSheet.create({
     color: Colors.text,
     textTransform: 'lowercase',
   },
+  calendarsContainer: {
+    flexDirection: 'column',
+    gap: 14,
+  },
   calendarCard: {
     backgroundColor: Colors.cellBg,
     borderColor: Colors.border,
     borderRadius: 14,
     borderWidth: 1,
-    overflow: 'hidden',
   },
 });
