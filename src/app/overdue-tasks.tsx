@@ -1,1 +1,1 @@
-export { default } from '@/components/task/OverdueTasks';
+export { default } from '@/components/task/OverdueTasksScreen';

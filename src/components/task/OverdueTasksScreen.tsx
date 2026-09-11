@@ -26,7 +26,7 @@ function sortByMostOverdue(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLo
   });
 }
 
-export default function OverdueTasks() {
+export default function OverdueTasksScreen() {
   const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
@@ -39,7 +39,7 @@ export default function OverdueTasks() {
           setCategories(loadedCategories);
           setTasks(sortByMostOverdue(loadedTasks));
         })
-        .catch((e) => console.error('[OverdueTasks] load failed', e));
+        .catch((e) => console.error('[OverdueTasksScreen] load failed', e));
     }, []),
   );
 
