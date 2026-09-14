@@ -1,14 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import {
-  createTaskLog,
-  loadTasks,
-  loadTaskLogsForDay,
-  removeTaskLog,
-  Task,
-  TaskLog,
-} from '../../../db/queries';
+import { loadTaskLogsForDay, loadTasks, Task, TaskLog, toggleTaskLog } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 import { FormSheet } from '@/components/ui/FormSheet';
@@ -42,17 +35,13 @@ export default function TaskPicker() {
 
   const toggleTask = useCallback(
     (taskId: number, taskLogId: number | undefined) => {
-      if (taskLogId) {
-        removeTaskLog(taskLogId)
-          .then(() => {
-            setTaskLogs((prev) => prev.filter((t) => t.id !== taskLogId));
-          })
-          .catch(() => {});
-      } else {
-        createTaskLog(taskId, date).then((created) => {
-          setTaskLogs((prev) => [...prev, created]);
-        });
-      }
+      toggleTaskLog(taskId, date)
+        .then((created) => {
+          created
+            ? setTaskLogs((prev) => [...prev, created])
+            : setTaskLogs((prev) => prev.filter((t) => t.id !== taskLogId));
+        })
+        .catch(() => {});
     },
     [date],
   );

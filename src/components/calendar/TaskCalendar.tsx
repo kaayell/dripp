@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { Colors, dimmed } from '@/constants/theme';
-import { createTaskLog, removeTaskLog, TaskLog } from '../../../db/queries';
+import { TaskLog, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
 
 type CalendarListRef = { scrollToMonth: (date: string) => void };
@@ -76,18 +76,16 @@ export function TaskCalendar({ taskId, color, taskLogs: taskLogsProp }: TaskCale
       if (isDifferentMonth) {
         calendarRef.current?.scrollToMonth(day.dateString);
       }
-      const existing = taskLogs.find((t) => t.date === day.dateString);
-      if (existing) {
-        removeTaskLog(existing.id)
-          .then(() => {
-            setTaskLogs((prev) => prev.filter((t) => t.id !== existing.id));
-          })
-          .catch(() => {});
-      } else {
-        createTaskLog(taskId, day.dateString).then((created) => {
-          setTaskLogs((prev) => [...prev, created]);
-        });
-      }
+      toggleTaskLog(taskId, day.dateString)
+        .then((created) => {
+          if (created) {
+            setTaskLogs((prev) => [...prev, created]);
+          } else {
+            const existing = taskLogs.find((t) => t.date === day.dateString);
+            setTaskLogs((prev) => prev.filter((t) => t.id !== existing?.id));
+          }
+        })
+        .catch(() => {});
     },
     [taskId, taskLogs, today, visibleMonth],
   );

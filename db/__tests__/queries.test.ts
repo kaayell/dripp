@@ -7,15 +7,16 @@ import {
   createTaskLog,
   loadCategories,
   loadTask,
+  loadTaskLogs,
+  loadTaskLogsForDay,
   loadTasks,
   loadTasksWithMostRecentLog,
   loadTaskWithDetails,
-  loadTaskLogs,
-  loadTaskLogsForDay,
   removeTaskLog,
+  toggleTaskLog,
   updateTask,
 } from '../queries';
-import { categories, tasks, taskLog } from '../schema';
+import { categories, taskLog, tasks } from '../schema';
 
 afterEach(async () => {
   await db.delete(taskLog);
@@ -264,7 +265,7 @@ describe('createTaskLog', () => {
       .returning();
 
     const created = await createTaskLog(dripTask.id, '2026-01-01');
-    expect(created).toMatchObject({});
+    expect(created).toMatchObject({ task_id: dripTask.id, date: '2026-01-01' });
     expect(created.id).toEqual(expect.any(Number));
     expect(await loadTaskLogs()).toHaveLength(1);
   });
@@ -284,6 +285,32 @@ describe('removeTaskLog', () => {
 
     await removeTaskLog(createdTaskLog.id);
 
+    expect(await loadTaskLogs()).toHaveLength(0);
+  });
+});
+
+describe('toggleTaskLog', () => {
+  let dripTaskId: number;
+
+  beforeEach(async () => {
+    const [dripTask] = await db
+      .insert(tasks)
+      .values({ name: 'drip', color: '#ffffff', categoryId: null })
+      .returning();
+    dripTaskId = dripTask.id;
+  });
+
+  it('creates task log when none exists', async () => {
+    const result = await toggleTaskLog(dripTaskId, '2026-01-01');
+    expect(result).toMatchObject({ task_id: dripTaskId, date: '2026-01-01' });
+    expect(await loadTaskLogs()).toHaveLength(1);
+  });
+
+  it('removes existing task log', async () => {
+    await db.insert(taskLog).values([{ task_id: dripTaskId, date: '2026-01-01' }]);
+
+    const result = await toggleTaskLog(dripTaskId, '2026-01-01');
+    expect(result).toBeUndefined();
     expect(await loadTaskLogs()).toHaveLength(0);
   });
 });

@@ -84,3 +84,15 @@ export async function createTaskLog(taskId: number, date: string): Promise<TaskL
 export async function removeTaskLog(taskLogId: number) {
   await db.delete(taskLog).where(eq(taskLog.id, taskLogId));
 }
+
+export async function toggleTaskLog(taskId: number, date: string): Promise<TaskLog | undefined> {
+  const existing = await db.query.taskLog.findFirst({
+    where: { task_id: taskId, date },
+  });
+
+  if (existing) {
+    await removeTaskLog(existing.id);
+    return;
+  }
+  return await createTaskLog(taskId, date);
+}
