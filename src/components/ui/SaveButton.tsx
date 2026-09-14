@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
     color: Colors.background,
   },
   textDisabled: {
-    color: Colors.textDimmer,
+    color: Colors.disabled,
   },
 });

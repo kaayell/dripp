@@ -1,8 +1,9 @@
 export const Colors = {
   background: '#18171b',
   text: '#f2efe9',
-  textDim: '#f2efe966',
-  textDimmer: '#f2efe940',
+  icon: '#f2efe9B3',
+  label: '#f2efe966',
+  disabled: '#f2efe940',
   border: '#ffffff14',
   cellBg: '#1e1d21',
   teal: '#00b7c1',

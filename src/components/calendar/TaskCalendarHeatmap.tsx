@@ -79,8 +79,8 @@ export function TaskCalendarHeatmap({ color, taskLogs: taskLogsProp }: TaskCalen
             plotBackground: Colors.cellBg,
             grid: Colors.border,
             axis: Colors.border,
-            text: Colors.textDim,
-            mutedText: Colors.textDimmer,
+            text: Colors.label,
+            mutedText: Colors.disabled,
           }}
         />
       </ScrollView>
@@ -108,6 +108,6 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: 9,
     fontWeight: '700',
-    color: Colors.textDimmer,
+    color: Colors.disabled,
   },
 });

@@ -10,7 +10,7 @@ export function EditTaskButton({ taskId }: { taskId: number }) {
     <IconButton
       onPress={() => router.push({ pathname: '/edit-task', params: { taskId: String(taskId) } })}
     >
-      <SquarePen color={Colors.textDim} size={18} strokeWidth={2.25} />
+      <SquarePen color={Colors.icon} size={18} strokeWidth={2.25} />
     </IconButton>
   );
 }

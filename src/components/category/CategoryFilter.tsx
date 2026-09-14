@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 12.5,
     fontWeight: '600',
-    color: Colors.textDim,
+    color: Colors.label,
     textTransform: 'lowercase',
   },
   tabTextActive: {

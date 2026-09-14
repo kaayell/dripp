@@ -8,7 +8,7 @@ export function OverdueTaskButton() {
 
   return (
     <IconButton onPress={() => router.push('/overdue-tasks')}>
-      <ClockAlert color={Colors.textDim} size={20} strokeWidth={2.25} />
+      <ClockAlert color={Colors.icon} size={20} strokeWidth={2.25} />
     </IconButton>
   );
 }

@@ -8,7 +8,7 @@ export function AddTaskButton() {
 
   return (
     <IconButton onPress={() => router.push('/add-task')}>
-      <Plus color={Colors.textDim} size={22} strokeWidth={2.25} />
+      <Plus color={Colors.icon} size={22} strokeWidth={2.25} />
     </IconButton>
   );
 }

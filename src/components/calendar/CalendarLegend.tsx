@@ -49,6 +49,6 @@ const styles = StyleSheet.create({
   legendLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.textDim,
+    color: Colors.label,
   },
 });

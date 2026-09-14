@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   taskLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.textDim,
+    color: Colors.label,
   },
   taskLabelActive: {
     fontWeight: '700',

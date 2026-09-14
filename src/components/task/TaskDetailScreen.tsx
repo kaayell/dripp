@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   category: {
     fontSize: 15,
     fontWeight: '600',
-    color: Colors.textDim,
+    color: Colors.label,
     textTransform: 'lowercase',
   },
   lastDonePill: {

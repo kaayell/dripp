@@ -37,7 +37,7 @@ export default function TaskCalendarDay({
         style={[
           styles.dayNum,
           marked && { fontWeight: '700' },
-          isDisabled && { color: Colors.textDimmer },
+          isDisabled && { color: Colors.disabled },
         ]}
       >
         {date.day}

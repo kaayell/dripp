@@ -54,7 +54,7 @@ export default function CalendarDay({
         style={[
           styles.dayNum,
           isToday && { fontWeight: '700' },
-          isDisabled && { color: Colors.textDimmer },
+          isDisabled && { color: Colors.disabled },
         ]}
       >
         {date.day}

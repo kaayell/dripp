@@ -34,7 +34,7 @@ const calendarTheme = {
     monthText: {
       fontSize: 16,
       fontWeight: '600',
-      color: Colors.textDim,
+      color: Colors.label,
     },
   },
   'stylesheet.calendar.main': {
@@ -169,7 +169,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 10.5,
     fontWeight: '600',
-    color: Colors.textDim,
+    color: Colors.label,
     letterSpacing: 0.5,
   },
 });

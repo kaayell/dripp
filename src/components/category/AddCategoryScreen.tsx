@@ -35,7 +35,7 @@ export default function AddCategoryScreen() {
         value={name}
         onChangeText={setName}
         placeholder="category name"
-        placeholderTextColor={Colors.textDim}
+        placeholderTextColor={Colors.label}
         style={styles.input}
         autoFocus
         onSubmitEditing={handleSave}

@@ -8,7 +8,7 @@ export function CloseButton() {
 
   return (
     <IconButton onPress={() => router.back()}>
-      <X color={Colors.textDim} size={20} strokeWidth={2.25} />
+      <X color={Colors.icon} size={20} strokeWidth={2.25} />
     </IconButton>
   );
 }

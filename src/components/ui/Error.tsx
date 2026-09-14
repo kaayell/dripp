@@ -16,7 +16,7 @@ export default function Error({ message }: Props) {
         padding: 20,
       }}
     >
-      <Text style={{ color: Colors.textDim, textAlign: 'center' }}>{message}</Text>
+      <Text style={{ color: Colors.label, textAlign: 'center' }}>{message}</Text>
     </View>
   );
 }

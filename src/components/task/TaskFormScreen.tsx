@@ -90,7 +90,7 @@ export default function TaskFormScreen({
           value={name}
           onChangeText={setName}
           placeholder="Task name"
-          placeholderTextColor={Colors.textDim}
+          placeholderTextColor={Colors.label}
           style={styles.input}
           autoFocus
         />
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   sectionLabel: {
     fontSize: 12,
     fontWeight: '700',
-    color: Colors.textDim,
+    color: Colors.label,
     textTransform: 'uppercase',
     marginBottom: 10,
     marginLeft: 2,
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   categoryChipText: {
     fontSize: 12.5,
     fontWeight: '600',
-    color: Colors.textDim,
+    color: Colors.label,
     textTransform: 'lowercase',
   },
   categoryChipTextActive: {

@@ -10,7 +10,7 @@ type CalendarListRef = { scrollToMonth: (date: string) => void };
 const calendarTheme = {
   calendarBackground: Colors.cellBg,
   dayTextColor: Colors.text,
-  textDisabledColor: Colors.textDimmer,
+  textDisabledColor: Colors.disabled,
   monthTextColor: Colors.text,
   weekVerticalMargin: 2,
   'stylesheet.calendar.header': {
@@ -30,7 +30,7 @@ const calendarTheme = {
       fontSize: 13,
       textAlign: 'center',
       textTransform: 'uppercase',
-      color: Colors.textDim,
+      color: Colors.label,
     },
   },
 };

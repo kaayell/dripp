@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
   taskSubLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: Colors.textDim,
+    color: Colors.label,
   },
   hr: {
     height: 4,
