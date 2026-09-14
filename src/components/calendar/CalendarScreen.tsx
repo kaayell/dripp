@@ -5,8 +5,8 @@ import { CalendarList } from 'react-native-calendars';
 import {
   Category,
   loadCategories,
-  loadTasks,
   loadTaskLogs,
+  loadTasks,
   Task,
   TaskLogWithTask,
 } from '../../../db/queries';
@@ -25,16 +25,16 @@ const calendarTheme = {
   weekVerticalMargin: 2,
   'stylesheet.calendar.header': {
     header: {
-      paddingTop: 20,
-      paddingBottom: 5,
+      paddingLeft: 10,
+      paddingVertical: 5,
       borderBottomWidth: 1,
       borderBottomColor: Colors.border,
-      marginBottom: 15,
+      marginVertical: 5,
     },
     monthText: {
-      fontSize: 16,
+      fontSize: 20,
       fontWeight: '600',
-      color: Colors.label,
+      color: Colors.text,
     },
   },
   'stylesheet.calendar.main': {
@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   weekdayLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 10.5,
+    fontSize: 11,
     fontWeight: '600',
     color: Colors.label,
     letterSpacing: 0.5,
