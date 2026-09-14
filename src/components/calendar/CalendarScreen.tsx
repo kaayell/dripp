@@ -158,7 +158,7 @@ export default function CalendarScreen() {
         />
       </View>
 
-      <CalendarLegend tasks={visibleTasks} />
+      <CalendarLegend tasks={visibleTasks} onToggle={refresh} />
     </View>
   );
 }
