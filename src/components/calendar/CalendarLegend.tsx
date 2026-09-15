@@ -4,6 +4,13 @@ import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
 
 type Props = {
   tasks: Task[];
@@ -32,19 +39,51 @@ export default function CalendarLegend({ tasks, onToggle }: Props) {
       contentContainerStyle={styles.legendRowContent}
     >
       {tasks.map((task) => (
-        <Pressable
-          key={task.id}
-          style={[styles.legendItem, { borderColor: dimmed(task.color, 40) }]}
-          onPress={() =>
-            router.push({ pathname: '/task-detail', params: { taskId: String(task.id) } })
-          }
-          onLongPress={() => toggleTask(task.id)}
-        >
-          <Drop color={task.color} size={10} />
-          <Text style={styles.legendLabel}>{task.name}</Text>
-        </Pressable>
+        <AnimatedLabel key={task.id} task={task} onToggle={toggleTask} />
       ))}
     </ScrollView>
+  );
+}
+
+function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: number) => void }) {
+  const pressAnim = useSharedValue(1);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: pressAnim.value }],
+    opacity: pressAnim.value ** 4,
+  }));
+
+  const onPressIn = () => {
+    pressAnim.value = withSpring(0.9);
+  };
+
+  const onPressOut = () => {
+    pressAnim.value = withSpring(1);
+  };
+
+  const onLongPress = () => {
+    pressAnim.value = withSequence(
+      withTiming(1.15, { duration: 100 }),
+      withTiming(1, { duration: 150 }),
+    );
+    onToggle(task.id);
+  };
+
+  return (
+    <Pressable
+      key={task.id}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      onPress={() => router.push({ pathname: '/task-detail', params: { taskId: String(task.id) } })}
+      onLongPress={onLongPress}
+    >
+      <Animated.View
+        style={[styles.legendItem, { borderColor: dimmed(task.color, 40) }, animatedStyle]}
+      >
+        <Drop color={task.color} size={10} />
+        <Text style={styles.legendLabel}>{task.name}</Text>
+      </Animated.View>
+    </Pressable>
   );
 }
 
