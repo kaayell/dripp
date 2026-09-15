@@ -6,11 +6,12 @@ import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
 import { timeSince } from '@/constants/dates';
 import { CloseButton } from '@/components/ui/CloseButton';
-import { EditTaskButton } from '@/components/ui/EditTaskButton';
 import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
+import { SquarePen } from 'lucide-react-native';
+import { IconButton } from '@/components/ui/IconButton';
 
 export default function TaskDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -44,7 +45,14 @@ export default function TaskDetailScreen() {
       <Stack.Screen
         options={{
           headerLeft: () => <CloseButton />,
-          headerRight: () => <EditTaskButton taskId={task.id} />,
+          headerRight: () => (
+            <IconButton
+              onPress={() =>
+                router.push({ pathname: '/edit-task', params: { taskId: String(taskId) } })
+              }
+              icon={<SquarePen color={Colors.icon} size={18} strokeWidth={2.25} />}
+            />
+          ),
         }}
       />
       <View style={[styles.container, { paddingBottom: insets.bottom + 24 }]}>

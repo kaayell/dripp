@@ -1,16 +1,10 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/theme';
 
-export function IconButton({
-  onPress,
-  children,
-}: {
-  onPress: () => void;
-  children: React.ReactNode;
-}) {
+export function IconButton({ onPress, icon }: { onPress: () => void; icon: React.ReactNode }) {
   return (
     <Pressable onPress={onPress} hitSlop={8} style={styles.button}>
-      {children}
+      {icon}
     </Pressable>
   );
 }
