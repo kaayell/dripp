@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useWindowDimensions } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { Colors, dimmed } from '@/constants/theme';
@@ -39,21 +39,17 @@ type TaskCalendarProps = {
   taskId: number;
   color: string;
   taskLogs: TaskLog[];
+  onToggle?: () => void;
 };
 
-export function TaskCalendar({ taskId, color, taskLogs: taskLogsProp }: TaskCalendarProps) {
+export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendarProps) {
   const now = new Date();
   const today = now.toLocaleDateString('sv');
   const currentYearMonth = { year: now.getFullYear(), month: now.getMonth() + 1 };
   const [visibleMonth, setVisibleMonth] = useState(currentYearMonth);
-  const [taskLogs, setTaskLogs] = useState(taskLogsProp);
   const { width: windowWidth } = useWindowDimensions();
   const width = Math.round(windowWidth) - 34;
   const calendarRef = useRef<CalendarListRef>(null);
-
-  useEffect(() => {
-    setTaskLogs(taskLogsProp);
-  }, [taskLogsProp]);
 
   const markedDates = useMemo(() => {
     return Object.fromEntries(
@@ -77,17 +73,10 @@ export function TaskCalendar({ taskId, color, taskLogs: taskLogsProp }: TaskCale
         calendarRef.current?.scrollToMonth(day.dateString);
       }
       toggleTaskLog(taskId, day.dateString)
-        .then((created) => {
-          if (created) {
-            setTaskLogs((prev) => [...prev, created]);
-          } else {
-            const existing = taskLogs.find((t) => t.date === day.dateString);
-            setTaskLogs((prev) => prev.filter((t) => t.id !== existing?.id));
-          }
-        })
+        .then(() => onToggle?.())
         .catch(() => {});
     },
-    [taskId, taskLogs, today, visibleMonth],
+    [taskId, today, visibleMonth, onToggle],
   );
 
   return (

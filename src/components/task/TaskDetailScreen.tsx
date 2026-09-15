@@ -18,19 +18,21 @@ export default function TaskDetailScreen() {
   const [task, setTask] = useState<TaskWithDetails | null>(null);
   const [loaded, setLoaded] = useState(false);
 
+  const refresh = useCallback(async () => {
+    const loadedTask = await loadTaskWithDetails(Number(taskId));
+    if (!loadedTask) {
+      router.back();
+      return;
+    }
+    setTask(loadedTask);
+  }, [taskId]);
+
   useFocusEffect(
     useCallback(() => {
-      loadTaskWithDetails(Number(taskId))
-        .then((loadedTask) => {
-          if (!loadedTask) {
-            router.back();
-            return;
-          }
-          setTask(loadedTask);
-        })
+      refresh()
         .catch((e) => console.error('[TaskDetailScreen] load failed', e))
         .finally(() => setLoaded(true));
-    }, [taskId]),
+    }, [refresh]),
   );
 
   if (!loaded || !task) {
@@ -77,7 +79,12 @@ export default function TaskDetailScreen() {
             <TaskCalendarHeatmap color={task.color} taskLogs={task.taskLogs} />
           </View>
           <View style={styles.calendarCard}>
-            <TaskCalendar taskId={task.id} color={task.color} taskLogs={task.taskLogs} />
+            <TaskCalendar
+              taskId={task.id}
+              color={task.color}
+              taskLogs={task.taskLogs}
+              onToggle={refresh}
+            />
           </View>
         </View>
       </View>

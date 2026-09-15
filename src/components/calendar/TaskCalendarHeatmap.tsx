@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Colors, dimmed } from '@/constants/theme';
 import { TaskLog } from '../../../db/queries';
@@ -23,16 +23,11 @@ const LABELED_WEEKDAYS = [
   { index: 5, label: 'Fri' },
 ];
 
-export function TaskCalendarHeatmap({ color, taskLogs: taskLogsProp }: TaskCalendarHeatmapProps) {
+export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProps) {
   const today = new Date().toLocaleDateString('sv');
-  const [taskLogs, setTaskLogs] = useState(taskLogsProp);
   const { width: windowWidth } = useWindowDimensions();
   const viewportWidth = Math.round(windowWidth) - 34;
   const scrollRef = useRef<ScrollView>(null);
-
-  useEffect(() => {
-    setTaskLogs(taskLogsProp);
-  }, [taskLogsProp]);
 
   const markedDates = useMemo(() => {
     return taskLogs.map((log) => {
