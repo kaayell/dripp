@@ -1,0 +1,9 @@
+appId: com.kaayell.dripp
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../subflows/create-task-with-category.yaml
+    env:
+      TASK_NAME: "drip"
+      CATEGORY_NAME: "bod"

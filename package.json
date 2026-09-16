@@ -43,8 +43,10 @@
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
+    "android:release": "expo run:android --variant release",
     "format": "prettier --write .",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "e2e": "maestro test .maestro/flows"
   },
   "private": true,
   "jest": {

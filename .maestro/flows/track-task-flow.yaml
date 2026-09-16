@@ -1,0 +1,11 @@
+appId: com.kaayell.dripp
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../subflows/create-task.yaml
+    env:
+      TASK_NAME: "drip"
+- longPressOn: "drip"
+- tapOn: "drip"
+- assertVisible: "Today"

@@ -45,6 +45,7 @@ export default function Layout() {
                   icon={<ClockAlert color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
+                  testID="add-task-button"
                   onPress={() => router.push('/add-task')}
                   icon={<Plus color={Colors.icon} size={22} strokeWidth={2.25} />}
                 />

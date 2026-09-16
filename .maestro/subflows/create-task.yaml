@@ -1,0 +1,13 @@
+appId: com.kaayell.dripp
+---
+- assertVisible:
+    id: "add-task-button"
+- tapOn:
+    id: "add-task-button"
+- assertVisible: "New Task"
+- tapOn: "Task name"
+- inputText: ${TASK_NAME}
+- pressKey: Enter
+- tapOn: "Save"
+- assertNotVisible: "New Task"
+- assertVisible: ${TASK_NAME}

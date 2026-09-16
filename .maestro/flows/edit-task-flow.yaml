@@ -1,0 +1,23 @@
+appId: com.kaayell.dripp
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../subflows/create-task.yaml
+    env:
+      TASK_NAME: "drip"
+- tapOn: "drip"
+- assertVisible:
+    id: "edit-task-button"
+- tapOn:
+    id: "edit-task-button"
+- assertVisible: "Edit Task"
+- eraseText
+- inputText: "drop"
+- pressKey: Enter
+- tapOn: "Save"
+- assertNotVisible: "Edit Task"
+- assertVisible: "drop"
+- tapOn:
+    id: "close-button"
+- assertVisible: "drop"

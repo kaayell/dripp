@@ -47,6 +47,7 @@ export default function TaskDetailScreen() {
           headerLeft: () => <CloseButton />,
           headerRight: () => (
             <IconButton
+              testID="edit-task-button"
               onPress={() =>
                 router.push({ pathname: '/edit-task', params: { taskId: String(taskId) } })
               }

@@ -91,3 +91,31 @@ sqlite3 /tmp/dripp.db ".tables"
 sqlite3 /tmp/dripp.db "select * from categories;"
 sqlite3 /tmp/dripp.db "select * from tasks;"
 ```
+
+## Tests
+
+### Unit
+```bash
+npm run test
+```
+
+# E2E tests (Maestro)
+
+## Install the CLI
+
+```
+curl -Ls "https://get.maestro.mobile.dev" | bash
+```
+
+## Build the app/start simulator
+
+```bash
+npm run android:release
+```
+
+## Run flows
+
+```bash
+npm run e2e
+```
+

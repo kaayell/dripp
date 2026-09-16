@@ -2,7 +2,15 @@ import { Pressable, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/theme';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
-export function IconButton({ onPress, icon }: { onPress: () => void; icon: React.ReactNode }) {
+export function IconButton({
+  onPress,
+  icon,
+  testID,
+}: {
+  onPress: () => void;
+  icon: React.ReactNode;
+  testID?: string;
+}) {
   const pressAnim = useSharedValue(1);
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: pressAnim.value }],
@@ -18,7 +26,13 @@ export function IconButton({ onPress, icon }: { onPress: () => void; icon: React
   };
 
   return (
-    <Pressable onPress={onPress} onPressIn={onPressIn} onPressOut={onPressOut} hitSlop={8}>
+    <Pressable
+      onPress={onPress}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      hitSlop={8}
+      testID={testID}
+    >
       <Animated.View style={[styles.button, animatedStyle]}>{icon}</Animated.View>
     </Pressable>
   );
