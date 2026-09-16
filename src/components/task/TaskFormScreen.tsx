@@ -49,6 +49,7 @@ export default function TaskFormScreen({
   const [color, setColor] = useState(task?.color ?? SWATCHES[0]);
   const [categoryId, setCategoryId] = useState<number | null>(task?.categoryId ?? null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (newCategoryIdParam) {
@@ -64,12 +65,13 @@ export default function TaskFormScreen({
   const handleSubmit = useCallback(async () => {
     if (!canSubmit) return;
     setSubmitting(true);
+    setError(null);
     try {
       await onSubmit({ name: name.trim(), color, categoryId });
       router.back();
     } catch (e) {
-      console.error('[TaskFormScreen] save task failed', e);
       setSubmitting(false);
+      setError('Task already exists');
     }
   }, [canSubmit, onSubmit, name, color, categoryId]);
 
@@ -88,12 +90,16 @@ export default function TaskFormScreen({
 
         <TextInput
           value={name}
-          onChangeText={setName}
+          onChangeText={(text) => {
+            setName(text);
+            setError(null);
+          }}
           placeholder="Task name"
           placeholderTextColor={Colors.label}
-          style={styles.input}
+          style={[styles.input, error && styles.inputError]}
           autoFocus
         />
+        {error && <Text style={styles.errorText}>{error}</Text>}
 
         <Text style={styles.sectionLabel}>Color</Text>
         <View style={styles.swatchRow}>
@@ -163,6 +169,16 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: Colors.text,
     marginBottom: 20,
+  },
+  inputError: {
+    borderColor: Colors.error,
+  },
+  errorText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.error,
+    marginTop: -12,
+    marginBottom: 16,
   },
   sectionLabel: {
     fontSize: 12,

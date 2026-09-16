@@ -8,6 +8,7 @@ export const Colors = {
   cellBg: '#1e1d21',
   teal: '#00b7c1',
   tealTint: '#00b7c114',
+  error: '#e05c5c',
 } as const;
 
 export const ColorOpacityAlphas = {

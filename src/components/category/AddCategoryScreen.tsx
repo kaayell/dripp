@@ -10,12 +10,14 @@ export default function AddCategoryScreen() {
   const { pathname, taskId } = useLocalSearchParams<{ pathname?: string; taskId?: string }>();
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const canSave = name.trim().length > 0 && !saving;
 
   const handleSave = useCallback(async () => {
     if (!canSave) return;
     setSaving(true);
+    setError(null);
     try {
       const created = await createCategory(name.trim());
       router.dismissTo({
@@ -23,8 +25,8 @@ export default function AddCategoryScreen() {
         params: { categoryId: String(created.id), ...(taskId ? { taskId } : {}) },
       });
     } catch (e) {
-      console.error('[AddCategoryScreen] create category failed', e);
       setSaving(false);
+      setError('Category already exists');
     }
   }, [canSave, name, pathname, taskId]);
 
@@ -33,14 +35,18 @@ export default function AddCategoryScreen() {
       <Text style={styles.title}>Create Category</Text>
       <TextInput
         value={name}
-        onChangeText={setName}
+        onChangeText={(text) => {
+          setName(text);
+          setError(null);
+        }}
         placeholder="category name"
         placeholderTextColor={Colors.label}
-        style={styles.input}
+        style={[styles.input, error && styles.inputError]}
         autoFocus
         onSubmitEditing={handleSave}
         returnKeyType="done"
       />
+      {error && <Text style={styles.errorText}>{error}</Text>}
       <SaveButton onPress={handleSave} disabled={!canSave} />
     </FormSheet>
   );
@@ -64,5 +70,15 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: Colors.text,
     marginBottom: 20,
+  },
+  inputError: {
+    borderColor: Colors.error,
+  },
+  errorText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.error,
+    marginTop: -12,
+    marginBottom: 16,
   },
 });
