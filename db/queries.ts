@@ -69,6 +69,7 @@ export async function updateTask(
 export async function loadTaskLogs() {
   return await db.query.taskLog.findMany({
     with: { task: true },
+    orderBy: { task_id: 'asc' },
   });
 }
 

@@ -29,6 +29,8 @@ const calendarTheme = {
       paddingVertical: 5,
       borderBottomWidth: 1,
       borderBottomColor: Colors.border,
+      borderTopWidth: 1,
+      borderTopColor: Colors.border,
       marginVertical: 5,
     },
     monthText: {
@@ -133,7 +135,7 @@ export default function CalendarScreen() {
         onSelectCategory={selectCategory}
       />
 
-      <View style={{ flexDirection: 'row', paddingVertical: 15 }}>
+      <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
         {WEEKDAY_LABELS.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
             {wd}
@@ -154,7 +156,6 @@ export default function CalendarScreen() {
           markedDates={markedDates as any}
           dayComponent={CalendarDay}
           onDayPress={handleDayPress}
-          contentContainerStyle={{ paddingBottom: 16 }}
         />
       </View>
 
