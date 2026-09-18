@@ -156,5 +156,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.border,
     borderRadius: 14,
     borderWidth: 1,
+    overflow: 'hidden',
   },
 });

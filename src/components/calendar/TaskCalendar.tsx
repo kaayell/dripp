@@ -1,9 +1,11 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useWindowDimensions } from 'react-native';
+import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { Colors, dimmed } from '@/constants/theme';
 import { TaskLog, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
+import { IconButton } from '@/components/ui/IconButton';
+import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 
 type CalendarListRef = { scrollToMonth: (date: string) => void };
 
@@ -14,18 +16,7 @@ const calendarTheme = {
   monthTextColor: Colors.text,
   weekVerticalMargin: 2,
   'stylesheet.calendar.header': {
-    header: {
-      paddingVertical: 12,
-      paddingHorizontal: 14,
-    },
-    monthText: {
-      fontSize: 18,
-      fontWeight: '700',
-      color: Colors.text,
-    },
     dayHeader: {
-      marginTop: 2,
-      marginBottom: 7,
       width: 38,
       fontSize: 13,
       textAlign: 'center',
@@ -79,6 +70,45 @@ export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendar
     [taskId, today, visibleMonth, onToggle],
   );
 
+  const renderHeader = useCallback(
+    (date: any) => {
+      if (!date) return null;
+      const isMaxMonth =
+        date.getFullYear() === currentYearMonth.year &&
+        date.getMonth() + 1 === currentYearMonth.month;
+
+      const goToMonth = (offset: number) => {
+        const target = date.clone().addMonths(offset);
+        const dateString = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, '0')}-01`;
+        calendarRef.current?.scrollToMonth(dateString);
+      };
+
+      return (
+        <View style={styles.header}>
+          <Text style={styles.monthText}>{date.toString('MMMM yyyy')}</Text>
+          <View style={styles.arrows}>
+            <IconButton
+              onPress={() => goToMonth(-1)}
+              icon={<ChevronLeft color={Colors.icon} size={20} strokeWidth={2.25} />}
+            />
+            <IconButton
+              onPress={() => goToMonth(1)}
+              disabled={isMaxMonth}
+              icon={
+                <ChevronRight
+                  color={isMaxMonth ? Colors.disabled : Colors.icon}
+                  size={20}
+                  strokeWidth={2.25}
+                />
+              }
+            />
+          </View>
+        </View>
+      );
+    },
+    [currentYearMonth],
+  );
+
   return (
     <CalendarList
       ref={calendarRef}
@@ -88,10 +118,11 @@ export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendar
       animateScroll
       calendarWidth={width}
       calendarHeight={400}
-      hideArrows
       showSixWeeks
+      staticHeader
+      hideArrows
+      renderHeader={renderHeader}
       futureScrollRange={0}
-      showScrollIndicator={false}
       hideExtraDays={false}
       maxDate={today}
       markedDates={markedDates}
@@ -101,3 +132,23 @@ export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendar
     />
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
+  },
+  monthText: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: Colors.text,
+  },
+  arrows: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+});

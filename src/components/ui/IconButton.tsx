@@ -4,10 +4,12 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-na
 
 export function IconButton({
   onPress,
+  disabled = false,
   icon,
   testID,
 }: {
   onPress: () => void;
+  disabled?: boolean;
   icon: React.ReactNode;
   testID?: string;
 }) {
@@ -31,6 +33,7 @@ export function IconButton({
       onPressIn={onPressIn}
       onPressOut={onPressOut}
       hitSlop={8}
+      disabled={disabled}
       testID={testID}
     >
       <Animated.View style={[styles.button, animatedStyle]}>{icon}</Animated.View>
