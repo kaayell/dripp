@@ -1,12 +1,19 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import type { Category, Task } from '../../../db/queries';
-import { loadCategories } from '../../../db/queries';
+import type {
+  Category,
+  ReminderInputValues,
+  Task,
+  TaskInputValues,
+  TaskWithReminder,
+} from '../../../db/queries';
+import { loadCategories, setTaskReminder } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { SaveButton } from '@/components/ui/SaveButton';
+import { TaskReminder } from '@/components/task/TaskReminder';
 
 const SWATCHES = [
   '#ec5b57',
@@ -27,12 +34,12 @@ const SWATCHES = [
   '#dc7492',
 ];
 
-export type TaskFormValues = { name: string; color: string; categoryId: number | null };
+export type TaskFormValues = TaskInputValues;
 
 type TaskScreenProps = {
   title: string;
-  task?: Task;
-  onSubmit: (values: TaskFormValues) => Promise<void>;
+  task?: TaskWithReminder;
+  onSubmit: (values: TaskFormValues) => Promise<Task>;
   newCategoryReturnTo: { pathname: '/add-task' | '/edit-task'; taskId?: number };
 };
 
@@ -48,6 +55,18 @@ export default function TaskFormScreen({
   const [name, setName] = useState(task?.name ?? '');
   const [color, setColor] = useState(task?.color ?? SWATCHES[0]);
   const [categoryId, setCategoryId] = useState<number | null>(task?.categoryId ?? null);
+  const [reminder, setReminder] = useState<ReminderInputValues | null>(
+    task?.reminder
+      ? {
+          time: task.reminder.time,
+          type: task.reminder.type,
+          interval: task.reminder.interval,
+          dayOfWeek: task.reminder.dayOfWeek,
+          dayOfMonth: task.reminder.dayOfMonth,
+        }
+      : null,
+  );
+  const [reminderEnabled, setReminderEnabled] = useState(task?.reminder != null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -67,13 +86,18 @@ export default function TaskFormScreen({
     setSubmitting(true);
     setError(null);
     try {
-      await onSubmit({ name: name.trim(), color, categoryId });
+      const savedTask = await onSubmit({
+        name: name.trim(),
+        color,
+        categoryId,
+      });
+      await setTaskReminder(savedTask.id, reminderEnabled ? reminder : null);
       router.back();
     } catch (e) {
       setSubmitting(false);
       setError('Task already exists');
     }
-  }, [canSubmit, onSubmit, name, color, categoryId]);
+  }, [canSubmit, onSubmit, name, color, categoryId, reminder, reminderEnabled]);
 
   return (
     <>
@@ -88,61 +112,80 @@ export default function TaskFormScreen({
       >
         <Text style={styles.title}>{title}</Text>
 
-        <TextInput
-          value={name}
-          onChangeText={(text) => {
-            setName(text);
-            setError(null);
-          }}
-          placeholder="Task name"
-          placeholderTextColor={Colors.label}
-          style={[styles.input, error && styles.inputError]}
-          autoFocus
-        />
-        {error && <Text style={styles.errorText}>{error}</Text>}
-
-        <Text style={styles.sectionLabel}>Color</Text>
-        <View style={styles.swatchRow}>
-          {SWATCHES.map((swatch) => (
-            <Pressable
-              key={swatch}
-              onPress={() => setColor(swatch)}
-              style={[
-                styles.swatch,
-                { backgroundColor: swatch },
-                swatch === color && styles.swatchActive,
-              ]}
-            />
-          ))}
+        <View style={styles.section}>
+          <TextInput
+            value={name}
+            onChangeText={(text) => {
+              setName(text);
+              setError(null);
+            }}
+            placeholder="Task name"
+            placeholderTextColor={Colors.label}
+            style={[styles.input, error && styles.inputError]}
+            autoFocus
+          />
+          {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
 
-        <Text style={styles.sectionLabel}>Category</Text>
-        <View style={styles.categoryRow}>
-          {categories.map((category) => {
-            const active = category.id === categoryId;
-            return (
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Color</Text>
+          <View style={styles.swatchRow}>
+            {SWATCHES.map((swatch) => (
               <Pressable
-                key={category.id}
-                style={[styles.categoryChip, active && styles.categoryChipActive]}
-                onPress={() => setCategoryId(active ? null : category.id)}
-              >
-                <Text style={[styles.categoryChipText, active && styles.categoryChipTextActive]}>
-                  {category.name}
-                </Text>
-              </Pressable>
-            );
-          })}
-          <Pressable
-            style={styles.categoryChip}
-            onPress={() =>
-              router.push({
-                pathname: '/add-category',
-                params: { ...newCategoryReturnTo },
-              })
-            }
-          >
-            <Text style={[styles.categoryChipText]}>+ new category</Text>
-          </Pressable>
+                key={swatch}
+                onPress={() => setColor(swatch)}
+                style={[
+                  styles.swatch,
+                  { backgroundColor: swatch },
+                  swatch === color && styles.swatchActive,
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionLabel}>Category</Text>
+          <View style={styles.categoryRow}>
+            {categories.map((category) => {
+              const active = category.id === categoryId;
+              return (
+                <Pressable
+                  key={category.id}
+                  style={[styles.categoryChip, active && styles.categoryChipActive]}
+                  onPress={() => setCategoryId(active ? null : category.id)}
+                >
+                  <Text style={[styles.categoryChipText, active && styles.categoryChipTextActive]}>
+                    {category.name}
+                  </Text>
+                </Pressable>
+              );
+            })}
+            <Pressable
+              style={styles.categoryChip}
+              onPress={() =>
+                router.push({
+                  pathname: '/add-category',
+                  params: { ...newCategoryReturnTo },
+                })
+              }
+            >
+              <Text style={[styles.categoryChipText]}>+ new category</Text>
+            </Pressable>
+          </View>
+        </View>
+
+        <View style={styles.section}>
+          <View style={styles.reminderRow}>
+            <Text style={styles.sectionLabel}>Reminder</Text>
+            <Switch
+              style={{ transform: [{ scale: 1.25 }] }}
+              value={reminderEnabled}
+              onValueChange={setReminderEnabled}
+              trackColor={{ true: Colors.teal }}
+            />
+          </View>
+          {reminderEnabled && <TaskReminder value={reminder} onChange={setReminder} />}
         </View>
 
         <SaveButton onPress={handleSubmit} disabled={!canSubmit} />
@@ -152,11 +195,14 @@ export default function TaskFormScreen({
 }
 
 const styles = StyleSheet.create({
+  section: {
+    gap: 10,
+  },
   title: {
-    fontSize: 22,
+    fontSize: 26,
     fontWeight: '700',
     color: Colors.text,
-    marginBottom: 20,
+    paddingBottom: 20,
   },
   input: {
     backgroundColor: Colors.cellBg,
@@ -185,8 +231,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: Colors.label,
     textTransform: 'uppercase',
-    marginBottom: 10,
-    marginLeft: 2,
+    letterSpacing: 0.75,
   },
   swatchRow: {
     flexDirection: 'row',
@@ -231,5 +276,11 @@ const styles = StyleSheet.create({
   categoryChipTextActive: {
     color: Colors.background,
     fontWeight: '700',
+  },
+  reminderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 10,
   },
 });

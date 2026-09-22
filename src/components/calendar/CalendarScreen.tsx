@@ -17,8 +17,7 @@ import { Colors } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-const WEEKDAY_LABELS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+import { WEEKDAY_NAMES } from '@/constants/dates';
 
 const calendarTheme = {
   calendarBackground: Colors.background,
@@ -136,7 +135,7 @@ export default function CalendarScreen() {
       />
 
       <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
-        {WEEKDAY_LABELS.map((wd) => (
+        {WEEKDAY_NAMES.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
             {wd}
           </Text>

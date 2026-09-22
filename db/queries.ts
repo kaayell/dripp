@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from './client';
-import { categories, tasks, taskLog } from './schema';
+import { categories, tasks, taskLog, reminders } from './schema';
 
 export type Category = typeof categories.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
@@ -13,6 +13,13 @@ export type TaskWithMostRecentLog = Task & {
   mostRecentTaskLog: TaskLog | null;
 };
 
+export type Reminder = typeof reminders.$inferSelect;
+export type TaskWithReminder = Task & { reminder: Reminder | null };
+
+export type ReminderInputValues = Omit<Reminder, 'id' | 'taskId'>;
+
+export type TaskInputValues = Omit<Task, 'id'>;
+
 export async function loadCategories(): Promise<Category[]> {
   return db.select().from(categories);
 }
@@ -22,9 +29,11 @@ export async function createCategory(name: string): Promise<Category> {
   return created;
 }
 
-export async function loadTask(taskId: number): Promise<Task | undefined> {
-  const [task] = await db.select().from(tasks).where(eq(tasks.id, taskId));
-  return task;
+export async function loadTask(taskId: number): Promise<TaskWithReminder | undefined> {
+  return await db.query.tasks.findFirst({
+    where: { id: taskId },
+    with: { reminder: true },
+  });
 }
 
 export async function loadTaskWithDetails(taskId: number): Promise<TaskWithDetails | undefined> {
@@ -49,21 +58,28 @@ export async function loadTasksWithMostRecentLog(): Promise<TaskWithMostRecentLo
   });
 }
 
-export async function createTask(task: {
-  name: string;
-  color: string;
-  categoryId: number | null;
-}): Promise<Task> {
+export async function createTask(task: TaskInputValues): Promise<Task> {
   const [created] = await db.insert(tasks).values(task).returning();
   return created;
 }
 
-export async function updateTask(
-  taskId: number,
-  task: { name: string; color: string; categoryId: number | null },
-): Promise<Task> {
+export async function updateTask(taskId: number, task: TaskInputValues): Promise<Task> {
   const [updated] = await db.update(tasks).set(task).where(eq(tasks.id, taskId)).returning();
   return updated;
+}
+
+export async function setTaskReminder(
+  taskId: number,
+  reminder: ReminderInputValues | null,
+): Promise<void> {
+  if (reminder) {
+    await db
+      .insert(reminders)
+      .values({ taskId, ...reminder })
+      .onConflictDoUpdate({ target: reminders.taskId, set: reminder });
+    return;
+  }
+  await db.delete(reminders).where(eq(reminders.taskId, taskId));
 }
 
 export async function loadTaskLogs() {

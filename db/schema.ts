@@ -40,11 +40,27 @@ export const taskLog = sqliteTable(
   (table) => [unique().on(table.task_id, table.date)],
 );
 
+export const reminders = sqliteTable(
+  'reminders',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    taskId: integer('task_id')
+      .references(() => tasks.id)
+      .notNull(),
+    time: text().notNull(),
+    type: text({ enum: ['daily', 'weekly', 'monthly'] }).notNull(),
+    interval: integer().notNull(),
+    dayOfWeek: integer(),
+    dayOfMonth: integer(),
+  },
+  (table) => [uniqueIndex('remindersTaskIdUniqueIndex').on(table.taskId)],
+);
+
 export function lower(name: AnySQLiteColumn) {
   return sql`lower(${name})`;
 }
 
-export const relations = defineRelations({ categories, tasks, taskLog }, (r) => ({
+export const relations = defineRelations({ categories, tasks, taskLog, reminders }, (r) => ({
   tasks: {
     category: r.one.categories({
       from: r.tasks.categoryId,
@@ -60,10 +76,22 @@ export const relations = defineRelations({ categories, tasks, taskLog }, (r) => 
       from: r.tasks.id,
       to: r.taskLog.task_id,
     }),
+    reminder: r.one.reminders({
+      from: r.tasks.id,
+      to: r.reminders.taskId,
+      optional: true,
+    }),
   },
   taskLog: {
     task: r.one.tasks({
       from: r.taskLog.task_id,
+      to: r.tasks.id,
+      optional: false,
+    }),
+  },
+  reminders: {
+    task: r.one.tasks({
+      from: r.reminders.taskId,
       to: r.tasks.id,
       optional: false,
     }),

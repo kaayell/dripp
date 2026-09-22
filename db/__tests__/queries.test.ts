@@ -1,5 +1,6 @@
 jest.mock('../client', () => require('./__fixtures__/client'));
 
+import { eq } from 'drizzle-orm';
 import { db } from '../client';
 import {
   createCategory,
@@ -13,12 +14,14 @@ import {
   loadTasksWithMostRecentLog,
   loadTaskWithDetails,
   removeTaskLog,
+  setTaskReminder,
   toggleTaskLog,
   updateTask,
 } from '../queries';
-import { categories, taskLog, tasks } from '../schema';
+import { categories, reminders, taskLog, tasks } from '../schema';
 
 afterEach(async () => {
+  await db.delete(reminders);
   await db.delete(taskLog);
   await db.delete(tasks);
   await db.delete(categories);
@@ -60,7 +63,7 @@ describe('loadTask', () => {
       .returning();
 
     const result = await loadTask(task.id);
-    expect(result).toEqual(task);
+    expect(result).toMatchObject(task);
   });
 });
 
@@ -202,6 +205,90 @@ describe('updateTask', () => {
     expect(updated).toMatchObject({ name: 'mop', color: '#000000', categoryId: category.id });
     expect(updated.id).toEqual(task.id);
     expect(await loadTasks()).toHaveLength(1);
+  });
+});
+
+describe('setTaskReminder', () => {
+  let dripTaskId: number;
+
+  beforeEach(async () => {
+    const [dripTask] = await db
+      .insert(tasks)
+      .values({ name: 'drip', color: '#ffffff', categoryId: null })
+      .returning();
+    dripTaskId = dripTask.id;
+  });
+
+  it('creates a reminder when none exists', async () => {
+    await setTaskReminder(dripTaskId, {
+      time: '09:00',
+      type: 'daily',
+      interval: 1,
+      dayOfWeek: null,
+      dayOfMonth: null,
+    });
+
+    const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
+    expect(result).toMatchObject([
+      {
+        taskId: dripTaskId,
+        time: '09:00',
+        type: 'daily',
+        interval: 1,
+        dayOfWeek: null,
+        dayOfMonth: null,
+      },
+    ]);
+  });
+
+  it('updates the existing reminder instead of creating a second one', async () => {
+    await setTaskReminder(dripTaskId, {
+      time: '09:00',
+      type: 'daily',
+      interval: 1,
+      dayOfWeek: null,
+      dayOfMonth: null,
+    });
+
+    await setTaskReminder(dripTaskId, {
+      time: '18:30',
+      type: 'weekly',
+      interval: 2,
+      dayOfWeek: 1,
+      dayOfMonth: null,
+    });
+
+    const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({
+      time: '18:30',
+      type: 'weekly',
+      interval: 2,
+      dayOfWeek: 1,
+      dayOfMonth: null,
+    });
+  });
+
+  it('deletes the reminder when passed null', async () => {
+    await setTaskReminder(dripTaskId, {
+      time: '09:00',
+      type: 'daily',
+      interval: 1,
+      dayOfWeek: null,
+      dayOfMonth: null,
+    });
+
+    await setTaskReminder(dripTaskId, null);
+
+    const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
+    expect(result).toEqual([]);
+  });
+
+  it('does nothing when passed null and no reminder exists', async () => {
+    await setTaskReminder(dripTaskId, null);
+
+    const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
+    expect(result).toEqual([]);
   });
 });
 

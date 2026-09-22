@@ -3,7 +3,7 @@ import TaskFormScreen, { TaskFormValues } from '@/components/task/TaskFormScreen
 
 export default function AddTaskScreen() {
   const handleSubmit = async (values: TaskFormValues) => {
-    await createTask(values);
+    return await createTask(values);
   };
 
   return (

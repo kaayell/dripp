@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "scheme": "dripp",
     "orientation": "portrait",
+    "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
     "android": {
       "adaptiveIcon": {
