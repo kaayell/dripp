@@ -140,7 +140,7 @@ describe('loadTasksWithMostRecentLog', () => {
     const result = await loadTasksWithMostRecentLog();
     expect(result).toHaveLength(2);
     expect(result[0].category).toBe(null);
-    expect(result[1].category).toEqual({ id: category.id, name: category.name });
+    expect(result[1].category).toEqual(category);
   });
 
   it('includes each task with its most recent task log', async () => {
@@ -314,8 +314,8 @@ describe('loadTaskLogs', () => {
     const result = await loadTaskLogs();
     expect(result).toHaveLength(2);
     expect([...result]).toEqual([
-      { date: logOne.date, id: logOne.id, task_id: dripTask.id, task: dripTask },
-      { date: logTwo.date, id: logTwo.id, task_id: dripTask.id, task: dripTask },
+      { ...logOne, task: dripTask },
+      { ...logTwo, task: dripTask },
     ]);
   });
 });

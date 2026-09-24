@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 import { db } from './client';
-import { categories, tasks, taskLog, reminders } from './schema';
+import { categories, tasks, taskLog, reminders, timestamps } from './schema';
 
 export type Category = typeof categories.$inferSelect;
 export type Task = typeof tasks.$inferSelect;
@@ -16,9 +16,11 @@ export type TaskWithMostRecentLog = Task & {
 export type Reminder = typeof reminders.$inferSelect;
 export type TaskWithReminder = Task & { reminder: Reminder | null };
 
-export type ReminderInputValues = Omit<Reminder, 'id' | 'taskId'>;
+type AuditFields = keyof typeof timestamps;
 
-export type TaskInputValues = Omit<Task, 'id'>;
+export type ReminderInputValues = Omit<Reminder, 'id' | 'taskId' | AuditFields>;
+
+export type TaskInputValues = Omit<Task, 'id' | AuditFields>;
 
 export async function loadCategories(): Promise<Category[]> {
   return db.select().from(categories);

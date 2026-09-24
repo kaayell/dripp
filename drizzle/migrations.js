@@ -5,6 +5,7 @@ import m0001 from './20260831210401_update-tracked-task-fk/migration.sql';
 import m0002 from './20260904215451_rename-tracked-task-to-task-log/migration.sql';
 import m0003 from './20260916180633_add-unique-constraints/migration.sql';
 import m0004 from './20260921164919_add-task-reminder/migration.sql';
+import m0005 from './20260924171426_add-audit-timestamps/migration.sql';
 
 export default {
     migrations: {
@@ -13,5 +14,6 @@ export default {
       "20260904215451_rename-tracked-task-to-task-log": m0002,
       "20260916180633_add-unique-constraints": m0003,
       "20260921164919_add-task-reminder": m0004,
+      "20260924171426_add-audit-timestamps": m0005
   }
 }

@@ -8,10 +8,17 @@ import {
 } from 'drizzle-orm/sqlite-core';
 import { defineRelations, sql } from 'drizzle-orm';
 
+const now = () => new Date().toISOString();
+export const timestamps = {
+  createdAt: text('created_at').notNull().$defaultFn(now),
+  updatedAt: text('updated_at').notNull().$defaultFn(now).$onUpdateFn(now),
+};
+
 export const categories = sqliteTable(
   'categories',
   {
     id: integer().primaryKey({ autoIncrement: true }),
+    ...timestamps,
     name: text().notNull(),
   },
   (table) => [uniqueIndex('categoriesNameUniqueIndex').on(lower(table.name))],
@@ -21,6 +28,7 @@ export const tasks = sqliteTable(
   'tasks',
   {
     id: integer().primaryKey({ autoIncrement: true }),
+    ...timestamps,
     name: text().notNull(),
     color: text().notNull(),
     categoryId: integer('category_id').references(() => categories.id),
@@ -32,6 +40,7 @@ export const taskLog = sqliteTable(
   'task_log',
   {
     id: integer().primaryKey({ autoIncrement: true }),
+    ...timestamps,
     task_id: integer('task_id')
       .references(() => tasks.id)
       .notNull(),
@@ -44,6 +53,7 @@ export const reminders = sqliteTable(
   'reminders',
   {
     id: integer().primaryKey({ autoIncrement: true }),
+    ...timestamps,
     taskId: integer('task_id')
       .references(() => tasks.id)
       .notNull(),
