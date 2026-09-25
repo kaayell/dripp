@@ -10,7 +10,9 @@ import {
   loadTask,
   loadTaskLogs,
   loadTaskLogsForDay,
+  loadTaskReminder,
   loadTasks,
+  loadTasksWithDatedReminders,
   loadTasksWithMostRecentLog,
   loadTaskWithDetails,
   removeTaskLog,
@@ -208,6 +210,84 @@ describe('updateTask', () => {
   });
 });
 
+describe('loadTaskReminder', () => {
+  let dripTaskId: number;
+
+  beforeEach(async () => {
+    const [dripTask] = await db
+      .insert(tasks)
+      .values({ name: 'drip', color: '#ffffff', categoryId: null })
+      .returning();
+    dripTaskId = dripTask.id;
+  });
+
+  it('returns undefined when no reminder exists', async () => {
+    expect(await loadTaskReminder(12)).toEqual(undefined);
+  });
+
+  it('returns task for id', async () => {
+    const [reminder] = await db
+      .insert(reminders)
+      .values([
+        {
+          taskId: dripTaskId,
+          time: '09:00',
+          type: 'daily',
+          interval: 1,
+          dayOfWeek: null,
+          dayOfMonth: null,
+        },
+      ])
+      .returning();
+
+    const result = await loadTaskReminder(dripTaskId);
+    expect(result).toMatchObject(reminder);
+  });
+});
+
+describe('loadTasksWithDatedReminders', () => {
+  it('returns empty array when no tasks exist', async () => {
+    expect(await loadTasksWithDatedReminders()).toEqual([]);
+  });
+
+  it('returns only tasks with a reminder interval above 1', async () => {
+    const [dripTask, mopTask] = await db
+      .insert(tasks)
+      .values([
+        { name: 'drip', color: '#ffffff', categoryId: null },
+        { name: 'mop', color: '#000000', categoryId: null },
+        { name: 'sweep', color: '#000000', categoryId: null },
+      ])
+      .returning();
+
+    const [datedReminder] = await db
+      .insert(reminders)
+      .values([
+        {
+          taskId: dripTask.id,
+          time: '09:00',
+          type: 'weekly',
+          interval: 2,
+          dayOfWeek: 1,
+          dayOfMonth: null,
+        },
+        {
+          taskId: mopTask.id,
+          time: '09:00',
+          type: 'daily',
+          interval: 1,
+          dayOfWeek: null,
+          dayOfMonth: null,
+        },
+      ])
+      .returning();
+
+    const result = await loadTasksWithDatedReminders();
+    expect(result).toHaveLength(1);
+    expect(result[0]).toMatchObject({ ...dripTask, reminder: datedReminder });
+  });
+});
+
 describe('setTaskReminder', () => {
   let dripTaskId: number;
 
@@ -220,7 +300,7 @@ describe('setTaskReminder', () => {
   });
 
   it('creates a reminder when none exists', async () => {
-    await setTaskReminder(dripTaskId, {
+    const reminder = await setTaskReminder(dripTaskId, {
       time: '09:00',
       type: 'daily',
       interval: 1,
@@ -229,16 +309,8 @@ describe('setTaskReminder', () => {
     });
 
     const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
-    expect(result).toMatchObject([
-      {
-        taskId: dripTaskId,
-        time: '09:00',
-        type: 'daily',
-        interval: 1,
-        dayOfWeek: null,
-        dayOfMonth: null,
-      },
-    ]);
+    expect(result).toHaveLength(1);
+    expect(result[0]).toEqual(reminder);
   });
 
   it('updates the existing reminder instead of creating a second one', async () => {
@@ -250,7 +322,7 @@ describe('setTaskReminder', () => {
       dayOfMonth: null,
     });
 
-    await setTaskReminder(dripTaskId, {
+    let reminder = await setTaskReminder(dripTaskId, {
       time: '18:30',
       type: 'weekly',
       interval: 2,
@@ -260,34 +332,29 @@ describe('setTaskReminder', () => {
 
     const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
     expect(result).toHaveLength(1);
-    expect(result[0]).toMatchObject({
-      time: '18:30',
-      type: 'weekly',
-      interval: 2,
-      dayOfWeek: 1,
-      dayOfMonth: null,
-    });
+    expect(result[0]).toEqual(reminder);
   });
 
   it('deletes the reminder when passed null', async () => {
-    await setTaskReminder(dripTaskId, {
+    const reminder = await setTaskReminder(dripTaskId, {
       time: '09:00',
       type: 'daily',
       interval: 1,
       dayOfWeek: null,
       dayOfMonth: null,
     });
+    expect(reminder).toBeDefined();
 
-    await setTaskReminder(dripTaskId, null);
-
+    const removedReminder = await setTaskReminder(dripTaskId, null);
     const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
+    expect(removedReminder).toBeUndefined();
     expect(result).toEqual([]);
   });
 
   it('does nothing when passed null and no reminder exists', async () => {
-    await setTaskReminder(dripTaskId, null);
-
+    const reminder = await setTaskReminder(dripTaskId, null);
     const result = await db.select().from(reminders).where(eq(reminders.taskId, dripTaskId));
+    expect(reminder).toBeUndefined();
     expect(result).toEqual([]);
   });
 });

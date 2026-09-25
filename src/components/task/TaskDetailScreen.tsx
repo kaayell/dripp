@@ -4,14 +4,16 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
-import { timeSince } from '@/constants/dates';
+import { formatDisplayTime, timeSince } from '@/constants/dates';
 import { CloseButton } from '@/components/ui/CloseButton';
 import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
-import { SquarePen } from 'lucide-react-native';
+import { Bell, SquarePen } from 'lucide-react-native';
+import { format, parse } from 'date-fns';
 import { IconButton } from '@/components/ui/IconButton';
+import { computeNextReminder } from '@/notifications/reminderDates';
 
 export default function TaskDetailScreen() {
   const insets = useSafeAreaInsets();
@@ -40,6 +42,9 @@ export default function TaskDetailScreen() {
     return <Loading />;
   }
 
+  const nextReminder = task.reminder
+    ? computeNextReminder(parse(task.reminder.time, 'HH:mm', new Date()), task.reminder)
+    : null;
   return (
     <>
       <Stack.Screen
@@ -60,27 +65,33 @@ export default function TaskDetailScreen() {
         <View style={styles.header}>
           <View style={styles.metaContainer}>
             <Drop color={task.color} size={32} />
-            <View>
+            <View style={styles.titleGroup}>
               <Text style={styles.title}>{task.name}</Text>
-              <View style={styles.metaRow}>
-                <Text style={styles.category}>{task.category?.name ?? 'no category'}</Text>
-                {task.taskLogs[0] && (
-                  <View
-                    style={[
-                      styles.lastDonePill,
-                      {
-                        backgroundColor: dimmed(task.color, 20),
-                        borderColor: dimmed(task.color, 40),
-                      },
-                    ]}
-                  >
-                    <Text style={styles.lastDoneText}>
-                      {`${timeSince(task.taskLogs[0]!.date)}`}
-                    </Text>
-                  </View>
-                )}
-              </View>
+              <Text style={styles.category}>{task.category?.name ?? 'no category'}</Text>
             </View>
+          </View>
+          <View style={styles.timeLabels}>
+            {task.taskLogs[0] && (
+              <View
+                style={[
+                  styles.lastDonePill,
+                  {
+                    backgroundColor: dimmed(task.color, 20),
+                    borderColor: dimmed(task.color, 40),
+                  },
+                ]}
+              >
+                <Text style={styles.lastDoneText}>{`${timeSince(task.taskLogs[0]!.date)}`}</Text>
+              </View>
+            )}
+            {nextReminder && (
+              <View style={styles.nextReminder}>
+                <Bell color={Colors.label} size={13} strokeWidth={2.25} />
+                <Text style={styles.nextReminderText}>
+                  {`${format(nextReminder, 'EEE, MMM d')} at ${formatDisplayTime(nextReminder)}`}
+                </Text>
+              </View>
+            )}
           </View>
         </View>
         <View style={styles.calendarsContainer}>
@@ -109,24 +120,28 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     justifyContent: 'space-between',
+    gap: 12,
     paddingBottom: 24,
   },
   metaContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
+    flexShrink: 1,
   },
   title: {
     fontSize: 28,
     fontWeight: '700',
     color: Colors.text,
   },
-  metaRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
+  titleGroup: {
+    flexShrink: 1,
+  },
+  timeLabels: {
+    alignItems: 'flex-end',
+    gap: 6,
   },
   category: {
     fontSize: 15,
@@ -146,6 +161,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.text,
     textTransform: 'lowercase',
+  },
+  nextReminder: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  nextReminderText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: Colors.label,
   },
   calendarsContainer: {
     flexDirection: 'column',

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Bell, ChevronDown, Clock, Minus, Plus } from 'lucide-react-native';
-import { addDays, addMonths, format, getDay, getDaysInMonth, isAfter, setDate } from 'date-fns';
+import { format } from 'date-fns';
 import type { ReminderInputValues } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { IconButton } from '@/components/ui/IconButton';
@@ -13,6 +13,7 @@ import {
   parseTime,
   WEEKDAY_NAMES,
 } from '@/constants/dates';
+import { computeNextReminder } from '@/notifications/reminderDates';
 
 enum Frequency {
   DAILY = 'daily',
@@ -26,37 +27,6 @@ function ordinal(dayOfMonth: number): string {
 
 function formatWeekdayName(name: string): string {
   return `${name.charAt(0)}${name.slice(1).toLowerCase()}`;
-}
-
-function computeNextOccurrence(
-  reminderTime: Date,
-  mode: Frequency,
-  interval: number,
-  dayOfWeek: number,
-  dayOfMonth: number,
-): Date {
-  let now = new Date();
-  let nextOccur = new Date(reminderTime);
-
-  if (mode === Frequency.DAILY) {
-    if (isAfter(nextOccur, now)) return nextOccur;
-    return addDays(nextOccur, interval);
-  }
-
-  if (mode === Frequency.WEEKLY) {
-    let diff = (dayOfWeek - getDay(nextOccur) + 7) % 7;
-    if (diff === 0 && !isAfter(nextOccur, now)) diff = 7 * interval;
-    return addDays(nextOccur, diff);
-  }
-
-  const clampedDay = Math.min(dayOfMonth, getDaysInMonth(nextOccur));
-  nextOccur = setDate(nextOccur, clampedDay);
-  if (!isAfter(nextOccur, now)) {
-    const nextMonth = addMonths(nextOccur, interval);
-    const nextDay = Math.min(dayOfMonth, getDaysInMonth(nextMonth));
-    nextOccur = setDate(nextMonth, nextDay);
-  }
-  return nextOccur;
 }
 
 function formatNextOccurrence(date: Date): string {
@@ -255,7 +225,12 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
           <Text style={styles.summarySubtitle}>
             Next:{' '}
             {formatNextOccurrence(
-              computeNextOccurrence(reminderTime, frequencyMode, interval, dayOfWeek, dayOfMonth),
+              computeNextReminder(reminderTime, {
+                type: frequencyMode,
+                interval,
+                dayOfWeek,
+                dayOfMonth,
+              }),
             )}
           </Text>
         </View>

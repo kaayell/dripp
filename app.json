@@ -29,7 +29,13 @@
           "imageWidth": 200
         }
       ],
-      "expo-router"
+      "expo-router",
+      [
+        "expo-notifications",
+        {
+          "color": "#00b7c1"
+        }
+      ]
     ],
     "extra": {
       "eas": {

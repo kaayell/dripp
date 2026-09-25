@@ -9,11 +9,12 @@ import type {
   TaskInputValues,
   TaskWithReminder,
 } from '../../../db/queries';
-import { loadCategories, setTaskReminder } from '../../../db/queries';
+import { loadCategories } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { SaveButton } from '@/components/ui/SaveButton';
 import { TaskReminder } from '@/components/task/TaskReminder';
+import { ensureNotificationPermission, saveTaskReminder } from '@/notifications/reminders';
 
 const SWATCHES = [
   '#ec5b57',
@@ -81,6 +82,14 @@ export default function TaskFormScreen({
 
   const canSubmit = name.trim().length > 0 && !submitting;
 
+  const handleToggleReminder = useCallback(async (enabled: boolean) => {
+    if (enabled) {
+      const granted = await ensureNotificationPermission();
+      if (!granted) return;
+    }
+    setReminderEnabled(enabled);
+  }, []);
+
   const handleSubmit = useCallback(async () => {
     if (!canSubmit) return;
     setSubmitting(true);
@@ -91,7 +100,7 @@ export default function TaskFormScreen({
         color,
         categoryId,
       });
-      await setTaskReminder(savedTask.id, reminderEnabled ? reminder : null);
+      await saveTaskReminder(savedTask.id, reminderEnabled ? reminder : null);
       router.back();
     } catch (e) {
       setSubmitting(false);
@@ -181,7 +190,7 @@ export default function TaskFormScreen({
             <Switch
               style={{ transform: [{ scale: 1.25 }] }}
               value={reminderEnabled}
-              onValueChange={setReminderEnabled}
+              onValueChange={handleToggleReminder}
               trackColor={{ true: Colors.teal }}
             />
           </View>

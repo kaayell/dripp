@@ -3,20 +3,28 @@ import { View } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { runMigrations } from '../../db/client';
+import '@/notifications/listeners';
 import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
 import { Colors } from '@/constants/theme';
 import { ClockAlert, Plus } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
+import { backfillDatedReminders } from '@/notifications/reminders';
+import { useNotificationNavigation } from '@/notifications/useNotificationNavigation';
 
 export default function Layout() {
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
 
   useEffect(() => {
     runMigrations()
-      .then(() => setStatus({ success: true }))
+      .then(() => {
+        setStatus({ success: true });
+        backfillDatedReminders().catch((e) => console.error('[Layout] reminder top-up failed', e));
+      })
       .catch((error) => setStatus({ success: false, error }));
   }, []);
+
+  useNotificationNavigation(status.success);
 
   if (status.error) {
     return <Error message={status.error.message} />;
