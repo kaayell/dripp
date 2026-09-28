@@ -49,7 +49,8 @@
     "android:release": "expo run:android --variant release",
     "format": "prettier --write .",
     "test": "jest --watchAll",
-    "e2e": "maestro test .maestro/flows"
+    "e2e": "maestro test .maestro/flows",
+    "seed": "node --no-warnings scripts/seed-emulator.ts"
   },
   "private": true,
   "jest": {

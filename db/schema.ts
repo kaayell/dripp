@@ -1,5 +1,5 @@
 import {
-  AnySQLiteColumn,
+  type AnySQLiteColumn,
   integer,
   sqliteTable,
   text,
