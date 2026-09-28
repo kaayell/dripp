@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { FlatList, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { CalendarList } from 'react-native-calendars';
+import { Calendar } from 'react-native-calendars';
 import {
   Category,
   loadCategories,
@@ -17,7 +17,7 @@ import { Colors } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { WEEKDAY_NAMES } from '@/constants/dates';
+import { startDatesForPastMonths, WEEKDAY_NAMES } from '@/constants/dates';
 
 const calendarTheme = {
   calendarBackground: Colors.background,
@@ -43,11 +43,6 @@ const calendarTheme = {
       flex: 1,
     },
   },
-  'stylesheet.calendar-list.main': {
-    calendar: {
-      paddingVertical: 0,
-    },
-  },
 } as any;
 
 export default function CalendarScreen() {
@@ -58,6 +53,7 @@ export default function CalendarScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const today = new Date().toLocaleDateString('sv');
+  const months = startDatesForPastMonths(6);
 
   const refresh = useCallback(async () => {
     const [loadedCategories, loadedTasks, loadedTaskLogs] = await Promise.all([
@@ -143,18 +139,26 @@ export default function CalendarScreen() {
       </View>
 
       <View style={{ flex: 1 }}>
-        <CalendarList
-          current={today}
-          firstDay={0}
-          pastScrollRange={6}
-          futureScrollRange={0}
-          maxDate={today}
-          hideDayNames
-          showScrollIndicator={false}
-          theme={calendarTheme}
-          markedDates={markedDates as any}
-          dayComponent={CalendarDay}
-          onDayPress={handleDayPress}
+        <FlatList
+          inverted
+          data={months}
+          keyExtractor={(month) => month}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item: month }) => (
+            <Calendar
+              current={month}
+              firstDay={0}
+              maxDate={today}
+              hideArrows
+              hideDayNames
+              hideExtraDays
+              disableMonthChange
+              theme={calendarTheme}
+              markedDates={markedDates as any}
+              dayComponent={CalendarDay}
+              onDayPress={handleDayPress}
+            />
+          )}
         />
       </View>
 
