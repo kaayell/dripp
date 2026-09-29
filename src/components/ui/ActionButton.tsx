@@ -1,22 +1,28 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
 import { Colors } from '@/constants/theme';
 
-export function SaveButton({
+export function ActionButton({
+  label,
   onPress,
   disabled,
+  destructive,
+  testID,
 }: {
-  label?: string;
+  label: string;
   onPress: () => void;
   disabled?: boolean;
+  destructive?: boolean;
+  testID?: string;
 }) {
   return (
     <Pressable
+      testID={testID}
       onPress={onPress}
       hitSlop={8}
       disabled={disabled}
-      style={[styles.button, disabled && styles.buttonDisabled]}
+      style={[styles.button, destructive && styles.destructive, disabled && styles.disabled]}
     >
-      <Text style={[styles.text, disabled && styles.textDisabled]}>Save</Text>
+      <Text style={[styles.text, disabled && styles.textDisabled]}>{label}</Text>
     </Pressable>
   );
 }
@@ -29,7 +35,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  buttonDisabled: {
+  destructive: {
+    backgroundColor: Colors.error,
+  },
+  disabled: {
     backgroundColor: Colors.cellBg,
   },
   text: {

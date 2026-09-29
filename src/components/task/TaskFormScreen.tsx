@@ -12,7 +12,7 @@ import type {
 import { loadCategories } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { CloseButton } from '@/components/ui/CloseButton';
-import { SaveButton } from '@/components/ui/SaveButton';
+import { ActionButton } from '@/components/ui/ActionButton';
 import { TaskReminder } from '@/components/task/TaskReminder';
 import { ensureNotificationPermission, saveTaskReminder } from '@/notifications/reminders';
 
@@ -197,7 +197,7 @@ export default function TaskFormScreen({
           {reminderEnabled && <TaskReminder value={reminder} onChange={setReminder} />}
         </View>
 
-        <SaveButton onPress={handleSubmit} disabled={!canSubmit} />
+        <ActionButton label="Save" onPress={handleSubmit} disabled={!canSubmit} />
       </ScrollView>
     </>
   );

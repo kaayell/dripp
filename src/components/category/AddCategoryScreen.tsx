@@ -4,7 +4,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { createCategory } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { FormSheet } from '@/components/ui/FormSheet';
-import { SaveButton } from '@/components/ui/SaveButton';
+import { ActionButton } from '@/components/ui/ActionButton';
 
 export default function AddCategoryScreen() {
   const { pathname, taskId } = useLocalSearchParams<{ pathname?: string; taskId?: string }>();
@@ -47,7 +47,7 @@ export default function AddCategoryScreen() {
         returnKeyType="done"
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
-      <SaveButton onPress={handleSave} disabled={!canSave} />
+      <ActionButton label="Save" onPress={handleSave} disabled={!canSave} />
     </FormSheet>
   );
 }
