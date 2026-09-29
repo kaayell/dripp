@@ -17,6 +17,7 @@ import {
   loadTaskWithDetails,
   removeTaskLog,
   setTaskReminder,
+  exportAppData,
   toggleTaskLog,
   updateTask,
 } from '../queries';
@@ -466,5 +467,82 @@ describe('toggleTaskLog', () => {
     const result = await toggleTaskLog(dripTaskId, '2026-01-01');
     expect(result).toBeUndefined();
     expect(await loadTaskLogs()).toHaveLength(0);
+  });
+});
+
+describe('exportAppData', () => {
+  beforeEach(async () => {
+    const [bod, home] = await db
+      .insert(categories)
+      .values([{ name: 'bod' }, { name: 'home' }])
+      .returning();
+    const [walk, mop] = await db
+      .insert(tasks)
+      .values([
+        { name: 'walk', color: '#e18b60', categoryId: bod.id },
+        { name: 'mop', color: '#64a1ee', categoryId: home.id },
+      ])
+      .returning();
+    await db.insert(taskLog).values([
+      { task_id: walk.id, date: '2026-09-01' },
+      { task_id: walk.id, date: '2026-09-03' },
+      { task_id: mop.id, date: '2026-09-02' },
+    ]);
+    await db
+      .insert(reminders)
+      .values({ taskId: mop.id, time: '09:00', type: 'weekly', interval: 1, dayOfWeek: 2 });
+  });
+
+  it('exports categories and tasks without database ids', async () => {
+    const audit = { createdAt: expect.any(String), updatedAt: expect.any(String) };
+
+    const data = await exportAppData();
+
+    expect(data).toEqual({
+      categories: [
+        { name: 'bod', ...audit },
+        { name: 'home', ...audit },
+      ],
+      tasks: [
+        {
+          name: 'walk',
+          color: '#e18b60',
+          category: 'bod',
+          logs: [
+            { date: '2026-09-01', ...audit },
+            { date: '2026-09-03', ...audit },
+          ],
+          reminder: null,
+          ...audit,
+        },
+        {
+          name: 'mop',
+          color: '#64a1ee',
+          category: 'home',
+          logs: [{ date: '2026-09-02', ...audit }],
+          reminder: {
+            time: '09:00',
+            type: 'weekly',
+            interval: 1,
+            dayOfWeek: 2,
+            dayOfMonth: null,
+            ...audit,
+          },
+          ...audit,
+        },
+      ],
+    });
+  });
+
+  it('exports a task without a category as null', async () => {
+    await db.insert(tasks).values({ name: 'nap', color: '#daa932' });
+
+    const data = await exportAppData();
+
+    expect(data.tasks.find((t) => t.name === 'nap')).toMatchObject({
+      category: null,
+      logs: [],
+      reminder: null,
+    });
   });
 });

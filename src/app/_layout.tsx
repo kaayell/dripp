@@ -7,7 +7,7 @@ import '@/notifications/listeners';
 import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
 import { Colors } from '@/constants/theme';
-import { ClockAlert, Plus } from 'lucide-react-native';
+import { ClockAlert, DatabaseBackup, Plus } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { backfillDatedReminders } from '@/notifications/reminders';
 import { useNotificationNavigation } from '@/notifications/useNotificationNavigation';
@@ -49,6 +49,10 @@ export default function Layout() {
             headerRight: () => (
               <View style={{ flexDirection: 'row', gap: 16 }}>
                 <IconButton
+                  onPress={() => router.push('/import-export')}
+                  icon={<DatabaseBackup color={Colors.icon} size={20} strokeWidth={2.25} />}
+                />
+                <IconButton
                   onPress={() => router.push('/overdue-tasks')}
                   icon={<ClockAlert color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
@@ -70,6 +74,13 @@ export default function Layout() {
         />
         <Stack.Screen
           name="overdue-tasks"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="import-export"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',

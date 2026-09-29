@@ -26,6 +26,23 @@ export type ReminderInputValues = Omit<Reminder, 'id' | 'taskId' | AuditFields>;
 
 export type TaskInputValues = Omit<Task, 'id' | AuditFields>;
 
+// Export format: rows are linked by name and nesting instead of database ids.
+type Audited = Pick<Task, AuditFields>;
+export type ExportedCategory = Pick<Category, 'name'> & Audited;
+export type ExportedTaskLog = Pick<TaskLog, 'date'> & Audited;
+export type ExportedReminder = Omit<Reminder, 'id' | 'taskId'>;
+export type ExportedTask = Pick<Task, 'name' | 'color'> &
+  Audited & {
+    category: string | null;
+    logs: ExportedTaskLog[];
+    reminder: ExportedReminder | null;
+  };
+
+export type AppData = {
+  categories: ExportedCategory[];
+  tasks: ExportedTask[];
+};
+
 export async function loadCategories(): Promise<Category[]> {
   return db.select().from(categories);
 }
@@ -132,4 +149,33 @@ export async function toggleTaskLog(taskId: number, date: string): Promise<TaskL
     return;
   }
   return await createTaskLog(taskId, date);
+}
+
+export async function exportAppData(): Promise<AppData> {
+  const audited = { createdAt: true, updatedAt: true } as const;
+  const [allCategories, allTasks] = await Promise.all([
+    db.query.categories.findMany({
+      columns: { name: true, ...audited },
+      orderBy: { id: 'asc' },
+    }),
+    db.query.tasks.findMany({
+      columns: { name: true, color: true, ...audited },
+      with: {
+        category: { columns: { name: true } },
+        taskLogs: { columns: { date: true, ...audited }, orderBy: { date: 'asc' } },
+        reminder: { columns: { id: false, taskId: false } },
+      },
+      orderBy: { id: 'asc' },
+    }),
+  ]);
+
+  return {
+    categories: allCategories,
+    tasks: allTasks.map(({ category, taskLogs, reminder, ...task }) => ({
+      ...task,
+      category: category?.name ?? null,
+      logs: taskLogs,
+      reminder: reminder ?? null,
+    })),
+  };
 }
