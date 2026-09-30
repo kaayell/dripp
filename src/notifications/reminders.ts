@@ -4,6 +4,7 @@ import {
   loadTask,
   loadTaskReminder,
   loadTasksWithDatedReminders,
+  loadTasksWithReminders,
   Reminder,
   ReminderInputValues,
   setTaskReminder,
@@ -161,5 +162,12 @@ export async function backfillDatedReminders() {
 
     const dates = computeReminderSchedule(lastDate, reminder, missing);
     await scheduleDatedNotifications(task, reminder, dates);
+  }
+}
+
+export async function rescheduleAllReminders() {
+  await Notifications.cancelAllScheduledNotificationsAsync();
+  for (const task of await loadTasksWithReminders()) {
+    await scheduleTaskNotifications(task);
   }
 }

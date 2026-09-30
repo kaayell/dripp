@@ -20,6 +20,7 @@ import {
   exportAppData,
   toggleTaskLog,
   updateTask,
+  loadTasksWithReminders,
 } from '../queries';
 import { categories, reminders, taskLog, tasks } from '../schema';
 
@@ -243,6 +244,46 @@ describe('loadTaskReminder', () => {
 
     const result = await loadTaskReminder(dripTaskId);
     expect(result).toMatchObject(reminder);
+  });
+});
+
+describe('loadTasksWithReminders', () => {
+  it('returns only tasks that have a reminder', async () => {
+    const [dripTask, mopTask] = await db
+      .insert(tasks)
+      .values([
+        { name: 'drip', color: '#ffffff', categoryId: null },
+        { name: 'mop', color: '#000000', categoryId: null },
+        { name: 'sweep', color: '#000000', categoryId: null },
+      ])
+      .returning();
+
+    const [dripReminder, mopReminder] = await db
+      .insert(reminders)
+      .values([
+        {
+          taskId: dripTask.id,
+          time: '09:00',
+          type: 'daily',
+          interval: 1,
+          dayOfWeek: null,
+          dayOfMonth: null,
+        },
+        {
+          taskId: mopTask.id,
+          time: '09:00',
+          type: 'weekly',
+          interval: 1,
+          dayOfWeek: 2,
+          dayOfMonth: null,
+        },
+      ])
+      .returning();
+
+    const result = await loadTasksWithReminders();
+    expect(result).toHaveLength(2);
+    expect(result[0]).toMatchObject({ ...dripTask, reminder: dripReminder });
+    expect(result[1]).toMatchObject({ ...mopTask, reminder: mopReminder });
   });
 });
 

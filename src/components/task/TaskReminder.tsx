@@ -7,6 +7,7 @@ import type { ReminderInputValues } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { IconButton } from '@/components/ui/IconButton';
 import {
+  DateFrequency,
   DAYS_OF_MONTH,
   formatDisplayTime,
   formatTime,
@@ -14,12 +15,6 @@ import {
   WEEKDAY_NAMES,
 } from '@/constants/dates';
 import { computeNextReminder } from '@/notifications/reminderDates';
-
-enum Frequency {
-  DAILY = 'daily',
-  WEEKLY = 'weekly',
-  MONTHLY = 'monthly',
-}
 
 function ordinal(dayOfMonth: number): string {
   return format(new Date(2000, 0, dayOfMonth), 'do');
@@ -33,12 +28,12 @@ function formatNextOccurrence(date: Date): string {
   return format(date, 'EEE, MMM d');
 }
 
-function frequencyUnit(mode: Frequency): string {
-  return mode === Frequency.DAILY ? 'day' : mode === Frequency.WEEKLY ? 'week' : 'month';
+function frequencyUnit(mode: DateFrequency): string {
+  return mode === DateFrequency.DAILY ? 'day' : mode === DateFrequency.WEEKLY ? 'week' : 'month';
 }
 
-function summarizeReminder(
-  mode: Frequency,
+export function summarizeReminder(
+  mode: DateFrequency,
   interval: number,
   time: string,
   dayOfWeek: number,
@@ -46,8 +41,8 @@ function summarizeReminder(
 ): string {
   const unit = frequencyUnit(mode);
   const every = interval === 1 ? `Every ${unit}` : `Every ${interval} ${unit}s`;
-  if (mode === Frequency.DAILY) return `${every} at ${time}`;
-  if (mode === Frequency.WEEKLY)
+  if (mode === DateFrequency.DAILY) return `${every} at ${time}`;
+  if (mode === DateFrequency.WEEKLY)
     return `${every} on ${formatWeekdayName(WEEKDAY_NAMES[dayOfWeek])} at ${time}`;
   return `${every} on the ${ordinal(dayOfMonth)} at ${time}`;
 }
@@ -62,8 +57,8 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
   const [reminderTime, setReminderTime] = useState(parseTime(value?.time ?? '09:00'));
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [showDayOfMonthPicker, setShowDayOfMonthPicker] = useState(false);
-  const [frequencyMode, setFrequencyMode] = useState<Frequency>(
-    (value?.type as Frequency) ?? Frequency.DAILY,
+  const [frequencyMode, setFrequencyMode] = useState<DateFrequency>(
+    (value?.type as DateFrequency) ?? DateFrequency.DAILY,
   );
   const [interval, setInterval] = useState(value?.interval ?? 1);
   const [dayOfWeek, setDayOfWeek] = useState(value?.dayOfWeek ?? now.getDay());
@@ -74,15 +69,15 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
       time: formatTime(reminderTime),
       type: frequencyMode,
       interval,
-      dayOfWeek: frequencyMode === Frequency.WEEKLY ? dayOfWeek : null,
-      dayOfMonth: frequencyMode === Frequency.MONTHLY ? dayOfMonth : null,
+      dayOfWeek: frequencyMode === DateFrequency.WEEKLY ? dayOfWeek : null,
+      dayOfMonth: frequencyMode === DateFrequency.MONTHLY ? dayOfMonth : null,
     });
   }, [reminderTime, frequencyMode, interval, dayOfWeek, dayOfMonth, onChange]);
 
   return (
     <>
       <View style={styles.segmentedControl}>
-        {Object.values(Frequency).map((mode) => (
+        {Object.values(DateFrequency).map((mode) => (
           <Pressable
             key={mode}
             style={[styles.segment, frequencyMode === mode && styles.segmentActive]}
@@ -140,7 +135,7 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
         )}
       </View>
 
-      {frequencyMode === Frequency.WEEKLY && (
+      {frequencyMode === DateFrequency.WEEKLY && (
         <>
           <Text style={styles.sectionLabel}>Repeat on</Text>
           <View style={styles.weekdayRow}>
@@ -162,7 +157,7 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
         </>
       )}
 
-      {frequencyMode === Frequency.MONTHLY && (
+      {frequencyMode === DateFrequency.MONTHLY && (
         <>
           <Text style={styles.sectionLabel}>Repeat on</Text>
           <Pressable

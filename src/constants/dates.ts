@@ -2,6 +2,11 @@ import { format, formatDistance, parse, parseISO, startOfMonth, subMonths } from
 
 export const WEEKDAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
+export enum DateFrequency {
+  DAILY = 'daily',
+  WEEKLY = 'weekly',
+  MONTHLY = 'monthly',
+}
 
 export function parseTime(time: string): Date {
   return parse(time, 'HH:mm', new Date());

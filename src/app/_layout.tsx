@@ -102,6 +102,13 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
+          name="importer"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
           name="add-category"
           options={{
             presentation: 'formSheet',

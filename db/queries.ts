@@ -26,11 +26,10 @@ export type ReminderInputValues = Omit<Reminder, 'id' | 'taskId' | AuditFields>;
 
 export type TaskInputValues = Omit<Task, 'id' | AuditFields>;
 
-// Export format: rows are linked by name and nesting instead of database ids.
-type Audited = Pick<Task, AuditFields>;
+type Audited = Partial<Pick<Task, AuditFields>>;
 export type ExportedCategory = Pick<Category, 'name'> & Audited;
 export type ExportedTaskLog = Pick<TaskLog, 'date'> & Audited;
-export type ExportedReminder = Omit<Reminder, 'id' | 'taskId'>;
+export type ExportedReminder = Omit<Reminder, 'id' | 'taskId' | AuditFields> & Audited;
 export type ExportedTask = Pick<Task, 'name' | 'color'> &
   Audited & {
     category: string | null;
@@ -63,6 +62,13 @@ export async function loadTaskWithDetails(taskId: number): Promise<TaskWithDetai
   return await db.query.tasks.findFirst({
     where: { id: taskId },
     with: { taskLogs: { orderBy: { date: 'desc' } }, category: true, reminder: true },
+  });
+}
+
+export async function loadTasksWithReminders(): Promise<TaskWithReminder[]> {
+  return await db.query.tasks.findMany({
+    where: { reminder: true },
+    with: { reminder: true },
   });
 }
 
