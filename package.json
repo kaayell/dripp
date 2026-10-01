@@ -50,7 +50,9 @@
     "android": "expo run:android",
     "android:release": "expo run:android --variant release",
     "format": "prettier --write .",
-    "test": "jest --watchAll",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "typecheck": "tsc --noEmit",
     "e2e": "maestro test .maestro/flows",
     "seed": "node --no-warnings scripts/seed-emulator.ts"
   },
