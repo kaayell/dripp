@@ -6,6 +6,7 @@ import { TaskLog, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
 import { IconButton } from '@/components/ui/IconButton';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
 
 type CalendarListRef = { scrollToMonth: (date: string) => void };
 
@@ -63,6 +64,7 @@ export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendar
       if (isDifferentMonth) {
         calendarRef.current?.scrollToMonth(day.dateString);
       }
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       toggleTaskLog(taskId, day.dateString)
         .then(() => onToggle?.())
         .catch(() => {});

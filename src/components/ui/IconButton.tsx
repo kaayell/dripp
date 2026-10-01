@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { Colors } from '@/constants/theme';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 
 export function IconButton({
   onPress,
@@ -20,6 +21,7 @@ export function IconButton({
   }));
 
   const onPressIn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     pressAnim.value = withSpring(0.9);
   };
 

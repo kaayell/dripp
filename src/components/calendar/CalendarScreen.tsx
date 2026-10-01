@@ -18,6 +18,7 @@ import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { startDatesForPastMonths, WEEKDAY_NAMES } from '@/constants/dates';
+import * as Haptics from 'expo-haptics';
 
 const calendarTheme = {
   calendarBackground: Colors.background,
@@ -105,6 +106,7 @@ export default function CalendarScreen() {
   const handleDayPress = useCallback(
     (day: DateData) => {
       if (day.dateString > today) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       router.push({
         pathname: '/task-picker',
         params: {

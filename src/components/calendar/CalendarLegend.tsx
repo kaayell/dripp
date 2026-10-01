@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -54,6 +55,7 @@ function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: numb
   }));
 
   const onPressIn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     pressAnim.value = withSpring(0.9);
   };
 
@@ -62,6 +64,7 @@ function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: numb
   };
 
   const onLongPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     pressAnim.value = withSequence(
       withTiming(1.15, { duration: 100 }),
       withTiming(1, { duration: 150 }),
