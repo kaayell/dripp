@@ -54,7 +54,7 @@ export default function CalendarScreen() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const today = new Date().toLocaleDateString('sv');
-  const months = startDatesForPastMonths(6);
+  const months = startDatesForPastMonths(12);
 
   const refresh = useCallback(async () => {
     const [loadedCategories, loadedTasks, loadedTaskLogs] = await Promise.all([
