@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AppState, FlatList, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Calendar } from 'react-native-calendars';
 import {
@@ -74,6 +74,14 @@ export default function CalendarScreen() {
         .finally(() => setLoaded(true));
     }, [refresh]),
   );
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'active') return;
+      refresh().catch((e) => console.error('[CalendarScreen] reload failed', e));
+    });
+    return () => subscription.remove();
+  }, [refresh]);
 
   const tasksForCategory = useCallback(
     (categoryId: number | null) =>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { AppState, View } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { runMigrations } from '../../db/client';
@@ -11,6 +11,7 @@ import { ClockAlert, DatabaseBackup, Plus } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { backfillDatedReminders } from '@/notifications/reminders';
 import { useNotificationNavigation } from '@/notifications/useNotificationNavigation';
+import { refreshQuickLogWidget } from '@/widget/widgetTaskHandler';
 
 export default function Layout() {
   const [status, setStatus] = useState<{ success: boolean; error?: Error }>({ success: false });
@@ -22,6 +23,14 @@ export default function Layout() {
         backfillDatedReminders().catch((e) => console.error('[Layout] reminder top-up failed', e));
       })
       .catch((error) => setStatus({ success: false, error }));
+  }, []);
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (state) => {
+      if (state !== 'background') return;
+      refreshQuickLogWidget().catch((e) => console.error('[Layout] widget refresh failed', e));
+    });
+    return () => subscription.remove();
   }, []);
 
   useNotificationNavigation(status.success);
