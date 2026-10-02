@@ -11,7 +11,7 @@ import { FileDown, FileUp } from 'lucide-react-native';
 import { AppData, exportAppData } from '../../../db/queries.ts';
 import { errorMessage } from '@/constants/error.ts';
 import { Directory } from 'expo-file-system';
-import { format } from 'date-fns';
+import { todayString } from '@/constants/dates';
 
 export default function ImportExportScreen() {
   const insets = useSafeAreaInsets();
@@ -27,7 +27,7 @@ export default function ImportExportScreen() {
       throw e;
     }
 
-    const fileName = `dripp-export-${format(new Date(), 'yyyy-MM-dd')}.json`;
+    const fileName = `dripp-export-${todayString()}.json`;
     const file = directory.createFile(fileName, 'application/json');
     file.write(JSON.stringify(data, null, 2));
     return file.name;

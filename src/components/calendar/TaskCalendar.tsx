@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
+import { isSameMonth, parseISO } from 'date-fns';
 import { Colors, dimmed } from '@/constants/theme';
+import { todayString } from '@/constants/dates';
 import { TaskLog, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
 import { IconButton } from '@/components/ui/IconButton';
@@ -36,9 +38,9 @@ type TaskCalendarProps = {
 
 export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendarProps) {
   const now = new Date();
-  const today = now.toLocaleDateString('sv');
+  const today = todayString();
   const currentYearMonth = { year: now.getFullYear(), month: now.getMonth() + 1 };
-  const [visibleMonth, setVisibleMonth] = useState(currentYearMonth);
+  const [visibleMonth, setVisibleMonth] = useState(today);
   const { width: windowWidth } = useWindowDimensions();
   const width = Math.round(windowWidth) - 34;
   const calendarRef = useRef<CalendarListRef>(null);
@@ -46,21 +48,20 @@ export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendar
   const markedDates = useMemo(() => {
     return Object.fromEntries(
       taskLogs.map(({ date }) => {
-        const [year, month] = date.split('-').map(Number);
-        const isVisibleMonth = year === visibleMonth.year && month === visibleMonth.month;
+        const isVisibleMonth = isSameMonth(parseISO(date), parseISO(visibleMonth));
         return [date, { color: dimmed(color, isVisibleMonth ? 60 : 15) }];
       }),
     );
   }, [taskLogs, color, visibleMonth]);
 
-  const handleMonthChange = useCallback(({ year, month }: { year: number; month: number }) => {
-    setVisibleMonth({ year, month });
-  }, []);
+  const handleMonthChange = (month: DateData) => {
+    setVisibleMonth(month.dateString);
+  };
 
   const handleDayPress = useCallback(
     (day: DateData) => {
       if (day.dateString > today) return;
-      const isDifferentMonth = day.year !== visibleMonth.year || day.month !== visibleMonth.month;
+      const isDifferentMonth = !isSameMonth(parseISO(day.dateString), parseISO(visibleMonth));
       if (isDifferentMonth) {
         calendarRef.current?.scrollToMonth(day.dateString);
       }
@@ -81,8 +82,7 @@ export function TaskCalendar({ taskId, color, taskLogs, onToggle }: TaskCalendar
 
       const goToMonth = (offset: number) => {
         const target = date.clone().addMonths(offset);
-        const dateString = `${target.getFullYear()}-${String(target.getMonth() + 1).padStart(2, '0')}-01`;
-        calendarRef.current?.scrollToMonth(dateString);
+        calendarRef.current?.scrollToMonth(target.toString('yyyy-MM-01'));
       };
 
       return (

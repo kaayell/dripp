@@ -1,6 +1,6 @@
 import * as Notifications from 'expo-notifications';
-import { format } from 'date-fns';
 import { createTaskLog } from '../../db/queries';
+import { todayString } from '@/constants/dates';
 import { TASK_COMPLETED_ACTION, TASK_REMINDER_CATEGORY } from '@/constants/notifications';
 
 Notifications.setNotificationHandler({
@@ -32,7 +32,7 @@ Notifications.addNotificationResponseReceivedListener(async (response) => {
   if (response.actionIdentifier === TASK_COMPLETED_ACTION) {
     await Notifications.dismissNotificationAsync(response.notification.request.identifier);
     try {
-      await createTaskLog(taskId, format(new Date(), 'yyyy-MM-dd'));
+      await createTaskLog(taskId, todayString());
     } catch {
       // already marked complete today
     }

@@ -20,8 +20,20 @@ export function formatDisplayTime(date: Date): string {
   return format(date, 'h:mm a');
 }
 
+export function toDateString(date: Date): string {
+  return format(date, 'yyyy-MM-dd');
+}
+
+export function todayString(): string {
+  return toDateString(new Date());
+}
+
+export function formatShortDate(date: Date): string {
+  return format(date, 'EEE, MMM d');
+}
+
 export function timeSince(dateString: string): string {
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const today = todayString();
   if (dateString === today) return 'Today';
   return formatDistance(parseISO(dateString), parseISO(today), { addSuffix: true });
 }
@@ -29,6 +41,6 @@ export function timeSince(dateString: string): string {
 export function startDatesForPastMonths(pastMonths: number): string[] {
   const currentMonth = startOfMonth(new Date());
   return Array.from({ length: pastMonths + 1 }, (_, i) =>
-    format(subMonths(currentMonth, i), 'yyyy-MM-dd'),
+    toDateString(subMonths(currentMonth, i)),
   );
 }

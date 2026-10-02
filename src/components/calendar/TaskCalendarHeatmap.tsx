@@ -1,6 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { Colors, dimmed } from '@/constants/theme';
+import { todayString } from '@/constants/dates';
 import { TaskLog } from '../../../db/queries';
 import { CalendarHeatmap } from 'react-native-chart-kit/v2';
 
@@ -24,7 +25,7 @@ const LABELED_WEEKDAYS = [
 ];
 
 export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProps) {
-  const today = new Date().toLocaleDateString('sv');
+  const today = todayString();
   const { width: windowWidth } = useWindowDimensions();
   const viewportWidth = Math.round(windowWidth) - 34;
   const scrollRef = useRef<ScrollView>(null);

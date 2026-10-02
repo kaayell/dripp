@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Colors } from '@/constants/theme';
+import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 
 type Marking = { color?: string; dim?: boolean };
@@ -19,7 +20,7 @@ export default function TaskCalendarDay({
   if (!date) return null;
   const isToday = state === 'today';
   const isDisabled = state === 'disabled';
-  const isFuture = date.dateString > new Date().toLocaleDateString('sv');
+  const isFuture = date.dateString > todayString();
   const marked = !!marking?.color;
 
   return (

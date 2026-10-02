@@ -3,6 +3,7 @@ import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
+import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import * as Haptics from 'expo-haptics';
 import Animated, {
@@ -21,7 +22,7 @@ type Props = {
 export default function CalendarLegend({ tasks, onToggle }: Props) {
   const toggleTask = useCallback(
     (taskId: number) => {
-      const today = new Date().toLocaleDateString('sv');
+      const today = todayString();
 
       toggleTaskLog(taskId, today)
         .then(() => onToggle?.())

@@ -17,7 +17,7 @@ import { Colors } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { startDatesForPastMonths, WEEKDAY_NAMES } from '@/constants/dates';
+import { startDatesForPastMonths, todayString, WEEKDAY_NAMES } from '@/constants/dates';
 import * as Haptics from 'expo-haptics';
 
 const calendarTheme = {
@@ -53,7 +53,7 @@ export default function CalendarScreen() {
   const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
-  const today = new Date().toLocaleDateString('sv');
+  const today = todayString();
   const months = startDatesForPastMonths(12);
 
   const refresh = useCallback(async () => {

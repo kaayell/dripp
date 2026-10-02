@@ -3,8 +3,8 @@ import {
   type WidgetInfo,
   type WidgetTaskHandlerProps,
 } from 'react-native-android-widget';
-import { format } from 'date-fns';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { todayString } from '@/constants/dates';
 import { runMigrations } from '../../db/client';
 import { loadCategories, loadTaskLogsForDay, loadTasks, toggleTaskLog } from '../../db/queries';
 import {
@@ -55,7 +55,7 @@ async function handleClick(
   switch (clickAction) {
     case TOGGLE_TASK_ACTION:
       if (typeof data?.taskId === 'number') {
-        await toggleTaskLog(data.taskId, today());
+        await toggleTaskLog(data.taskId, todayString());
       }
       break;
 
@@ -67,13 +67,9 @@ async function handleClick(
   }
 }
 
-function today(): string {
-  return format(new Date(), 'yyyy-MM-dd');
-}
-
 async function loadData(widgetInfo: WidgetInfo): Promise<QuickLogWidgetData> {
   await runMigrations();
-  const date = today();
+  const date = todayString();
   const [categories, tasks, logs] = await Promise.all([
     loadCategories(),
     loadTasks(),

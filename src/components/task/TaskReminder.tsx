@@ -10,6 +10,7 @@ import {
   DateFrequency,
   DAYS_OF_MONTH,
   formatDisplayTime,
+  formatShortDate,
   formatTime,
   parseTime,
   WEEKDAY_NAMES,
@@ -22,10 +23,6 @@ function ordinal(dayOfMonth: number): string {
 
 function formatWeekdayName(name: string): string {
   return `${name.charAt(0)}${name.slice(1).toLowerCase()}`;
-}
-
-function formatNextOccurrence(date: Date): string {
-  return format(date, 'EEE, MMM d');
 }
 
 function frequencyUnit(mode: DateFrequency): string {
@@ -219,7 +216,7 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
           </Text>
           <Text style={styles.summarySubtitle}>
             Next:{' '}
-            {formatNextOccurrence(
+            {formatShortDate(
               computeNextReminder(reminderTime, {
                 type: frequencyMode,
                 interval,

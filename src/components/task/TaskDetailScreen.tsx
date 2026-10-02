@@ -4,14 +4,13 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
-import { formatDisplayTime, timeSince } from '@/constants/dates';
+import { formatDisplayTime, formatShortDate, parseTime, timeSince } from '@/constants/dates';
 import { CloseButton } from '@/components/ui/CloseButton';
 import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
 import { Bell, SquarePen } from 'lucide-react-native';
-import { format, parse } from 'date-fns';
 import { IconButton } from '@/components/ui/IconButton';
 import { computeNextReminder } from '@/notifications/reminderDates';
 
@@ -43,7 +42,7 @@ export default function TaskDetailScreen() {
   }
 
   const nextReminder = task.reminder
-    ? computeNextReminder(parse(task.reminder.time, 'HH:mm', new Date()), task.reminder)
+    ? computeNextReminder(parseTime(task.reminder.time), task.reminder)
     : null;
   return (
     <>
@@ -88,7 +87,7 @@ export default function TaskDetailScreen() {
               <View style={styles.nextReminder}>
                 <Bell color={Colors.label} size={13} strokeWidth={2.25} />
                 <Text style={styles.nextReminderText}>
-                  {`${format(nextReminder, 'EEE, MMM d')} at ${formatDisplayTime(nextReminder)}`}
+                  {`${formatShortDate(nextReminder)} at ${formatDisplayTime(nextReminder)}`}
                 </Text>
               </View>
             )}

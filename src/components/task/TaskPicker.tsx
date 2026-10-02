@@ -1,19 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
+import { format, parseISO } from 'date-fns';
 import { loadTaskLogsForDay, loadTasks, Task, TaskLog, toggleTaskLog } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 import { FormSheet } from '@/components/ui/FormSheet';
-
-function formatPickerDate(dateStr: string): string {
-  const date = new Date(`${dateStr}T00:00:00`);
-  return date.toLocaleDateString(undefined, {
-    weekday: 'long',
-    month: 'long',
-    day: 'numeric',
-  });
-}
 
 export default function TaskPicker() {
   const { date, categoryId } = useLocalSearchParams<{ date: string; categoryId?: string }>();
@@ -48,7 +40,7 @@ export default function TaskPicker() {
   return (
     <FormSheet>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{formatPickerDate(date)}</Text>
+        <Text style={styles.title}>{format(parseISO(date), 'EEEE, MMMM d')}</Text>
         <Pressable onPress={() => router.back()} hitSlop={8}>
           <Text style={styles.doneText}>Done</Text>
         </Pressable>

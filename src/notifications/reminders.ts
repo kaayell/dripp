@@ -16,7 +16,8 @@ import {
   reminderIdentifier,
   TASK_REMINDER_CATEGORY,
 } from '@/constants/notifications';
-import { format, parse } from 'date-fns';
+import { parse } from 'date-fns';
+import { parseTime, toDateString } from '@/constants/dates';
 import { computeReminderSchedule } from '@/notifications/reminderDates';
 
 const DATED_OCCURRENCES = 4;
@@ -70,7 +71,7 @@ function buildContent(task: Task, reminder: Reminder) {
 async function scheduleDatedNotifications(task: Task, reminder: Reminder, dates: Date[]) {
   const content = buildContent(task, reminder);
   for (const date of dates) {
-    const targetDate = format(date, 'yyyy-MM-dd');
+    const targetDate = toDateString(date);
     await Notifications.scheduleNotificationAsync({
       identifier: reminderIdentifier(task.id, targetDate),
       content: { ...content, data: { ...content.data, targetDate } },
@@ -87,7 +88,7 @@ async function scheduleTaskNotifications(task: TaskWithReminder) {
   await setNotificationChannel();
 
   if (reminder.interval > 1) {
-    const startDate = parse(reminder.time, 'HH:mm', new Date());
+    const startDate = parseTime(reminder.time);
     const nextReminderDates = computeReminderSchedule(startDate, reminder, DATED_OCCURRENCES);
     await scheduleDatedNotifications(task, reminder, nextReminderDates);
     return;
@@ -158,7 +159,7 @@ export async function backfillDatedReminders() {
     const lastDate =
       typeof lastTargetDate === 'string'
         ? parse(`${lastTargetDate} ${reminder.time}`, 'yyyy-MM-dd HH:mm', new Date())
-        : parse(reminder.time, 'HH:mm', new Date());
+        : parseTime(reminder.time);
 
     const dates = computeReminderSchedule(lastDate, reminder, missing);
     await scheduleDatedNotifications(task, reminder, dates);

@@ -1,6 +1,7 @@
 import { FlexWidget, ListWidget, TextWidget, type HexColor } from 'react-native-android-widget';
-import { format, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { Colors } from '@/constants/theme';
+import { formatShortDate } from '@/constants/dates';
 import type { Category, Task } from '../../db/queries';
 
 export const QUICK_LOG_WIDGET_NAME = 'QuickLog';
@@ -41,7 +42,7 @@ export function QuickLogWidget({ data }: { data: QuickLogWidgetData }) {
       >
         <TextWidget text="Today" style={{ fontSize: 16, fontWeight: '700', color: Colors.text }} />
         <TextWidget
-          text={format(parseISO(date), 'EEE, MMM d')}
+          text={formatShortDate(parseISO(date))}
           style={{ fontSize: 13, fontWeight: '500', color: Colors.label }}
         />
       </FlexWidget>
