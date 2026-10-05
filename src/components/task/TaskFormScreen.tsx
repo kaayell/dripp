@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import type {
   Category,
   ReminderInputValues,
@@ -50,7 +50,6 @@ export default function TaskFormScreen({
   onSubmit,
   newCategoryReturnTo,
 }: TaskScreenProps) {
-  const insets = useSafeAreaInsets();
   const { categoryId: newCategoryIdParam } = useLocalSearchParams<{ categoryId?: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState(task?.name ?? '');
@@ -115,10 +114,7 @@ export default function TaskFormScreen({
           headerLeft: () => <CloseButton />,
         }}
       />
-      <ScrollView
-        style={{ flex: 1, backgroundColor: Colors.background }}
-        contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
-      >
+      <SafeAreaScreen scroll>
         <Text style={styles.title}>{title}</Text>
 
         <View style={styles.section}>
@@ -198,7 +194,7 @@ export default function TaskFormScreen({
         </View>
 
         <ActionButton label="Save" onPress={handleSubmit} disabled={!canSubmit} />
-      </ScrollView>
+      </SafeAreaScreen>
     </>
   );
 }

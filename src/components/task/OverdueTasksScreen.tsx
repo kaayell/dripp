@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import {
   Category,
   loadCategories,
@@ -10,7 +10,7 @@ import { Colors, dimmed } from '@/constants/theme';
 import { timeSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import { format, parseISO } from 'date-fns';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { Stack, useFocusEffect } from 'expo-router';
 import CategoryFilter from '@/components/category/CategoryFilter';
 import { CloseButton } from '@/components/ui/CloseButton';
@@ -27,7 +27,6 @@ function sortByMostOverdue(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLo
 }
 
 export default function OverdueTasksScreen() {
-  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [tasks, setTasks] = useState<TaskWithMostRecentLog[]>([]);
@@ -65,10 +64,7 @@ export default function OverdueTasksScreen() {
           headerLeft: () => <CloseButton />,
         }}
       />
-      <ScrollView
-        style={{ flex: 1, backgroundColor: Colors.background }}
-        contentContainerStyle={{ padding: 16, paddingBottom: insets.bottom + 24 }}
-      >
+      <SafeAreaScreen scroll>
         <CategoryFilter
           categories={categories}
           selectedCategoryId={selectedCategoryId}
@@ -110,7 +106,7 @@ export default function OverdueTasksScreen() {
             </View>
           );
         })}
-      </ScrollView>
+      </SafeAreaScreen>
     </>
   );
 }

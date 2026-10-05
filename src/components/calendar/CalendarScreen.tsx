@@ -16,7 +16,7 @@ import CategoryFilter from '../category/CategoryFilter';
 import { Colors } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { startDatesForPastMonths, todayString, WEEKDAY_NAMES } from '@/constants/dates';
 import * as Haptics from 'expo-haptics';
 
@@ -47,7 +47,6 @@ const calendarTheme = {
 } as any;
 
 export default function CalendarScreen() {
-  const insets = useSafeAreaInsets();
   const [categories, setCategories] = useState<Category[]>([]);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
@@ -131,9 +130,7 @@ export default function CalendarScreen() {
   }
 
   return (
-    <View
-      style={{ flex: 1, backgroundColor: Colors.background, paddingBottom: insets.bottom + 24 }}
-    >
+    <SafeAreaScreen padded={false}>
       <CategoryFilter
         categories={categories}
         selectedCategoryId={selectedCategoryId}
@@ -173,7 +170,7 @@ export default function CalendarScreen() {
       </View>
 
       <CalendarLegend tasks={visibleTasks} onToggle={refresh} />
-    </View>
+    </SafeAreaScreen>
   );
 }
 

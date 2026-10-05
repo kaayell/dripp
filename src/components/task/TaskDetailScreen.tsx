@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
 import { formatDisplayTime, formatShortDate, parseTime, timeSince } from '@/constants/dates';
@@ -15,7 +15,6 @@ import { IconButton } from '@/components/ui/IconButton';
 import { computeNextReminder } from '@/notifications/reminderDates';
 
 export default function TaskDetailScreen() {
-  const insets = useSafeAreaInsets();
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const [task, setTask] = useState<TaskWithDetails | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -60,7 +59,7 @@ export default function TaskDetailScreen() {
           ),
         }}
       />
-      <View style={[styles.container, { paddingBottom: insets.bottom + 24 }]}>
+      <SafeAreaScreen>
         <View style={styles.header}>
           <View style={styles.metaContainer}>
             <Drop color={task.color} size={32} />
@@ -106,17 +105,12 @@ export default function TaskDetailScreen() {
             />
           </View>
         </View>
-      </View>
+      </SafeAreaScreen>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    padding: 16,
-  },
   header: {
     flexDirection: 'row',
     alignItems: 'center',

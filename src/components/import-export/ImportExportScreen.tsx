@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import { router, Stack } from 'expo-router';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { describeCounts } from '@/import-export/describeCounts.ts';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { CloseButton } from '@/components/ui/CloseButton';
@@ -14,7 +14,6 @@ import { Directory } from 'expo-file-system';
 import { todayString } from '@/constants/dates';
 
 export default function ImportExportScreen() {
-  const insets = useSafeAreaInsets();
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<SnackbarMessage | null>(null);
 
@@ -59,12 +58,9 @@ export default function ImportExportScreen() {
   };
 
   return (
-    <View style={styles.screen}>
+    <>
       <Stack.Screen options={{ headerLeft: () => <CloseButton /> }} />
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={[{ paddingBottom: insets.bottom + 24 }]}
-      >
+      <SafeAreaScreen scroll>
         <View style={styles.card}>
           <View style={styles.descriptionContainer}>
             <View style={[styles.icon, { backgroundColor: dimmed(Colors.teal, 10) }]}>
@@ -86,21 +82,13 @@ export default function ImportExportScreen() {
           </View>
           <ActionButton label="Import" onPress={onPickImport} disabled={busy} />
         </View>
-      </ScrollView>
+      </SafeAreaScreen>
       {message && <Snackbar message={message} onDismiss={() => setMessage(null)} />}
-    </View>
+    </>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: Colors.background,
-    padding: 16,
-  },
   card: {
     backgroundColor: Colors.cellBg,
     borderColor: Colors.border,
