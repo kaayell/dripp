@@ -115,7 +115,7 @@ export default function CalendarScreen() {
       if (day.dateString > today) return;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       router.push({
-        pathname: '/task-picker',
+        pathname: '/task/picker',
         params: {
           date: day.dateString,
           categoryId: selectedCategoryId,

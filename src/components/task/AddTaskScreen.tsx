@@ -10,7 +10,7 @@ export default function AddTaskScreen() {
     <TaskFormScreen
       title="New Task"
       onSubmit={handleSubmit}
-      newCategoryReturnTo={{ pathname: '/add-task' }}
+      newCategoryReturnTo={{ pathname: '/task/add' }}
     />
   );
 }

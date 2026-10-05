@@ -36,7 +36,7 @@ export default function EditTaskScreen() {
       title="Edit Task"
       task={task}
       onSubmit={handleSubmit}
-      newCategoryReturnTo={{ pathname: '/edit-task', taskId: task.id }}
+      newCategoryReturnTo={{ pathname: '/task/edit', taskId: task.id }}
     />
   );
 }

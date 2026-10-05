@@ -54,7 +54,7 @@ export default function ImportExportScreen() {
 
   const onPickImport = () => {
     setMessage(null);
-    router.push('/importer');
+    router.push('/import-export/preview');
   };
 
   return (

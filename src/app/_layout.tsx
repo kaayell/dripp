@@ -62,12 +62,12 @@ export default function Layout() {
                   icon={<DatabaseBackup color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
-                  onPress={() => router.push('/overdue-tasks')}
+                  onPress={() => router.push('/task/overdue')}
                   icon={<ClockAlert color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
                   testID="add-task-button"
-                  onPress={() => router.push('/add-task')}
+                  onPress={() => router.push('/task/add')}
                   icon={<Plus color={Colors.icon} size={22} strokeWidth={2.25} />}
                 />
               </View>
@@ -75,35 +75,35 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
-          name="add-task"
+          name="task/add"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
           }}
         />
         <Stack.Screen
-          name="overdue-tasks"
+          name="task/overdue"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
           }}
         />
         <Stack.Screen
-          name="import-export"
+          name="import-export/index"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
           }}
         />
         <Stack.Screen
-          name="task-detail"
+          name="task/[taskId]"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
           }}
         />
         <Stack.Screen
-          name="task-picker"
+          name="task/picker"
           options={{
             presentation: 'formSheet',
             sheetAllowedDetents: 'fitToContents',
@@ -111,14 +111,14 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
-          name="importer"
+          name="import-export/preview"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
           }}
         />
         <Stack.Screen
-          name="add-category"
+          name="category/add"
           options={{
             presentation: 'formSheet',
             sheetAllowedDetents: 'fitToContents',

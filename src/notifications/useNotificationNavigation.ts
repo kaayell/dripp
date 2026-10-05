@@ -12,7 +12,7 @@ export function useNotificationNavigation(ready: boolean) {
     const taskId = response.notification.request.content.data?.taskId;
     if (typeof taskId !== 'number') return;
 
-    router.push({ pathname: '/task-detail', params: { taskId: String(taskId) } });
+    router.push({ pathname: '/task/[taskId]', params: { taskId: String(taskId) } });
     Notifications.clearLastNotificationResponse();
   }, [ready, response]);
 }

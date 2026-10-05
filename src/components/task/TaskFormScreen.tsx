@@ -41,7 +41,7 @@ type TaskScreenProps = {
   title: string;
   task?: TaskWithReminder;
   onSubmit: (values: TaskFormValues) => Promise<Task>;
-  newCategoryReturnTo: { pathname: '/add-task' | '/edit-task'; taskId?: number };
+  newCategoryReturnTo: { pathname: '/task/add' | '/task/edit'; taskId?: number };
 };
 
 export default function TaskFormScreen({
@@ -170,7 +170,7 @@ export default function TaskFormScreen({
               style={styles.categoryChip}
               onPress={() =>
                 router.push({
-                  pathname: '/add-category',
+                  pathname: '/category/add',
                   params: { ...newCategoryReturnTo },
                 })
               }

@@ -78,7 +78,9 @@ function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: numb
       key={task.id}
       onPressIn={onPressIn}
       onPressOut={onPressOut}
-      onPress={() => router.push({ pathname: '/task-detail', params: { taskId: String(task.id) } })}
+      onPress={() =>
+        router.push({ pathname: '/task/[taskId]', params: { taskId: String(task.id) } })
+      }
       onLongPress={onLongPress}
     >
       <Animated.View

@@ -21,7 +21,7 @@ export default function AddCategoryScreen() {
     try {
       const created = await createCategory(name.trim());
       router.dismissTo({
-        pathname: pathname ?? '/add-task',
+        pathname: pathname ?? '/task/add',
         params: { categoryId: String(created.id), ...(taskId ? { taskId } : {}) },
       });
     } catch (e) {

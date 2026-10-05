@@ -52,7 +52,7 @@ export default function TaskDetailScreen() {
             <IconButton
               testID="edit-task-button"
               onPress={() =>
-                router.push({ pathname: '/edit-task', params: { taskId: String(taskId) } })
+                router.push({ pathname: '/task/edit', params: { taskId: String(taskId) } })
               }
               icon={<SquarePen color={Colors.icon} size={18} strokeWidth={2.25} />}
             />
