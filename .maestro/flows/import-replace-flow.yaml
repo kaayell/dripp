@@ -1,0 +1,33 @@
+appId: com.kaayell.dripp
+---
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../subflows/create-task-with-category.yaml
+    env:
+      TASK_NAME: "drip"
+      CATEGORY_NAME: "bod"
+- runFlow:
+    file: ../subflows/export-data.yaml
+    env:
+      EXPECTED_COUNTS: "1 tasks, 1 categories, 0 logs, 0 reminders"
+
+- launchApp:
+    clearState: true
+- runFlow:
+    file: ../subflows/create-task.yaml
+    env:
+      TASK_NAME: "trash"
+- runFlow: ../subflows/open-latest-export.yaml
+- assertVisible: "1 tasks, 1 categories, 0 logs, 0 reminders"
+- assertVisible: "drip"
+- tapOn:
+    id: "replace-button"
+- assertVisible: "Replace all data?"
+- tapOn: "(?i)replace"
+- assertVisible: "Added 1 task, 1 category, 0 logs, 0 reminders"
+- tapOn:
+    id: "done-button"
+- assertVisible: "drip"
+- assertVisible: "bod"
+- assertNotVisible: "trash"

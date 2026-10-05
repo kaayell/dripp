@@ -1,0 +1,24 @@
+appId: com.kaayell.dripp
+---
+- tapOn:
+    id: "import-export-button"
+- tapOn:
+    id: "import-button"
+- tapOn:
+    id: "choose-file-button"
+- tapOn: "Show roots"
+- waitForAnimationToEnd
+- tapOn:
+    text: "sdk_gphone.*" # emulator's internal storage
+    childOf:
+      id: "com.google.android.documentsui:id/roots_list"
+- tapOn:
+    text: "Documents"
+    childOf:
+      id: "com.google.android.documentsui:id/dir_list"
+- tapOn: "More options"
+- tapOn: "Sort by..."
+- tapOn: "Modified \\(newest first\\)"
+- tapOn:
+    text: "dripp-export-.*\\.json"
+    index: 0

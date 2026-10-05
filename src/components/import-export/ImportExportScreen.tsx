@@ -69,7 +69,7 @@ export default function ImportExportScreen() {
             <Text style={styles.title}>Export</Text>
             <Text style={styles.subtitle}>Save all tasks, logs and reminders.</Text>
           </View>
-          <ActionButton label="Export" onPress={onExport} disabled={busy} />
+          <ActionButton testID="export-button" label="Export" onPress={onExport} disabled={busy} />
         </View>
 
         <View style={styles.card}>
@@ -80,7 +80,12 @@ export default function ImportExportScreen() {
             <Text style={styles.title}>Import</Text>
             <Text style={styles.subtitle}>Load data from a dripp export file.</Text>
           </View>
-          <ActionButton label="Import" onPress={onPickImport} disabled={busy} />
+          <ActionButton
+            testID="import-button"
+            label="Import"
+            onPress={onPickImport}
+            disabled={busy}
+          />
         </View>
       </SafeAreaScreen>
       {message && <Snackbar message={message} onDismiss={() => setMessage(null)} />}

@@ -58,6 +58,7 @@ export default function Layout() {
             headerRight: () => (
               <View style={{ flexDirection: 'row', gap: 16 }}>
                 <IconButton
+                  testID="import-export-button"
                   onPress={() => router.push('/import-export')}
                   icon={<DatabaseBackup color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />

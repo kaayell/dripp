@@ -113,18 +113,20 @@ export default function ImportPreviewScreen() {
 
   const footerContent = !data ? (
     <ActionButton
+      testID="choose-file-button"
       label={fileErrors.length > 0 ? 'Choose another file' : 'Choose file'}
       onPress={chooseFile}
     />
   ) : status.kind === 'done' ? (
     <>
       <Text style={styles.subtitle}>{status.message}</Text>
-      <ActionButton label="Done" onPress={() => router.dismissTo('/')} />
+      <ActionButton testID="done-button" label="Done" onPress={() => router.dismissTo('/')} />
     </>
   ) : (
     <>
       {status.kind === 'error' && <Text style={styles.error}>{status.message}</Text>}
       <ActionButton
+        testID="merge-button"
         label="Merge with current data"
         onPress={() => doImport('merge')}
         disabled={status.kind === 'importing'}
@@ -133,6 +135,7 @@ export default function ImportPreviewScreen() {
         Adds new tasks, categories and logs. Tasks already in dripp keep their settings.
       </Text>
       <ActionButton
+        testID="replace-button"
         label="Replace all data"
         onPress={onReplace}
         disabled={status.kind === 'importing'}
