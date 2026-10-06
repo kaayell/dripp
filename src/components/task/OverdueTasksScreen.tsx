@@ -7,9 +7,9 @@ import {
   TaskWithMostRecentLog,
 } from '../../../db/queries';
 import { Colors, dimmed } from '@/constants/theme';
-import { timeSince } from '@/constants/dates';
+import { formatForDisplay, timeSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
-import { format, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { Stack, useFocusEffect } from 'expo-router';
 import CategoryFilter from '@/components/category/CategoryFilter';
@@ -97,7 +97,7 @@ export default function OverdueTasksScreen() {
 
                     <Text style={styles.taskSubLabel}>
                       {mostRecentTaskLog
-                        ? format(parseISO(mostRecentTaskLog.date), 'MMM dd')
+                        ? formatForDisplay(parseISO(mostRecentTaskLog.date), 'MMM dd')
                         : 'Nope'}
                     </Text>
                   </View>

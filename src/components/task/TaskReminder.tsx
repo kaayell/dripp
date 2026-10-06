@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Bell, ChevronDown, Clock, Minus, Plus } from 'lucide-react-native';
-import { format } from 'date-fns';
 import type { ReminderInputValues } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { IconButton } from '@/components/ui/IconButton';
@@ -10,6 +9,7 @@ import {
   DateFrequency,
   DAYS_OF_MONTH,
   formatDisplayTime,
+  formatForDisplay,
   formatShortDate,
   formatTime,
   parseTime,
@@ -18,7 +18,7 @@ import {
 import { computeNextReminder } from '@/notifications/reminderDates';
 
 function ordinal(dayOfMonth: number): string {
-  return format(new Date(2000, 0, dayOfMonth), 'do');
+  return formatForDisplay(new Date(2000, 0, dayOfMonth), 'do');
 }
 
 function formatWeekdayName(name: string): string {

@@ -20,12 +20,12 @@ export function formatDisplayTime(date: Date): string {
   return format(date, 'h:mm a');
 }
 
-export function toDateString(date: Date): string {
-  return format(date, 'yyyy-MM-dd');
+export function formatForDisplay(date: Date, formatStr = 'yyyy-MM-dd'): string {
+  return format(date, formatStr);
 }
 
 export function todayString(): string {
-  return toDateString(new Date());
+  return formatForDisplay(new Date());
 }
 
 export function formatShortDate(date: Date): string {
@@ -41,6 +41,6 @@ export function timeSince(dateString: string): string {
 export function startDatesForPastMonths(pastMonths: number): string[] {
   const currentMonth = startOfMonth(new Date());
   return Array.from({ length: pastMonths + 1 }, (_, i) =>
-    toDateString(subMonths(currentMonth, i)),
+    formatForDisplay(subMonths(currentMonth, i)),
   );
 }

@@ -17,7 +17,7 @@ import {
   TASK_REMINDER_CATEGORY,
 } from '@/constants/notifications';
 import { parse } from 'date-fns';
-import { parseTime, toDateString } from '@/constants/dates';
+import { parseTime, formatForDisplay } from '@/constants/dates';
 import { computeReminderSchedule } from '@/notifications/reminderDates';
 
 const DATED_OCCURRENCES = 4;
@@ -71,7 +71,7 @@ function buildContent(task: Task, reminder: Reminder) {
 async function scheduleDatedNotifications(task: Task, reminder: Reminder, dates: Date[]) {
   const content = buildContent(task, reminder);
   for (const date of dates) {
-    const targetDate = toDateString(date);
+    const targetDate = formatForDisplay(date);
     await Notifications.scheduleNotificationAsync({
       identifier: reminderIdentifier(task.id, targetDate),
       content: { ...content, data: { ...content.data, targetDate } },
