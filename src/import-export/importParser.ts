@@ -5,6 +5,7 @@ import type {
   ExportedReminder,
   ExportedTask,
   ExportedTaskLog,
+  ExportedTaskNote,
   Reminder,
 } from '../../db/queries.ts';
 import { DateFrequency } from '@/constants/dates.ts';
@@ -70,6 +71,10 @@ abstract class ImportedRow<T> {
     if (Array.isArray(value)) return value;
     this.invalid(field, 'a list');
     return [];
+  }
+
+  protected readOptionalList(field: string): unknown[] {
+    return this.raw[field] == null ? [] : this.readList(field);
   }
 
   protected readOptional(field: string): unknown {
@@ -150,6 +155,21 @@ export class ImportedTaskLog extends ImportedRow<ExportedTaskLog> {
   }
 }
 
+export class ImportedTaskNote extends ImportedRow<ExportedTaskNote> {
+  readonly date: string;
+  readonly note: string;
+
+  constructor(value: unknown, label: string) {
+    super(value, label);
+    this.date = this.readDate('date');
+    this.note = this.readText('note');
+  }
+
+  toRow(): ExportedTaskNote {
+    return { date: this.date, note: this.note, ...this.audit };
+  }
+}
+
 export class ImportedReminder extends ImportedRow<ExportedReminder> {
   readonly time: string;
   readonly type: Reminder['type'];
@@ -191,6 +211,7 @@ export class ImportedTask extends ImportedRow<ExportedTask> {
   readonly color: string;
   readonly category: string | null;
   readonly logs: ImportedTaskLog[];
+  readonly notes: ImportedTaskNote[];
   readonly reminder: ImportedReminder | null;
 
   constructor(value: unknown, index: number) {
@@ -201,6 +222,9 @@ export class ImportedTask extends ImportedRow<ExportedTask> {
     this.logs = this.readList('logs').map(
       (log, i) => new ImportedTaskLog(log, `${this.label}.logs[${i}]`),
     );
+    this.notes = this.readOptionalList('notes').map(
+      (note, i) => new ImportedTaskNote(note, `${this.label}.notes[${i}]`),
+    );
     const reminder = this.readOptional('reminder');
     this.reminder =
       reminder == null ? null : new ImportedReminder(reminder, `${this.label}.reminder`);
@@ -210,6 +234,7 @@ export class ImportedTask extends ImportedRow<ExportedTask> {
     return [
       ...this.errors,
       ...this.logs.flatMap((log) => log.allErrors),
+      ...this.notes.flatMap((note) => note.allErrors),
       ...(this.reminder?.allErrors ?? []),
     ];
   }
@@ -222,6 +247,7 @@ export class ImportedTask extends ImportedRow<ExportedTask> {
       category,
       ...this.audit,
       logs: this.logs.map((log) => log.toRow()),
+      notes: this.notes.map((note) => note.toRow()),
       reminder: this.reminder?.toRow() ?? null,
     };
   }

@@ -4,6 +4,7 @@ import {
   ImportedReminder,
   ImportedTask,
   ImportedTaskLog,
+  ImportedTaskNote,
 } from '../importParser';
 
 const audit = { createdAt: '2026-09-01T10:00:00.000Z', updatedAt: '2026-09-02T10:00:00.000Z' };
@@ -17,6 +18,7 @@ function validFile() {
         color: '#e18b60',
         category: 'bod' as string | null,
         logs: [{ date: '2026-09-01', ...audit }],
+        notes: [{ date: '2026-09-02', note: 'too hot', ...audit }],
         reminder: null,
         ...audit,
       },
@@ -25,6 +27,7 @@ function validFile() {
         color: '#64a1ee',
         category: null as string | null,
         logs: [],
+        notes: [],
         reminder: {
           time: '09:00',
           type: 'weekly',
@@ -138,6 +141,23 @@ describe('ImportedTask', () => {
     expect(imported.reminder).toBeNull();
   });
 
+  it('treats missing notes as none', () => {
+    const imported = task({ notes: undefined });
+
+    expect(imported.isValid).toBe(true);
+    expect(imported.toRow().notes).toEqual([]);
+  });
+
+  it('requires notes to be a list when present', () => {
+    expect(task({ notes: 'hi' }).errors).toEqual(['tasks[0].notes must be a list']);
+  });
+
+  it('is invalid when a nested note is invalid', () => {
+    const imported = task({ notes: [{ date: '2026-09-01', note: '', ...audit }] });
+
+    expect(imported.allErrors).toEqual(['tasks[0].notes[0].note must be non-empty text']);
+  });
+
   it('requires logs to be a list', () => {
     expect(task({ logs: undefined }).errors).toEqual(['tasks[0].logs must be a list']);
   });
@@ -148,6 +168,21 @@ describe('ImportedTask', () => {
     expect(imported.errors).toEqual([]);
     expect(imported.isValid).toBe(false);
     expect(imported.allErrors).toEqual(['tasks[0].logs[0].date must be YYYY-MM-DD']);
+  });
+});
+
+describe('ImportedTaskNote', () => {
+  it('turns a valid note into a row', () => {
+    const note = new ImportedTaskNote({ date: '2026-09-01', note: 'rained', ...audit }, 'note');
+
+    expect(note.isValid).toBe(true);
+    expect(note.toRow()).toEqual({ date: '2026-09-01', note: 'rained', ...audit });
+  });
+
+  it('requires a valid date', () => {
+    expect(new ImportedTaskNote({ date: '2026-02-30', note: 'x' }, 'note').errors).toEqual([
+      'note.date must be YYYY-MM-DD',
+    ]);
   });
 });
 

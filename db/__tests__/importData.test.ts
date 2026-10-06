@@ -3,11 +3,12 @@ jest.mock('../client', () => require('./__fixtures__/client'));
 import { db } from '../client';
 import { importAppData } from '../importData';
 import type { AppData } from '../queries';
-import { categories, reminders, taskLog, tasks } from '../schema';
+import { categories, reminders, taskLog, taskNotes, tasks } from '../schema';
 
 async function clearAll() {
   await db.delete(reminders);
   await db.delete(taskLog);
+  await db.delete(taskNotes);
   await db.delete(tasks);
   await db.delete(categories);
 }
@@ -30,6 +31,7 @@ const file: AppData = {
         { date: '2026-08-10', ...audit },
         { date: '2026-08-12', ...audit },
       ],
+      notes: [{ date: '2026-08-11', note: 'skipped, vet visit', ...audit }],
       reminder: null,
       ...audit,
     },
@@ -71,7 +73,7 @@ describe('importAppData replace', () => {
 
     const result = await importAppData(file, 'replace');
 
-    expect(result).toEqual({ categories: 2, tasks: 2, logs: 3, reminders: 1 });
+    expect(result).toEqual({ categories: 2, tasks: 2, logs: 3, notes: 1, reminders: 1 });
     expect(await storedTasks()).toEqual([
       {
         name: 'feed',
@@ -90,10 +92,34 @@ describe('importAppData replace', () => {
     ]);
   });
 
+  it('replaces notes, including ones on tasks it removes', async () => {
+    const [leftover] = await db
+      .insert(tasks)
+      .values({ name: 'leftover', color: '#000000' })
+      .returning();
+    await db.insert(taskNotes).values({ task_id: leftover.id, date: '2026-08-01', note: 'old' });
+
+    await importAppData(file, 'replace');
+
+    const notes = await db.select({ date: taskNotes.date, note: taskNotes.note }).from(taskNotes);
+    expect(notes).toEqual([{ date: '2026-08-11', note: 'skipped, vet visit' }]);
+  });
+
+  it('imports files exported before notes existed', async () => {
+    const legacy: AppData = {
+      ...file,
+      tasks: file.tasks.map(({ notes, ...task }) => task),
+    };
+
+    const result = await importAppData(legacy, 'replace');
+
+    expect(result).toMatchObject({ tasks: 2, logs: 3, notes: 0 });
+  });
+
   it('keeps the timestamps from the file', async () => {
     await importAppData(file, 'replace');
 
-    for (const table of [categories, tasks, taskLog, reminders]) {
+    for (const table of [categories, tasks, taskLog, taskNotes, reminders]) {
       const rows = await db
         .select({ createdAt: table.createdAt, updatedAt: table.updatedAt })
         .from(table);
@@ -113,7 +139,7 @@ describe('importAppData merge', () => {
 
     const result = await importAppData(file, 'merge');
 
-    expect(result).toEqual({ categories: 1, tasks: 1, logs: 2, reminders: 1 });
+    expect(result).toEqual({ categories: 1, tasks: 1, logs: 2, notes: 1, reminders: 1 });
     expect(await storedTasks()).toEqual([
       {
         name: 'Feed',
@@ -132,12 +158,23 @@ describe('importAppData merge', () => {
     ]);
   });
 
+  it('keeps an existing note for the same day', async () => {
+    const [feed] = await db.insert(tasks).values({ name: 'feed', color: '#daa932' }).returning();
+    await db.insert(taskNotes).values({ task_id: feed.id, date: '2026-08-11', note: 'mine' });
+
+    const result = await importAppData(file, 'merge');
+
+    expect(result.notes).toBe(0);
+    const notes = await db.select({ note: taskNotes.note }).from(taskNotes);
+    expect(notes).toEqual([{ note: 'mine' }]);
+  });
+
   it('is idempotent', async () => {
     await importAppData(file, 'merge');
 
     const result = await importAppData(file, 'merge');
 
-    expect(result).toEqual({ categories: 0, tasks: 0, logs: 0, reminders: 0 });
+    expect(result).toEqual({ categories: 0, tasks: 0, logs: 0, notes: 0, reminders: 0 });
   });
 
   it('folds tasks whose names differ only by case into one', async () => {
@@ -154,7 +191,7 @@ describe('importAppData merge', () => {
       'merge',
     );
 
-    expect(result).toEqual({ categories: 0, tasks: 1, logs: 2, reminders: 0 });
+    expect(result).toEqual({ categories: 0, tasks: 1, logs: 2, notes: 0, reminders: 0 });
     expect((await storedTasks()).map((t) => [t.name, t.dates])).toEqual([
       ['walk', ['2026-09-01', '2026-09-02']],
     ]);

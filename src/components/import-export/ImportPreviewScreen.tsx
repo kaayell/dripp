@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { router, Stack } from 'expo-router';
-import { format, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 import { Bell } from 'lucide-react-native';
 import { importAppData, ImportMode, ImportResult } from '../../../db/importData.ts';
 import { AppData, loadCategories, loadTasks } from '../../../db/queries.ts';
@@ -13,7 +13,12 @@ import { CloseButton } from '@/components/ui/CloseButton.tsx';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import Drop from '@/components/ui/Drop.tsx';
 import { Colors, dimmed } from '@/constants/theme.ts';
-import { DateFrequency, formatDisplayTime, parseTime } from '@/constants/dates.ts';
+import {
+  DateFrequency,
+  formatDisplayTime,
+  formatForDisplay,
+  parseTime,
+} from '@/constants/dates.ts';
 import { errorMessage } from '@/constants/error.ts';
 import { File } from 'expo-file-system';
 import { ImportedData } from '@/import-export/importParser.ts';
@@ -37,6 +42,7 @@ export default function ImportPreviewScreen() {
       pluralize(result.tasks, 'task'),
       pluralize(result.categories, 'category', 'categories'),
       pluralize(result.logs, 'log'),
+      pluralize(result.notes, 'note'),
       pluralize(result.reminders, 'reminder'),
     ].join(', ');
   }
@@ -197,7 +203,9 @@ export default function ImportPreviewScreen() {
                     {[
                       task.category,
                       pluralize(task.logs.length, 'log'),
-                      task.lastLog && `last ${format(parseISO(task.lastLog), 'MMM d, yyyy')}`,
+                      task.notes?.length && pluralize(task.notes.length, 'note'),
+                      task.lastLog &&
+                        `last ${formatForDisplay(parseISO(task.lastLog), 'MMM d, yyyy')}`,
                     ]
                       .filter(Boolean)
                       .join(' · ')}

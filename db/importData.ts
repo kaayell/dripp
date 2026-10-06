@@ -1,5 +1,5 @@
 import { db } from './client';
-import { categories, reminders, taskLog, tasks } from './schema';
+import { categories, reminders, taskLog, taskNotes, tasks } from './schema';
 import { AppData } from './queries.ts';
 
 export type ImportMode = 'replace' | 'merge';
@@ -8,6 +8,7 @@ export type ImportResult = {
   categories: number;
   tasks: number;
   logs: number;
+  notes: number;
   reminders: number;
 };
 
@@ -24,7 +25,7 @@ async function insertChunked<T>(rows: T[], insert: (chunk: T[]) => Promise<unkno
 }
 
 async function mergeInto(tx: Transaction, data: AppData): Promise<ImportResult> {
-  const result: ImportResult = { categories: 0, tasks: 0, logs: 0, reminders: 0 };
+  const result: ImportResult = { categories: 0, tasks: 0, logs: 0, notes: 0, reminders: 0 };
 
   const categoryIds = new Map(
     (await tx.select().from(categories)).map((c) => [c.name.toLowerCase(), c.id]),
@@ -37,7 +38,7 @@ async function mergeInto(tx: Transaction, data: AppData): Promise<ImportResult> 
   }
 
   const taskIds = new Map((await tx.select().from(tasks)).map((t) => [t.name.toLowerCase(), t.id]));
-  for (const { category, logs, reminder, ...task } of data.tasks) {
+  for (const { category, logs, notes, reminder, ...task } of data.tasks) {
     if (taskIds.has(task.name.toLowerCase())) continue;
     const categoryId = category == null ? null : categoryIds.get(category.toLowerCase())!;
     const [created] = await tx
@@ -55,6 +56,14 @@ async function mergeInto(tx: Transaction, data: AppData): Promise<ImportResult> 
     (chunk) => tx.insert(taskLog).values(chunk).onConflictDoNothing().returning({ id: taskLog.id }),
   );
 
+  result.notes = await insertChunked(
+    data.tasks.flatMap((task) =>
+      (task.notes ?? []).map((note) => ({ ...note, task_id: taskId(task.name) })),
+    ),
+    (chunk) =>
+      tx.insert(taskNotes).values(chunk).onConflictDoNothing().returning({ id: taskNotes.id }),
+  );
+
   result.reminders = await insertChunked(
     data.tasks.flatMap((task) =>
       task.reminder ? [{ ...task.reminder, taskId: taskId(task.name) }] : [],
@@ -69,6 +78,7 @@ async function mergeInto(tx: Transaction, data: AppData): Promise<ImportResult> 
 async function replaceAll(tx: Transaction, data: AppData): Promise<ImportResult> {
   await tx.delete(reminders);
   await tx.delete(taskLog);
+  await tx.delete(taskNotes);
   await tx.delete(tasks);
   await tx.delete(categories);
   return mergeInto(tx, data);

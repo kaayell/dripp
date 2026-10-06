@@ -10,7 +10,7 @@ appId: com.kaayell.dripp
 - runFlow:
     file: ../subflows/export-data.yaml
     env:
-      EXPECTED_COUNTS: "1 tasks, 1 categories, 0 logs, 0 reminders"
+      EXPECTED_COUNTS: "1 tasks, 1 categories, 0 logs, 0 notes, 0 reminders"
 
 - launchApp:
     clearState: true
@@ -20,11 +20,11 @@ appId: com.kaayell.dripp
       TASK_NAME: "trash"
       CATEGORY_NAME: "home"
 - runFlow: ../subflows/open-latest-export.yaml
-- assertVisible: "1 tasks, 1 categories, 0 logs, 0 reminders"
+- assertVisible: "1 tasks, 1 categories, 0 logs, 0 notes, 0 reminders"
 - assertVisible: "drip"
 - tapOn:
     id: "merge-button"
-- assertVisible: "Added 1 task, 1 category, 0 logs, 0 reminders"
+- assertVisible: "Added 1 task, 1 category, 0 logs, 0 notes, 0 reminders"
 - tapOn:
     id: "done-button"
 - assertVisible: "drip"
