@@ -49,6 +49,20 @@ export const taskLog = sqliteTable(
   (table) => [unique().on(table.task_id, table.date)],
 );
 
+export const taskNotes = sqliteTable(
+  'task_notes',
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    ...timestamps,
+    task_id: integer('task_id')
+      .references(() => tasks.id)
+      .notNull(),
+    date: text().notNull(),
+    note: text().notNull(),
+  },
+  (table) => [unique().on(table.task_id, table.date)],
+);
+
 export const reminders = sqliteTable(
   'reminders',
   {
@@ -70,40 +84,47 @@ export function lower(name: AnySQLiteColumn) {
   return sql`lower(${name})`;
 }
 
-export const relations = defineRelations({ categories, tasks, taskLog, reminders }, (r) => ({
-  tasks: {
-    category: r.one.categories({
-      from: r.tasks.categoryId,
-      to: r.categories.id,
-      optional: true,
-    }),
-    mostRecentTaskLog: r.one.taskLog({
-      from: r.tasks.id,
-      to: r.taskLog.task_id,
-      optional: true,
-    }),
-    taskLogs: r.many.taskLog({
-      from: r.tasks.id,
-      to: r.taskLog.task_id,
-    }),
-    reminder: r.one.reminders({
-      from: r.tasks.id,
-      to: r.reminders.taskId,
-      optional: true,
-    }),
-  },
-  taskLog: {
-    task: r.one.tasks({
-      from: r.taskLog.task_id,
-      to: r.tasks.id,
-      optional: false,
-    }),
-  },
-  reminders: {
-    task: r.one.tasks({
-      from: r.reminders.taskId,
-      to: r.tasks.id,
-      optional: false,
-    }),
-  },
-}));
+export const relations = defineRelations(
+  { categories, tasks, taskLog, taskNotes, reminders },
+  (r) => ({
+    tasks: {
+      category: r.one.categories({
+        from: r.tasks.categoryId,
+        to: r.categories.id,
+        optional: true,
+      }),
+      mostRecentTaskLog: r.one.taskLog({
+        from: r.tasks.id,
+        to: r.taskLog.task_id,
+        optional: true,
+      }),
+      taskLogs: r.many.taskLog({
+        from: r.tasks.id,
+        to: r.taskLog.task_id,
+      }),
+      taskNotes: r.many.taskNotes({
+        from: r.tasks.id,
+        to: r.taskNotes.task_id,
+      }),
+      reminder: r.one.reminders({
+        from: r.tasks.id,
+        to: r.reminders.taskId,
+        optional: true,
+      }),
+    },
+    taskLog: {
+      task: r.one.tasks({
+        from: r.taskLog.task_id,
+        to: r.tasks.id,
+        optional: false,
+      }),
+    },
+    reminders: {
+      task: r.one.tasks({
+        from: r.reminders.taskId,
+        to: r.tasks.id,
+        optional: false,
+      }),
+    },
+  }),
+);
