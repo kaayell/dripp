@@ -4,18 +4,20 @@ import { Colors } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 
-type Marking = { color?: string; dim?: boolean };
+type Marking = { color?: string; dim?: boolean; hasNote?: boolean };
 
 export default function TaskCalendarDay({
   date,
   state,
   marking,
   onPress,
+  onLongPress,
 }: {
   date?: DateData;
   state?: string;
   marking?: Marking;
   onPress?: (date: DateData) => void;
+  onLongPress?: (date: DateData) => void;
 }) {
   if (!date) return null;
   const isToday = state === 'today';
@@ -27,6 +29,7 @@ export default function TaskCalendarDay({
     <Pressable
       disabled={isFuture}
       onPress={() => onPress?.(date)}
+      onLongPress={() => onLongPress?.(date)}
       style={[styles.cell, isToday && styles.cellToday]}
     >
       {marked && (
@@ -43,6 +46,7 @@ export default function TaskCalendarDay({
       >
         {date.day}
       </Text>
+      {marking?.hasNote && <View style={[styles.noteDot, isDisabled && styles.noteDotDisabled]} />}
     </Pressable>
   );
 }
@@ -67,6 +71,18 @@ const styles = StyleSheet.create({
     bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  noteDot: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: Colors.text,
+  },
+  noteDotDisabled: {
+    backgroundColor: Colors.disabled,
   },
   dayNum: {
     fontSize: 15,

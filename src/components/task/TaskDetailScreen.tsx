@@ -10,6 +10,7 @@ import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
 import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
+import { TaskNotes } from '@/components/task/TaskNotes';
 import { Bell, SquarePen } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { computeNextReminder } from '@/notifications/reminderDates';
@@ -59,7 +60,7 @@ export default function TaskDetailScreen() {
           ),
         }}
       />
-      <SafeAreaScreen>
+      <SafeAreaScreen scroll>
         <View style={styles.header}>
           <View style={styles.metaContainer}>
             <Drop color={task.color} size={32} />
@@ -92,17 +93,21 @@ export default function TaskDetailScreen() {
             )}
           </View>
         </View>
-        <View style={styles.calendarsContainer}>
-          <View style={styles.calendarCard}>
+        <View style={styles.taskDetailsContainer}>
+          <View style={styles.detailCard}>
             <TaskCalendarHeatmap color={task.color} taskLogs={task.taskLogs} />
           </View>
-          <View style={styles.calendarCard}>
+          <View style={styles.detailCard}>
             <TaskCalendar
               taskId={task.id}
               color={task.color}
               taskLogs={task.taskLogs}
+              taskNotes={task.taskNotes}
               onToggle={refresh}
             />
+          </View>
+          <View style={styles.detailCard}>
+            <TaskNotes taskId={task.id} color={task.color} taskNotes={task.taskNotes} />
           </View>
         </View>
       </SafeAreaScreen>
@@ -165,11 +170,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Colors.label,
   },
-  calendarsContainer: {
+  taskDetailsContainer: {
     flexDirection: 'column',
     gap: 14,
   },
-  calendarCard: {
+  detailCard: {
     backgroundColor: Colors.cellBg,
     borderColor: Colors.border,
     borderRadius: 14,

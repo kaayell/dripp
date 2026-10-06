@@ -112,6 +112,14 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
+          name="task/note"
+          options={{
+            presentation: 'formSheet',
+            sheetAllowedDetents: 'fitToContents',
+            sheetCornerRadius: 20,
+          }}
+        />
+        <Stack.Screen
           name="import-export/preview"
           options={{
             presentation: 'modal',

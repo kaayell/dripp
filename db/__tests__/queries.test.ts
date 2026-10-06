@@ -10,23 +10,26 @@ import {
   loadTask,
   loadTaskLogs,
   loadTaskLogsForDay,
+  loadTaskNote,
   loadTaskReminder,
   loadTasks,
   loadTasksWithDatedReminders,
   loadTasksWithMostRecentLog,
   loadTaskWithDetails,
   removeTaskLog,
+  saveTaskNote,
   setTaskReminder,
   exportAppData,
   toggleTaskLog,
   updateTask,
   loadTasksWithReminders,
 } from '../queries';
-import { categories, reminders, taskLog, tasks } from '../schema';
+import { categories, reminders, taskLog, taskNotes, tasks } from '../schema';
 
 afterEach(async () => {
   await db.delete(reminders);
   await db.delete(taskLog);
+  await db.delete(taskNotes);
   await db.delete(tasks);
   await db.delete(categories);
 });
@@ -92,6 +95,24 @@ describe('loadTaskWithDetails', () => {
 
     const result = await loadTaskWithDetails(task.id);
     expect(result?.taskLogs).toEqual([logTwo, logOne]);
+  });
+
+  it('returns task with sorted task notes', async () => {
+    const [task] = await db
+      .insert(tasks)
+      .values([{ name: 'drip', color: '#ffffff', categoryId: null }])
+      .returning();
+
+    const [noteOne, noteTwo] = await db
+      .insert(taskNotes)
+      .values([
+        { task_id: task.id, date: '2026-01-01', note: 'lalala' },
+        { task_id: task.id, date: '2026-01-02', note: 'hihi' },
+      ])
+      .returning();
+
+    const result = await loadTaskWithDetails(task.id);
+    expect(result?.taskNotes).toEqual([noteTwo, noteOne]);
   });
 
   it('returns task with category', async () => {
@@ -511,6 +532,75 @@ describe('toggleTaskLog', () => {
   });
 });
 
+describe('loadTaskNote', () => {
+  let dripTaskId: number;
+  let mopTaskId: number;
+
+  beforeEach(async () => {
+    const [drip, mop] = await db
+      .insert(tasks)
+      .values([
+        { name: 'drip', color: '#ffffff' },
+        { name: 'mop', color: '#000000' },
+      ])
+      .returning();
+    dripTaskId = drip.id;
+    mopTaskId = mop.id;
+  });
+
+  it('returns undefined when the day has no note', async () => {
+    expect(await loadTaskNote(dripTaskId, '2026-01-01')).toBeUndefined();
+  });
+
+  it('returns the note for that task and day only', async () => {
+    await db.insert(taskNotes).values([
+      { task_id: dripTaskId, date: '2026-01-01', note: 'drip note' },
+      { task_id: dripTaskId, date: '2026-01-02', note: 'next day' },
+      { task_id: mopTaskId, date: '2026-01-01', note: 'mop note' },
+    ]);
+
+    const result = await loadTaskNote(dripTaskId, '2026-01-01');
+
+    expect(result).toMatchObject({ task_id: dripTaskId, date: '2026-01-01', note: 'drip note' });
+  });
+});
+
+describe('saveTaskNote', () => {
+  let dripTaskId: number;
+
+  const storedNotes = () =>
+    db.select({ date: taskNotes.date, note: taskNotes.note }).from(taskNotes);
+
+  beforeEach(async () => {
+    const [drip] = await db.insert(tasks).values({ name: 'drip', color: '#ffffff' }).returning();
+    dripTaskId = drip.id;
+  });
+
+  it('creates a note when none exists', async () => {
+    await saveTaskNote(dripTaskId, '2026-01-01', 'rained');
+
+    expect(await storedNotes()).toEqual([{ date: '2026-01-01', note: 'rained' }]);
+  });
+
+  it('updates the existing note for the same day', async () => {
+    await saveTaskNote(dripTaskId, '2026-01-01', 'rained');
+    await saveTaskNote(dripTaskId, '2026-01-01', 'rained a lot');
+
+    expect(await storedNotes()).toEqual([{ date: '2026-01-01', note: 'rained a lot' }]);
+  });
+
+  it('deletes the note when saved empty', async () => {
+    await db.insert(taskNotes).values([
+      { task_id: dripTaskId, date: '2026-01-01', note: 'rained' },
+      { task_id: dripTaskId, date: '2026-01-02', note: 'sunny' },
+    ]);
+
+    await saveTaskNote(dripTaskId, '2026-01-01', '');
+
+    expect(await storedNotes()).toEqual([{ date: '2026-01-02', note: 'sunny' }]);
+  });
+});
+
 describe('exportAppData', () => {
   beforeEach(async () => {
     const [bod, home] = await db
@@ -529,6 +619,7 @@ describe('exportAppData', () => {
       { task_id: walk.id, date: '2026-09-03' },
       { task_id: mop.id, date: '2026-09-02' },
     ]);
+    await db.insert(taskNotes).values({ task_id: walk.id, date: '2026-09-02', note: 'rained' });
     await db
       .insert(reminders)
       .values({ taskId: mop.id, time: '09:00', type: 'weekly', interval: 1, dayOfWeek: 2 });
@@ -553,6 +644,7 @@ describe('exportAppData', () => {
             { date: '2026-09-01', ...audit },
             { date: '2026-09-03', ...audit },
           ],
+          notes: [{ date: '2026-09-02', note: 'rained', ...audit }],
           reminder: null,
           ...audit,
         },
@@ -561,6 +653,7 @@ describe('exportAppData', () => {
           color: '#64a1ee',
           category: 'home',
           logs: [{ date: '2026-09-02', ...audit }],
+          notes: [],
           reminder: {
             time: '09:00',
             type: 'weekly',
@@ -583,6 +676,7 @@ describe('exportAppData', () => {
     expect(data.tasks.find((t) => t.name === 'nap')).toMatchObject({
       category: null,
       logs: [],
+      notes: [],
       reminder: null,
     });
   });
