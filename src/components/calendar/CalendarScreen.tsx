@@ -131,12 +131,6 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaScreen padded={false}>
-      <CategoryFilter
-        categories={categories}
-        selectedCategoryId={selectedCategoryId}
-        onSelectCategory={selectCategory}
-      />
-
       <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
         {WEEKDAY_NAMES.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
@@ -170,6 +164,11 @@ export default function CalendarScreen() {
       </View>
 
       <CalendarLegend tasks={visibleTasks} onToggle={refresh} />
+      <CategoryFilter
+        categories={categories}
+        selectedCategoryId={selectedCategoryId}
+        onSelectCategory={selectCategory}
+      />
     </SafeAreaScreen>
   );
 }

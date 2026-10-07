@@ -84,7 +84,7 @@ function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: numb
       onLongPress={onLongPress}
     >
       <Animated.View
-        style={[styles.legendItem, { borderColor: dimmed(task.color, 40) }, animatedStyle]}
+        style={[styles.legendItem, { backgroundColor: dimmed(task.color, 15) }, animatedStyle]}
       >
         <Drop color={task.color} size={10} />
         <Text style={styles.legendLabel}>{task.name}</Text>
@@ -102,19 +102,21 @@ const styles = StyleSheet.create({
   legendRowContent: {
     paddingHorizontal: 12,
     paddingVertical: 10,
-    gap: 14,
+    gap: 8,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 6,
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    borderBottomWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   legendLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.label,
+    color: Colors.text,
   },
 });
