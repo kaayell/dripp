@@ -144,6 +144,25 @@ describe('loadTasks', () => {
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe('drip');
   });
+
+  it('returns all tasks ordered by categories', async () => {
+    const [bod, home] = await db
+      .insert(categories)
+      .values([{ name: 'bod' }, { name: 'home' }])
+      .returning();
+    const [mop, drip, party, walk] = await db
+      .insert(tasks)
+      .values([
+        { name: 'mop', color: '#64a1ee', categoryId: home.id },
+        { name: 'drip', color: '#ffffff', categoryId: bod.id },
+        { name: 'party', color: '#000000', categoryId: null },
+        { name: 'walk', color: '#e18b60', categoryId: bod.id },
+      ])
+      .returning();
+
+    const result = await loadTasks();
+    expect(result).toEqual([drip, walk, mop, party]);
+  });
 });
 
 describe('loadTasksWithMostRecentLog', () => {

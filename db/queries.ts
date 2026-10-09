@@ -89,7 +89,9 @@ export async function loadTasksWithDatedReminders(): Promise<TaskWithReminder[]>
 }
 
 export async function loadTasks(): Promise<Task[]> {
-  return db.select().from(tasks);
+  return await db.query.tasks.findMany({
+    orderBy: (t, { sql }) => sql`${t.categoryId} asc nulls last`,
+  });
 }
 
 export async function loadTasksWithMostRecentLog(): Promise<TaskWithMostRecentLog[]> {
