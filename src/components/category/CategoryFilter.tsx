@@ -182,10 +182,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   tabText: {
-    fontSize: 12.5,
+    fontSize: 12,
     fontWeight: '600',
     color: Colors.label,
-    textTransform: 'lowercase',
+    textTransform: 'uppercase',
   },
   tabTextActive: {
     fontWeight: '700',

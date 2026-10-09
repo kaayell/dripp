@@ -14,6 +14,7 @@ import {
   loadTaskReminder,
   loadTasks,
   loadTasksWithDatedReminders,
+  loadTasksWithCategory,
   loadTasksWithMostRecentLog,
   loadTaskWithDetails,
   removeTaskLog,
@@ -162,6 +163,36 @@ describe('loadTasks', () => {
 
     const result = await loadTasks();
     expect(result).toEqual([drip, walk, mop, party]);
+  });
+});
+
+describe('loadTasksWithCategory', () => {
+  it('returns empty array when no tasks exist', async () => {
+    expect(await loadTasksWithCategory()).toEqual([]);
+  });
+
+  it('returns tasks with their category, ordered by category with uncategorized last', async () => {
+    const [bod, home] = await db
+      .insert(categories)
+      .values([{ name: 'bod' }, { name: 'home' }])
+      .returning();
+    const [mop, drip, party, walk] = await db
+      .insert(tasks)
+      .values([
+        { name: 'mop', color: '#64a1ee', categoryId: home.id },
+        { name: 'drip', color: '#ffffff', categoryId: bod.id },
+        { name: 'party', color: '#000000', categoryId: null },
+        { name: 'walk', color: '#e18b60', categoryId: bod.id },
+      ])
+      .returning();
+
+    const result = await loadTasksWithCategory();
+    expect(result).toEqual([
+      { ...drip, category: bod },
+      { ...walk, category: bod },
+      { ...mop, category: home },
+      { ...party, category: null },
+    ]);
   });
 });
 

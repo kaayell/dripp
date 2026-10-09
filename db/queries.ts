@@ -14,6 +14,7 @@ export type TaskWithDetails = Task & {
 export type TaskLog = typeof taskLog.$inferSelect;
 export type TaskNote = typeof taskNotes.$inferSelect;
 export type TaskLogWithTask = TaskLog & { task: Task };
+export type TaskWithCategory = Task & { category: Category | null };
 export type TaskWithMostRecentLog = Task & {
   category: Category | null;
   mostRecentTaskLog: TaskLog | null;
@@ -90,6 +91,13 @@ export async function loadTasksWithDatedReminders(): Promise<TaskWithReminder[]>
 
 export async function loadTasks(): Promise<Task[]> {
   return await db.query.tasks.findMany({
+    orderBy: (t, { sql }) => sql`${t.categoryId} asc nulls last`,
+  });
+}
+
+export async function loadTasksWithCategory(): Promise<TaskWithCategory[]> {
+  return await db.query.tasks.findMany({
+    with: { category: true },
     orderBy: (t, { sql }) => sql`${t.categoryId} asc nulls last`,
   });
 }
