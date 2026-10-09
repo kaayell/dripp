@@ -7,6 +7,8 @@ import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import * as Haptics from 'expo-haptics';
 import Animated, {
+  SlideInRight,
+  SlideOutRight,
   useAnimatedStyle,
   useSharedValue,
   withSequence,
@@ -41,7 +43,9 @@ export default function CalendarLegend({ tasks, onToggle }: Props) {
       contentContainerStyle={styles.legendRowContent}
     >
       {tasks.map((task) => (
-        <AnimatedLabel key={task.id} task={task} onToggle={toggleTask} />
+        <Animated.View key={task.id} entering={SlideInRight} exiting={SlideOutRight}>
+          <AnimatedLabel task={task} onToggle={toggleTask} />
+        </Animated.View>
       ))}
     </ScrollView>
   );
@@ -84,7 +88,7 @@ function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: numb
       onLongPress={onLongPress}
     >
       <Animated.View
-        style={[styles.legendItem, { backgroundColor: dimmed(task.color, 15) }, animatedStyle]}
+        style={[styles.legendItem, { backgroundColor: dimmed(task.color, 10) }, animatedStyle]}
       >
         <Drop color={task.color} size={10} />
         <Text style={styles.legendLabel}>{task.name}</Text>
@@ -100,23 +104,23 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   legendRowContent: {
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 16,
     gap: 8,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     paddingVertical: 6,
-    borderRadius: 20,
+    borderRadius: 999,
     borderWidth: 1,
     borderColor: Colors.border,
   },
   legendLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.text,
+    color: dimmed(Colors.text, 70),
   },
 });
