@@ -1,4 +1,12 @@
-import { format, formatDistance, parse, parseISO, startOfMonth, subMonths } from 'date-fns';
+import {
+  differenceInCalendarDays,
+  format,
+  formatDistance,
+  parse,
+  parseISO,
+  startOfMonth,
+  subMonths,
+} from 'date-fns';
 
 export const WEEKDAY_NAMES = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 export const DAYS_OF_MONTH = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -34,8 +42,14 @@ export function formatShortDate(date: Date): string {
 
 export function timeSince(dateString: string): string {
   const today = todayString();
-  if (dateString === today) return 'Today';
+  if (dateString === today) return 'today';
   return formatDistance(parseISO(dateString), parseISO(today), { addSuffix: true });
+}
+
+export function daysSince(dateString: string): string {
+  const today = todayString();
+  if (dateString === today) return 'today';
+  return `${differenceInCalendarDays(parseISO(today), parseISO(dateString))}d`;
 }
 
 export function startDatesForPastMonths(pastMonths: number): string[] {

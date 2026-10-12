@@ -63,7 +63,7 @@ export default function Layout() {
                   icon={<DatabaseBackup color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
-                  onPress={() => router.push('/task/overdue')}
+                  onPress={() => router.push('/task/last-done')}
                   icon={<ClockAlert color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
@@ -83,7 +83,7 @@ export default function Layout() {
           }}
         />
         <Stack.Screen
-          name="task/overdue"
+          name="task/last-done"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
