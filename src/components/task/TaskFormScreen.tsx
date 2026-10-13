@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { Pipette } from 'lucide-react-native';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import type {
   Category,
@@ -14,9 +15,11 @@ import { Colors } from '@/constants/theme';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { TaskReminder } from '@/components/task/TaskReminder';
+import { ColorPickerModal } from '@/components/task/ColorPickerModal';
 import { ensureNotificationPermission, saveTaskReminder } from '@/notifications/reminders';
 
 const SWATCHES = [
+  '#d9435a',
   '#ec5b57',
   '#e18b60',
   '#daa932',
@@ -54,6 +57,7 @@ export default function TaskFormScreen({
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState(task?.name ?? '');
   const [color, setColor] = useState(task?.color ?? SWATCHES[0]);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [categoryId, setCategoryId] = useState<number | null>(task?.categoryId ?? null);
   const [reminder, setReminder] = useState<ReminderInputValues | null>(
     task?.reminder
@@ -80,6 +84,7 @@ export default function TaskFormScreen({
   }, [newCategoryIdParam]);
 
   const canSubmit = name.trim().length > 0 && !submitting;
+  const isCustomColor = !SWATCHES.includes(color);
 
   const handleToggleReminder = useCallback(async (enabled: boolean) => {
     if (enabled) {
@@ -146,7 +151,25 @@ export default function TaskFormScreen({
                 ]}
               />
             ))}
+            <Pressable
+              testID="custom-color-button"
+              onPress={() => setPickerOpen(true)}
+              style={[
+                styles.swatch,
+                styles.swatchCustom,
+                isCustomColor && { backgroundColor: color },
+                isCustomColor && styles.swatchActive,
+              ]}
+            >
+              {!isCustomColor && <Pipette color={Colors.icon} size={16} strokeWidth={2.25} />}
+            </Pressable>
           </View>
+          <ColorPickerModal
+            visible={pickerOpen}
+            color={color}
+            onSelect={setColor}
+            onClose={() => setPickerOpen(false)}
+          />
         </View>
 
         <View style={styles.section}>
@@ -241,18 +264,25 @@ const styles = StyleSheet.create({
   swatchRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
     marginBottom: 20,
   },
   swatch: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: 10,
     borderWidth: 2,
     borderColor: 'transparent',
   },
   swatchActive: {
     borderColor: Colors.text,
+  },
+  swatchCustom: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.cellBg,
+    borderWidth: 1,
+    borderColor: Colors.border,
   },
   categoryRow: {
     flexDirection: 'row',
