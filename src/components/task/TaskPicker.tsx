@@ -9,7 +9,7 @@ import {
   TaskWithCategory,
   toggleTaskLog,
 } from '../../../db/queries';
-import { Colors } from '@/constants/theme';
+import { Colors, dimmed } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { formatForDisplay } from '@/constants/dates.ts';
@@ -72,19 +72,26 @@ export default function TaskPicker() {
             {tasks.map((task) => {
               const existingId = taskLogs.find((t) => t.task_id === task.id)?.id;
               const checked = existingId != undefined;
+              const color = task.color;
               return (
                 <Pressable
                   key={task.id}
                   onPress={() => toggleTask(task.id, existingId)}
-                  style={[styles.taskRow, checked && { backgroundColor: Colors.border }]}
+                  style={[
+                    styles.taskRow,
+                    {
+                      backgroundColor: dimmed(color, checked ? 30 : 5),
+                      borderColor: dimmed(color, checked ? 40 : 10),
+                    },
+                  ]}
                 >
                   <View style={styles.taskLabelRow}>
-                    <Drop size={8} color={task.color} />
+                    <Drop size={10} color={color} />
                     <Text style={[styles.taskLabel, checked && styles.taskLabelActive]}>
                       {task.name}
                     </Text>
                   </View>
-                  {checked && <Text style={[styles.checkmark, { color: task.color }]}>✓</Text>}
+                  {checked && <Text style={[styles.checkmark]}>✓</Text>}
                 </Pressable>
               );
             })}
@@ -101,7 +108,7 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'space-between',
     paddingHorizontal: 4,
-    paddingVertical: 16,
+    paddingVertical: 10,
   },
   title: {
     fontSize: 18,
@@ -117,10 +124,11 @@ const styles = StyleSheet.create({
     paddingBottom: 4,
   },
   categoryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
+    fontSize: 14,
+    fontWeight: '700',
+    color: Colors.label,
     textTransform: 'uppercase',
+    letterSpacing: 1.25,
     paddingHorizontal: 4,
     paddingVertical: 6,
   },
@@ -153,5 +161,6 @@ const styles = StyleSheet.create({
   checkmark: {
     fontSize: 15,
     fontWeight: '700',
+    color: Colors.text,
   },
 });
