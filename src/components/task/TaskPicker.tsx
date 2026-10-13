@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { parseISO } from 'date-fns';
 import {
@@ -11,13 +11,14 @@ import {
 } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
-import { FormSheet } from '@/components/ui/FormSheet';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { formatForDisplay } from '@/constants/dates.ts';
 
 export default function TaskPicker() {
   const { date, categoryId } = useLocalSearchParams<{ date: string; categoryId?: string }>();
   const [tasks, setTasks] = useState<TaskWithCategory[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLog[]>([]);
+  const { height: windowHeight } = useWindowDimensions();
 
   useEffect(() => {
     Promise.all([loadTasksWithCategory(), loadTaskLogsForDay(date)])
@@ -53,7 +54,7 @@ export default function TaskPicker() {
     [date],
   );
   return (
-    <FormSheet>
+    <SafeAreaScreen sheet>
       <View style={styles.headerRow}>
         <Text style={styles.title}>{formatForDisplay(parseISO(date), 'EEEE, MMMM d')}</Text>
         <Pressable onPress={() => router.back()} hitSlop={8}>
@@ -61,31 +62,36 @@ export default function TaskPicker() {
         </Pressable>
       </View>
 
-      {[...tasksByCategory].map(([categoryName, tasks]) => (
-        <View key={categoryName} style={styles.categoryGroup}>
-          <Text style={styles.categoryTitle}>{categoryName}</Text>
-          {tasks.map((task) => {
-            const existingId = taskLogs.find((t) => t.task_id === task.id)?.id;
-            const checked = existingId != undefined;
-            return (
-              <Pressable
-                key={task.id}
-                onPress={() => toggleTask(task.id, existingId)}
-                style={[styles.taskRow, checked && { backgroundColor: Colors.border }]}
-              >
-                <View style={styles.taskLabelRow}>
-                  <Drop size={8} color={task.color} />
-                  <Text style={[styles.taskLabel, checked && styles.taskLabelActive]}>
-                    {task.name}
-                  </Text>
-                </View>
-                {checked && <Text style={[styles.checkmark, { color: task.color }]}>✓</Text>}
-              </Pressable>
-            );
-          })}
-        </View>
-      ))}
-    </FormSheet>
+      <ScrollView
+        style={{ flexGrow: 0, maxHeight: windowHeight * 0.7 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {[...tasksByCategory].map(([categoryName, tasks]) => (
+          <View key={categoryName} style={styles.categoryGroup}>
+            <Text style={styles.categoryTitle}>{categoryName}</Text>
+            {tasks.map((task) => {
+              const existingId = taskLogs.find((t) => t.task_id === task.id)?.id;
+              const checked = existingId != undefined;
+              return (
+                <Pressable
+                  key={task.id}
+                  onPress={() => toggleTask(task.id, existingId)}
+                  style={[styles.taskRow, checked && { backgroundColor: Colors.border }]}
+                >
+                  <View style={styles.taskLabelRow}>
+                    <Drop size={8} color={task.color} />
+                    <Text style={[styles.taskLabel, checked && styles.taskLabelActive]}>
+                      {task.name}
+                    </Text>
+                  </View>
+                  {checked && <Text style={[styles.checkmark, { color: task.color }]}>✓</Text>}
+                </Pressable>
+              );
+            })}
+          </View>
+        ))}
+      </ScrollView>
+    </SafeAreaScreen>
   );
 }
 

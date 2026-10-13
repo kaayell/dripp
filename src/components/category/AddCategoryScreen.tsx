@@ -3,7 +3,7 @@ import { StyleSheet, Text, TextInput } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { createCategory } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
-import { FormSheet } from '@/components/ui/FormSheet';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { ActionButton } from '@/components/ui/ActionButton';
 
 export default function AddCategoryScreen() {
@@ -31,7 +31,7 @@ export default function AddCategoryScreen() {
   }, [canSave, name, pathname, taskId]);
 
   return (
-    <FormSheet>
+    <SafeAreaScreen sheet>
       <Text style={styles.title}>Create Category</Text>
       <TextInput
         value={name}
@@ -48,7 +48,7 @@ export default function AddCategoryScreen() {
       />
       {error && <Text style={styles.errorText}>{error}</Text>}
       <ActionButton label="Save" onPress={handleSave} disabled={!canSave} />
-    </FormSheet>
+    </SafeAreaScreen>
   );
 }
 
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '700',
     color: Colors.text,
-    paddingVertical: 20,
+    paddingBottom: 16,
   },
   input: {
     backgroundColor: Colors.cellBg,

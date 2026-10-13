@@ -7,7 +7,7 @@ import { Check } from 'lucide-react-native';
 import { loadTaskLog, loadTaskNote, saveTaskNote, toggleTaskLog } from '../../../db/queries';
 import { Colors } from '@/constants/theme';
 import { formatShortDate } from '@/constants/dates';
-import { FormSheet } from '@/components/ui/FormSheet';
+import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { ActionButton } from '@/components/ui/ActionButton';
 
 export default function TaskNoteScreen() {
@@ -50,7 +50,7 @@ export default function TaskNoteScreen() {
   }, [taskId, date]);
 
   return (
-    <FormSheet>
+    <SafeAreaScreen sheet>
       <View style={styles.titleRow}>
         <Text style={styles.title}>{formatShortDate(parseISO(date))}</Text>
         <Pressable
@@ -70,7 +70,7 @@ export default function TaskNoteScreen() {
         multiline
       />
       <ActionButton label="Save" onPress={handleSave} disabled={saving} />
-    </FormSheet>
+    </SafeAreaScreen>
   );
 }
 
