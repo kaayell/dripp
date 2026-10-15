@@ -2,7 +2,8 @@ import { Pressable, StyleSheet, Text } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CircleAlert, CircleCheck, X } from 'lucide-react-native';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 
 export type SnackbarMessage = { text: string; type: 'success' | 'error' };
 
@@ -21,7 +22,10 @@ export function Snackbar({
     <Animated.View
       entering={FadeInDown}
       exiting={FadeOutDown}
-      style={[styles.container, { bottom: insets.bottom + 16, borderColor: dimmed(color, 40) }]}
+      style={[
+        styles.container,
+        { bottom: insets.bottom + Spacing.xl, borderColor: dimmed(color, 40) },
+      ]}
     >
       <Icon color={color} size={20} strokeWidth={2.25} />
       <Text style={styles.text}>{message.text}</Text>
@@ -34,23 +38,21 @@ export function Snackbar({
 
 const styles = StyleSheet.create({
   container: {
+    ...CommonStyles.surface,
     position: 'absolute',
-    left: 16,
-    right: 16,
+    left: Spacing.xl,
+    right: Spacing.xl,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    borderRadius: 14,
-    borderWidth: 1,
-    backgroundColor: Colors.cellBg,
+    gap: Spacing.lg,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.xl,
     elevation: 6,
   },
   text: {
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.medium,
     flex: 1,
-    fontSize: 14,
-    fontWeight: '500',
     color: Colors.text,
   },
 });

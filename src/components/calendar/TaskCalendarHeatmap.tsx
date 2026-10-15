@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog } from '../../../db/queries';
 import { CalendarHeatmap } from 'react-native-chart-kit/v2';
@@ -87,7 +87,7 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    padding: 12,
+    padding: Spacing.lg,
   },
   labelColumn: {
     width: 30,
@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   labelText: {
-    fontSize: 9,
-    fontWeight: '700',
+    fontSize: FontSize.xs,
+    fontWeight: FontWeight.bold,
     color: Colors.disabled,
   },
 });

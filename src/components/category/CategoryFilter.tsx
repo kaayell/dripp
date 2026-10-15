@@ -10,7 +10,8 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import type { Category } from '../../../db/queries';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 
 const FADE_DURATION = 150;
 const SPRING = { damping: 18, stiffness: 180, mass: 0.8 };
@@ -149,45 +150,43 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   capsule: {
+    ...CommonStyles.surface,
+    borderRadius: Radius.full,
     flexGrow: 0,
     maxWidth: '100%',
-    borderRadius: 999,
-    backgroundColor: Colors.cellBg,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   capsuleContent: {
     flexDirection: 'row',
     padding: 3,
-    gap: 2,
+    gap: Spacing.xs,
   },
   pill: {
     position: 'absolute',
     top: 3,
     bottom: 3,
     left: 0,
-    borderRadius: 999,
+    borderRadius: Radius.full,
     backgroundColor: Colors.text,
   },
   tab: {
     minWidth: 50,
-    borderRadius: 999,
+    borderRadius: Radius.full,
   },
   tabPressable: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    gap: Spacing.xs,
     justifyContent: 'center',
   },
   tabText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
     textTransform: 'uppercase',
   },
   tabTextActive: {
-    fontWeight: '700',
+    fontWeight: FontWeight.bold,
   },
 });

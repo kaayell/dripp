@@ -2,7 +2,8 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
 import { parseISO } from 'date-fns';
 import { TaskNote } from '../../../db/queries';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import { formatForDisplay } from '@/constants/dates';
 
 type TaskNotesProps = {
@@ -37,48 +38,46 @@ export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: 14,
-    paddingHorizontal: 10,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing.base,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
-    paddingBottom: 8,
-    paddingLeft: 6,
+    paddingBottom: Spacing.md,
+    paddingLeft: Spacing.sm,
   },
   empty: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.medium,
     color: Colors.label,
-    paddingVertical: 8,
-    paddingLeft: 6,
+    paddingVertical: Spacing.md,
+    paddingLeft: Spacing.sm,
   },
   row: {
+    ...CommonStyles.surface,
+    borderRadius: Radius.md,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    marginBottom: 8,
-    backgroundColor: Colors.cellBg,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    gap: Spacing.lg,
+    paddingVertical: Spacing.base,
+    paddingHorizontal: Spacing.lg,
+    marginBottom: Spacing.md,
   },
   content: {
     flex: 1,
-    gap: 4,
+    gap: Spacing.xs,
   },
   date: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
     textTransform: 'uppercase',
   },
   note: {
-    fontSize: 15,
-    fontWeight: '500',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.medium,
     color: Colors.text,
     lineHeight: 21,
   },

@@ -1,7 +1,7 @@
 import type { PropsWithChildren } from 'react';
 import { ScrollView, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Colors } from '@/constants/theme';
+import { Colors, Radius, Spacing } from '@/constants/theme';
 
 export function SafeAreaScreen({
   children,
@@ -16,7 +16,11 @@ export function SafeAreaScreen({
   contentStyle?: StyleProp<ViewStyle>;
 }>) {
   const insets = useSafeAreaInsets();
-  const content = [padded && styles.padded, { paddingBottom: insets.bottom + 16 }, contentStyle];
+  const content = [
+    padded && styles.padded,
+    { paddingBottom: insets.bottom + Spacing.xl },
+    contentStyle,
+  ];
   const handle = sheet && <View style={styles.handle} />;
 
   return scroll ? (
@@ -38,14 +42,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   padded: {
-    padding: 16,
+    padding: Spacing.xl,
   },
   handle: {
     alignSelf: 'center',
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: Radius.md,
     backgroundColor: Colors.border,
-    marginBottom: 16,
+    marginBottom: Spacing.xl,
   },
 });

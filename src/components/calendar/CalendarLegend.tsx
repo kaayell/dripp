@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import * as Haptics from 'expo-haptics';
@@ -104,23 +104,23 @@ const styles = StyleSheet.create({
     borderTopColor: Colors.border,
   },
   legendRowContent: {
-    paddingHorizontal: 6,
-    paddingVertical: 16,
-    gap: 8,
+    paddingHorizontal: Spacing.sm,
+    paddingVertical: Spacing.xl,
+    gap: Spacing.md,
   },
   legendItem: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 6,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    borderRadius: 999,
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.sm,
+    borderRadius: Radius.full,
     borderWidth: 1,
     borderColor: Colors.border,
   },
   legendLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.semibold,
     color: dimmed(Colors.text, 70),
   },
 });

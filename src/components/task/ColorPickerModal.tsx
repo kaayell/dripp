@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ColorPicker, { HueSlider, Panel1 } from 'reanimated-color-picker';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 
@@ -69,38 +70,38 @@ const styles = StyleSheet.create({
   },
   backdrop: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#00000099',
+    ...CommonStyles.backdrop,
   },
   sheet: {
     flex: 0,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderTopLeftRadius: Radius.xl,
+    borderTopRightRadius: Radius.xl,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 16,
+    paddingBottom: Spacing.xl,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   preview: {
     width: 32,
     height: 32,
-    borderRadius: 10,
+    borderRadius: Radius.md,
   },
   picker: {
-    gap: 14,
-    marginBottom: 20,
+    gap: Spacing.lg,
+    marginBottom: Spacing.xxl,
   },
   panel: {
     height: 200,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
   },
   slider: {
-    borderRadius: 10,
+    borderRadius: Radius.md,
   },
 });

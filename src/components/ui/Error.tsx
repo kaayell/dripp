@@ -1,5 +1,5 @@
 import { Text, View } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 
 type Props = {
   message: string;
@@ -13,7 +13,7 @@ export default function Error({ message }: Props) {
         backgroundColor: Colors.background,
         alignItems: 'center',
         justifyContent: 'center',
-        padding: 20,
+        padding: Spacing.xxl,
       }}
     >
       <Text style={{ color: Colors.label, textAlign: 'center' }}>{message}</Text>

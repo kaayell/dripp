@@ -12,7 +12,8 @@ import { ActionButton } from '@/components/ui/ActionButton.tsx';
 import { CloseButton } from '@/components/ui/CloseButton.tsx';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import Drop from '@/components/ui/Drop.tsx';
-import { Colors, dimmed } from '@/constants/theme.ts';
+import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import {
   DateFrequency,
   formatDisplayTime,
@@ -252,97 +253,95 @@ export default function ImportPreviewScreen() {
 
 const styles = StyleSheet.create({
   content: {
-    padding: 16,
-    gap: 8,
+    padding: Spacing.xl,
+    gap: Spacing.md,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.medium,
     color: Colors.icon,
   },
   hint: {
-    fontSize: 14,
+    fontSize: FontSize.base,
     color: Colors.label,
   },
   error: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.medium,
     color: Colors.error,
   },
   sectionLabel: {
-    marginTop: 16,
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
     color: Colors.label,
     textTransform: 'uppercase',
+    letterSpacing: 0.75,
+    marginTop: Spacing.xl,
   },
   chips: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
+    gap: Spacing.md,
   },
   chip: {
+    ...CommonStyles.surface,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    backgroundColor: Colors.cellBg,
+    gap: Spacing.sm,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
   },
   chipText: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.medium,
     color: Colors.text,
   },
   task: {
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     borderWidth: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    gap: 4,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    gap: Spacing.xs,
   },
   taskHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.md,
   },
   taskName: {
     flex: 1,
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.semibold,
     color: Colors.text,
   },
   taskDetail: {
-    fontSize: 13,
+    fontSize: FontSize.md,
     color: Colors.icon,
   },
   reminder: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: Spacing.sm,
   },
   newBadge: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
     color: Colors.teal,
   },
   existingBadge: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
   },
   footer: {
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    gap: 10,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.lg,
+    gap: Spacing.base,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
     backgroundColor: Colors.background,

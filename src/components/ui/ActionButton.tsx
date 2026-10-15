@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import * as Haptics from 'expo-haptics';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 
@@ -57,8 +57,8 @@ export function ActionButton({
 const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.teal,
-    borderRadius: 14,
-    paddingVertical: 14,
+    borderRadius: Radius.lg,
+    paddingVertical: Spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -69,8 +69,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cellBg,
   },
   text: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
     color: Colors.background,
   },
   textDisabled: {

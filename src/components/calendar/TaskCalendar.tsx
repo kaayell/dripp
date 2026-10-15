@@ -2,7 +2,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { isSameMonth, parseISO } from 'date-fns';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog, TaskNote, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
@@ -160,13 +160,13 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   monthText: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   arrows: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: Spacing.lg,
   },
 });

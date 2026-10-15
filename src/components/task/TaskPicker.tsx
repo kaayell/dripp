@@ -9,7 +9,7 @@ import {
   TaskWithCategory,
   toggleTaskLog,
 } from '../../../db/queries';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { formatForDisplay } from '@/constants/dates.ts';
@@ -107,60 +107,60 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    paddingHorizontal: 4,
-    paddingVertical: 10,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.base,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '700',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   doneText: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
     color: Colors.teal,
   },
   categoryGroup: {
-    paddingBottom: 4,
+    paddingBottom: Spacing.xs,
   },
   categoryTitle: {
-    fontSize: 14,
-    fontWeight: '700',
+    fontWeight: FontWeight.bold,
     color: Colors.label,
     textTransform: 'uppercase',
+    fontSize: FontSize.base,
     letterSpacing: 1.25,
-    paddingHorizontal: 4,
-    paddingVertical: 6,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.sm,
   },
   taskRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: Colors.background,
-    borderRadius: 14,
+    borderRadius: Radius.lg,
     borderWidth: 1,
     borderColor: Colors.border,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 10,
+    paddingVertical: Spacing.lg,
+    paddingHorizontal: Spacing.xl,
+    marginBottom: Spacing.base,
   },
   taskLabelRow: {
     flexDirection: 'row',
     alignItems: 'baseline',
-    gap: 10,
+    gap: Spacing.base,
   },
   taskLabel: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.medium,
     color: Colors.label,
   },
   taskLabelActive: {
-    fontWeight: '700',
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   checkmark: {
-    fontSize: 15,
-    fontWeight: '700',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
 });

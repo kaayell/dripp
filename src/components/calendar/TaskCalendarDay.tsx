@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 
@@ -40,7 +40,7 @@ export default function TaskCalendarDay({
       <Text
         style={[
           styles.dayNum,
-          marked && { fontWeight: '700' },
+          marked && { fontWeight: FontWeight.bold },
           isDisabled && { color: Colors.disabled },
         ]}
       >
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
   },
   cellToday: {
     borderWidth: 2,
-    borderRadius: 2,
+    borderRadius: Radius.sm,
     borderColor: Colors.teal,
   },
   dropWrap: {
@@ -78,14 +78,14 @@ const styles = StyleSheet.create({
     right: 4,
     width: 6,
     height: 6,
-    borderRadius: 3,
+    borderRadius: Radius.full,
     backgroundColor: Colors.text,
   },
   noteDotDisabled: {
     backgroundColor: Colors.disabled,
   },
   dayNum: {
-    fontSize: 15,
+    fontSize: FontSize.lg,
     color: Colors.text,
   },
 });

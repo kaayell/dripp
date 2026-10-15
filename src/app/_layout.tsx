@@ -6,7 +6,7 @@ import { runMigrations } from '../../db/client';
 import '@/notifications/listeners';
 import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
-import { Colors } from '@/constants/theme';
+import { Colors, Spacing } from '@/constants/theme';
 import { ClockAlert, DatabaseBackup, Plus } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { backfillDatedReminders } from '@/notifications/reminders';
@@ -56,7 +56,7 @@ export default function Layout() {
           name="index"
           options={{
             headerRight: () => (
-              <View style={{ flexDirection: 'row', gap: 16 }}>
+              <View style={{ flexDirection: 'row', gap: Spacing.xl }}>
                 <IconButton
                   testID="import-export-button"
                   onPress={() => router.push('/import-export')}

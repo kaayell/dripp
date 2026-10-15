@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet } from 'react-native';
-import { Colors } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import * as Haptics from 'expo-haptics';
 
@@ -45,13 +45,8 @@ export function IconButton({
 
 const styles = StyleSheet.create({
   button: {
+    ...CommonStyles.circle,
     width: 35,
     height: 35,
-    borderRadius: 50,
-    backgroundColor: Colors.cellBg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

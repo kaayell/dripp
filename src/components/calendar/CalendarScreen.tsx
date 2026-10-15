@@ -13,7 +13,7 @@ import {
 import CalendarDay from './CalendarDay';
 import CalendarLegend from './CalendarLegend';
 import CategoryFilter from '../category/CategoryFilter';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
@@ -25,7 +25,7 @@ const calendarTheme = {
   weekVerticalMargin: 2,
   'stylesheet.calendar.header': {
     header: {
-      paddingLeft: 10,
+      paddingLeft: Spacing.base,
       paddingVertical: 5,
       borderBottomWidth: 1,
       borderBottomColor: Colors.border,
@@ -34,8 +34,8 @@ const calendarTheme = {
       marginVertical: 5,
     },
     monthText: {
-      fontSize: 20,
-      fontWeight: '600',
+      fontSize: FontSize.xxl,
+      fontWeight: FontWeight.semibold,
       color: Colors.text,
     },
   },
@@ -131,7 +131,7 @@ export default function CalendarScreen() {
 
   return (
     <SafeAreaScreen padded={false}>
-      <View style={{ flexDirection: 'row', paddingVertical: 10 }}>
+      <View style={{ flexDirection: 'row', paddingVertical: Spacing.base }}>
         {WEEKDAY_NAMES.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
             {wd}
@@ -177,8 +177,8 @@ const styles = StyleSheet.create({
   weekdayLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 11,
-    fontWeight: '600',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
     letterSpacing: 0.5,
   },

@@ -1,14 +1,15 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { parseISO } from 'date-fns';
 import * as Haptics from 'expo-haptics';
 import { Check } from 'lucide-react-native';
 import { loadTaskLog, loadTaskNote, saveTaskNote, toggleTaskLog } from '../../../db/queries';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { formatShortDate } from '@/constants/dates';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { ActionButton } from '@/components/ui/ActionButton';
+import { TextField } from '@/components/ui/TextField';
 
 export default function TaskNoteScreen() {
   const params = useLocalSearchParams<{ taskId: string; date: string; color: string }>();
@@ -61,11 +62,10 @@ export default function TaskNoteScreen() {
           {done && <Check color={Colors.background} size={20} strokeWidth={3} />}
         </Pressable>
       </View>
-      <TextInput
+      <TextField
         value={note}
         onChangeText={setNote}
         placeholder="gotta note..."
-        placeholderTextColor={Colors.label}
         style={styles.input}
         multiline
       />
@@ -79,33 +79,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 20,
+    paddingVertical: Spacing.xxl,
   },
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   checkbox: {
     width: 28,
     height: 28,
-    borderRadius: 8,
+    borderRadius: Radius.sm,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
   input: {
-    backgroundColor: Colors.cellBg,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    fontWeight: '500',
-    color: Colors.text,
     minHeight: 80,
     textAlignVertical: 'top',
-    marginBottom: 20,
   },
 });

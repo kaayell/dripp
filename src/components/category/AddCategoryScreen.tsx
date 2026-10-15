@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, TextInput } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { createCategory } from '../../../db/queries';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { ActionButton } from '@/components/ui/ActionButton';
+import { TextField } from '@/components/ui/TextField';
 
 export default function AddCategoryScreen() {
   const { pathname, taskId } = useLocalSearchParams<{ pathname?: string; taskId?: string }>();
@@ -33,20 +34,18 @@ export default function AddCategoryScreen() {
   return (
     <SafeAreaScreen sheet>
       <Text style={styles.title}>Create Category</Text>
-      <TextInput
+      <TextField
         value={name}
         onChangeText={(text) => {
           setName(text);
           setError(null);
         }}
         placeholder="category name"
-        placeholderTextColor={Colors.label}
-        style={[styles.input, error && styles.inputError]}
+        error={error}
         autoFocus
         onSubmitEditing={handleSave}
         returnKeyType="done"
       />
-      {error && <Text style={styles.errorText}>{error}</Text>}
       <ActionButton label="Save" onPress={handleSave} disabled={!canSave} />
     </SafeAreaScreen>
   );
@@ -54,31 +53,9 @@ export default function AddCategoryScreen() {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
-    paddingBottom: 16,
-  },
-  input: {
-    backgroundColor: Colors.cellBg,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    fontWeight: '500',
-    color: Colors.text,
-    marginBottom: 20,
-  },
-  inputError: {
-    borderColor: Colors.error,
-  },
-  errorText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.error,
-    marginTop: -12,
-    marginBottom: 16,
+    paddingBottom: Spacing.xl,
   },
 });

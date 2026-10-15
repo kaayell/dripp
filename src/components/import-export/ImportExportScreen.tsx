@@ -6,7 +6,8 @@ import { describeCounts } from '@/import-export/describeCounts.ts';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { Snackbar, SnackbarMessage } from '@/components/ui/Snackbar';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import { FileDown, FileUp } from 'lucide-react-native';
 import { AppData, exportAppData } from '../../../db/queries.ts';
 import { errorMessage } from '@/constants/error.ts';
@@ -95,38 +96,30 @@ export default function ImportExportScreen() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.cellBg,
-    borderColor: Colors.border,
-    borderRadius: 14,
-    borderWidth: 1,
+    ...CommonStyles.surface,
     overflow: 'hidden',
-    padding: 20,
-    gap: 10,
-    marginBottom: 20,
+    padding: Spacing.xxl,
+    gap: Spacing.base,
+    marginBottom: Spacing.xxl,
   },
   descriptionContainer: {
     flexDirection: 'column',
     alignItems: 'center',
-    gap: 4,
+    gap: Spacing.xs,
   },
   icon: {
+    ...CommonStyles.circle,
     width: 60,
     height: 60,
-    borderRadius: 50,
-    backgroundColor: Colors.cellBg,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   subtitle: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: FontSize.base,
+    fontWeight: FontWeight.medium,
     color: Colors.icon,
   },
 });

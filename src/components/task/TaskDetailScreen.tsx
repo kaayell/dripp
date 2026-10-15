@@ -3,7 +3,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import { formatDisplayTime, formatShortDate, parseTime, timeSince } from '@/constants/dates';
 import { CloseButton } from '@/components/ui/CloseButton';
 import Drop from '@/components/ui/Drop';
@@ -63,7 +64,7 @@ export default function TaskDetailScreen() {
       <SafeAreaScreen scroll>
         <View style={styles.header}>
           <View style={styles.metaContainer}>
-            <Drop color={task.color} size={32} />
+            <Drop color={task.color} size={28} />
             <View style={styles.titleGroup}>
               <Text style={styles.title}>{task.name}</Text>
               <Text style={styles.category}>{task.category?.name ?? 'no category'}</Text>
@@ -120,18 +121,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 12,
-    paddingBottom: 24,
+    gap: Spacing.lg,
+    paddingBottom: Spacing.xl,
   },
   metaContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: Spacing.xl,
     flexShrink: 1,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '700',
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
   },
   titleGroup: {
@@ -139,46 +140,43 @@ const styles = StyleSheet.create({
   },
   timeLabels: {
     alignItems: 'flex-end',
-    gap: 6,
+    gap: Spacing.sm,
   },
   category: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
+    fontSize: FontSize.lg,
     textTransform: 'lowercase',
   },
   lastDonePill: {
     alignItems: 'center',
     borderWidth: 1,
-    borderRadius: 50,
-    paddingVertical: 2,
-    paddingHorizontal: 8,
+    borderRadius: Radius.full,
+    paddingVertical: Spacing.xxs,
+    paddingHorizontal: Spacing.md,
   },
   lastDoneText: {
-    fontSize: 12,
-    fontWeight: '600',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
     color: Colors.text,
     textTransform: 'lowercase',
   },
   nextReminder: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: Spacing.sm,
   },
   nextReminderText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
   },
   taskDetailsContainer: {
     flexDirection: 'column',
-    gap: 14,
+    gap: Spacing.xl,
   },
   detailCard: {
-    backgroundColor: Colors.cellBg,
-    borderColor: Colors.border,
-    borderRadius: 14,
-    borderWidth: 1,
+    ...CommonStyles.surface,
     overflow: 'hidden',
   },
 });

@@ -6,7 +6,7 @@ import {
   loadTasksWithMostRecentLog,
   TaskWithMostRecentLog,
 } from '../../../db/queries';
-import { Colors, dimmed } from '@/constants/theme';
+import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { daysSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
@@ -106,43 +106,43 @@ export default function LastDoneTasksScreen() {
 
 const styles = StyleSheet.create({
   title: {
-    paddingLeft: 20,
-    fontSize: 24,
-    fontWeight: '700',
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
+    paddingLeft: Spacing.xxl,
   },
   taskContainer: {
     flexDirection: 'row',
-    borderRadius: 20,
+    borderRadius: Radius.xl,
     borderWidth: 1,
-    padding: 16,
-    marginBottom: 14,
+    padding: Spacing.xl,
+    marginBottom: Spacing.xl,
   },
   taskRow: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: Spacing.base,
   },
   taskDetail: {
     flexDirection: 'row',
-    gap: 10,
+    gap: Spacing.base,
     alignItems: 'center',
     justifyContent: 'center',
   },
   taskLabel: {
-    fontSize: 18,
-    fontWeight: '600',
+    fontSize: FontSize.xxl,
+    fontWeight: FontWeight.semibold,
     color: Colors.text,
   },
   taskCategoryLabel: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: FontSize.lg,
+    fontWeight: FontWeight.medium,
     color: Colors.label,
   },
   categoryContainer: {
-    paddingTop: 20,
+    paddingTop: Spacing.xxl,
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Pipette } from 'lucide-react-native';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
@@ -11,32 +11,14 @@ import type {
   TaskWithReminder,
 } from '../../../db/queries';
 import { loadCategories } from '../../../db/queries';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing, TaskSwatchColors } from '@/constants/theme';
+import { CommonStyles } from '@/constants/styles';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { ActionButton } from '@/components/ui/ActionButton';
+import { TextField } from '@/components/ui/TextField';
 import { TaskReminder } from '@/components/task/TaskReminder';
 import { ColorPickerModal } from '@/components/task/ColorPickerModal';
 import { ensureNotificationPermission, saveTaskReminder } from '@/notifications/reminders';
-
-const SWATCHES = [
-  '#d9435a',
-  '#ec5b57',
-  '#e18b60',
-  '#daa932',
-  '#e1d660',
-  '#bce160',
-  '#8be160',
-  '#60e165',
-  '#5ec386',
-  '#50bfbe',
-  '#00b7c1',
-  '#64a1ee',
-  '#606be1',
-  '#b386e4',
-  '#e160e1',
-  '#da85b6',
-  '#dc7492',
-];
 
 export type TaskFormValues = TaskInputValues;
 
@@ -56,7 +38,7 @@ export default function TaskFormScreen({
   const { categoryId: newCategoryIdParam } = useLocalSearchParams<{ categoryId?: string }>();
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState(task?.name ?? '');
-  const [color, setColor] = useState(task?.color ?? SWATCHES[0]);
+  const [color, setColor] = useState(task?.color ?? TaskSwatchColors[0]);
   const [pickerOpen, setPickerOpen] = useState(false);
   const [categoryId, setCategoryId] = useState<number | null>(task?.categoryId ?? null);
   const [reminder, setReminder] = useState<ReminderInputValues | null>(
@@ -84,7 +66,7 @@ export default function TaskFormScreen({
   }, [newCategoryIdParam]);
 
   const canSubmit = name.trim().length > 0 && !submitting;
-  const isCustomColor = !SWATCHES.includes(color);
+  const isCustomColor = !TaskSwatchColors.includes(color);
 
   const handleToggleReminder = useCallback(async (enabled: boolean) => {
     if (enabled) {
@@ -123,24 +105,22 @@ export default function TaskFormScreen({
         <Text style={styles.title}>{title}</Text>
 
         <View style={styles.section}>
-          <TextInput
+          <TextField
             value={name}
             onChangeText={(text) => {
               setName(text);
               setError(null);
             }}
             placeholder="Task name"
-            placeholderTextColor={Colors.label}
-            style={[styles.input, error && styles.inputError]}
+            error={error}
             autoFocus
           />
-          {error && <Text style={styles.errorText}>{error}</Text>}
         </View>
 
         <View style={styles.section}>
           <Text style={styles.sectionLabel}>Color</Text>
           <View style={styles.swatchRow}>
-            {SWATCHES.map((swatch) => (
+            {TaskSwatchColors.map((swatch) => (
               <Pressable
                 key={swatch}
                 onPress={() => setColor(swatch)}
@@ -198,7 +178,7 @@ export default function TaskFormScreen({
                 })
               }
             >
-              <Text style={[styles.categoryChipText]}>+ new category</Text>
+              <Text style={styles.categoryChipText}>+ new category</Text>
             </Pressable>
           </View>
         </View>
@@ -224,39 +204,17 @@ export default function TaskFormScreen({
 
 const styles = StyleSheet.create({
   section: {
-    gap: 10,
+    gap: Spacing.base,
   },
   title: {
-    fontSize: 26,
-    fontWeight: '700',
+    fontSize: FontSize.title,
+    fontWeight: FontWeight.bold,
     color: Colors.text,
-    paddingBottom: 20,
-  },
-  input: {
-    backgroundColor: Colors.cellBg,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: Colors.border,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    fontSize: 15,
-    fontWeight: '500',
-    color: Colors.text,
-    marginBottom: 20,
-  },
-  inputError: {
-    borderColor: Colors.error,
-  },
-  errorText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: Colors.error,
-    marginTop: -12,
-    marginBottom: 16,
+    paddingBottom: Spacing.xxl,
   },
   sectionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.bold,
     color: Colors.label,
     textTransform: 'uppercase',
     letterSpacing: 0.75,
@@ -264,13 +222,13 @@ const styles = StyleSheet.create({
   swatchRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 20,
+    gap: Spacing.base,
+    marginBottom: Spacing.xxl,
   },
   swatch: {
     width: 32,
     height: 32,
-    borderRadius: 10,
+    borderRadius: Radius.md,
     borderWidth: 2,
     borderColor: 'transparent',
   },
@@ -278,44 +236,40 @@ const styles = StyleSheet.create({
     borderColor: Colors.text,
   },
   swatchCustom: {
+    ...CommonStyles.surface,
+    borderRadius: Radius.md,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.cellBg,
-    borderWidth: 1,
-    borderColor: Colors.border,
   },
   categoryRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
+    gap: Spacing.md,
+    marginBottom: Spacing.md,
   },
   categoryChip: {
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    borderRadius: 14,
-    backgroundColor: Colors.cellBg,
-    borderWidth: 1,
-    borderColor: Colors.border,
+    ...CommonStyles.surface,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.lg,
   },
   categoryChipActive: {
     backgroundColor: Colors.text,
     borderColor: Colors.text,
   },
   categoryChipText: {
-    fontSize: 12.5,
-    fontWeight: '600',
+    fontSize: FontSize.sm,
+    fontWeight: FontWeight.semibold,
     color: Colors.label,
     textTransform: 'lowercase',
   },
   categoryChipTextActive: {
     color: Colors.background,
-    fontWeight: '700',
+    fontWeight: FontWeight.bold,
   },
   reminderRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 10,
+    paddingBottom: Spacing.base,
   },
 });

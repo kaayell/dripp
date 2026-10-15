@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { Colors } from '@/constants/theme';
+import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
 
 const COLS = 3;
@@ -53,7 +53,7 @@ export default function CalendarDay({
       <Text
         style={[
           styles.dayNum,
-          isToday && { fontWeight: '700' },
+          isToday && { fontWeight: FontWeight.bold },
           isDisabled && { color: Colors.disabled },
         ]}
       >
@@ -66,10 +66,10 @@ export default function CalendarDay({
 const styles = StyleSheet.create({
   dayWrap: {
     height: 56,
-    marginHorizontal: 2,
-    borderRadius: 4,
+    marginHorizontal: Spacing.xxs,
+    borderRadius: Radius.sm,
     overflow: 'hidden',
-    padding: 6,
+    padding: Spacing.sm,
   },
   tilesWrap: {
     flexDirection: 'row',
@@ -84,13 +84,13 @@ const styles = StyleSheet.create({
     right: 3,
     width: DAY_NUM_SIZE,
     height: DAY_NUM_SIZE,
-    fontSize: 13,
-    fontWeight: '400',
+    fontSize: FontSize.md,
+    fontWeight: FontWeight.regular,
     color: Colors.text,
     lineHeight: DAY_NUM_SIZE,
     textAlign: 'right',
     textAlignVertical: 'center',
-    borderRadius: 2,
+    borderRadius: Radius.sm,
   },
   dayCell: {
     borderWidth: 0,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   },
   dayCellToday: {
     borderWidth: 2,
-    borderRadius: 2,
+    borderRadius: Radius.sm,
     borderColor: Colors.teal,
     backgroundColor: Colors.tealTint,
   },
