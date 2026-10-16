@@ -1,5 +1,5 @@
 import { useMemo, useRef } from 'react';
-import { ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog } from '../../../db/queries';
@@ -26,8 +26,6 @@ const LABELED_WEEKDAYS = [
 
 export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProps) {
   const today = todayString();
-  const { width: windowWidth } = useWindowDimensions();
-  const viewportWidth = Math.round(windowWidth) - 34;
   const scrollRef = useRef<ScrollView>(null);
 
   const markedDates = useMemo(() => {
@@ -36,10 +34,10 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
     });
   }, [taskLogs]);
 
-  const graphWidth = GRAPH_LABEL_WIDTH + 54 * STEP - GUTTER_SIZE + 8;
+  const graphWidth = GRAPH_LABEL_WIDTH + 53 * STEP - GUTTER_SIZE + 2;
 
   return (
-    <View style={styles.row}>
+    <View style={styles.heatmapContainer}>
       <View style={styles.labelColumn}>
         {LABELED_WEEKDAYS.map(({ index, label }) => (
           <View
@@ -54,7 +52,7 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
         ref={scrollRef}
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ width: viewportWidth }}
+        style={{ flex: 1 }}
         onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: false })}
       >
         <CalendarHeatmap
@@ -85,7 +83,7 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
 }
 
 const styles = StyleSheet.create({
-  row: {
+  heatmapContainer: {
     flexDirection: 'row',
     padding: Spacing.lg,
   },

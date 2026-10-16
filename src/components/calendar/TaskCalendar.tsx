@@ -22,10 +22,11 @@ const calendarTheme = {
   'stylesheet.calendar.header': {
     dayHeader: {
       width: 38,
-      fontSize: 13,
+      fontSize: FontSize.sm,
       textAlign: 'center',
       textTransform: 'uppercase',
       color: Colors.label,
+      paddingBottom: Spacing.sm,
     },
   },
 };
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 5,
+    paddingVertical: Spacing.sm,
   },
   monthText: {
     fontSize: FontSize.xxl,
