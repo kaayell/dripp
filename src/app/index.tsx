@@ -1,1 +1,1 @@
-export { default } from '@/components/calendar/CalendarScreen';
+export { default } from '@/components/HomeScreen.tsx';

@@ -2,21 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState, FlatList, StyleSheet, Text, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Calendar } from 'react-native-calendars';
-import {
-  Category,
-  loadCategories,
-  loadTaskLogs,
-  loadTasks,
-  Task,
-  TaskLogWithTask,
-} from '../../../db/queries';
+import { loadTaskLogs, loadTasks, Task, TaskLogWithTask } from '../../../db/queries';
 import CalendarDay from './CalendarDay';
 import CalendarLegend from './CalendarLegend';
-import CategoryFilter from '../category/CategoryFilter';
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
-import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { startDatesForPastMonths, todayString, WEEKDAY_NAMES } from '@/constants/dates';
 import * as Haptics from 'expo-haptics';
 
@@ -46,22 +37,19 @@ const calendarTheme = {
   },
 } as any;
 
-export default function CalendarScreen() {
-  const [categories, setCategories] = useState<Category[]>([]);
+export default function CalendarScreen({
+  selectedCategoryId,
+}: {
+  selectedCategoryId: number | null;
+}) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [loaded, setLoaded] = useState(false);
   const today = todayString();
   const months = startDatesForPastMonths(12);
 
   const refresh = useCallback(async () => {
-    const [loadedCategories, loadedTasks, loadedTaskLogs] = await Promise.all([
-      loadCategories(),
-      loadTasks(),
-      loadTaskLogs(),
-    ]);
-    setCategories(loadedCategories);
+    const [loadedTasks, loadedTaskLogs] = await Promise.all([loadTasks(), loadTaskLogs()]);
     setTasks(loadedTasks);
     setTaskLogs(loadedTaskLogs);
   }, []);
@@ -92,10 +80,6 @@ export default function CalendarScreen() {
     () => tasksForCategory(selectedCategoryId),
     [tasksForCategory, selectedCategoryId],
   );
-
-  const selectCategory = useCallback((categoryId: number | null) => {
-    setSelectedCategoryId(categoryId);
-  }, []);
 
   const markedDates = useMemo(() => {
     const visibleTaskIds = new Set(visibleTasks.map((task) => task.id));
@@ -130,7 +114,7 @@ export default function CalendarScreen() {
   }
 
   return (
-    <SafeAreaScreen padded={false}>
+    <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', paddingVertical: Spacing.base }}>
         {WEEKDAY_NAMES.map((wd) => (
           <Text key={wd} style={styles.weekdayLabel}>
@@ -164,12 +148,7 @@ export default function CalendarScreen() {
       </View>
 
       <CalendarLegend tasks={visibleTasks} onToggle={refresh} />
-      <CategoryFilter
-        categories={categories}
-        selectedCategoryId={selectedCategoryId}
-        onSelectCategory={selectCategory}
-      />
-    </SafeAreaScreen>
+    </View>
   );
 }
 

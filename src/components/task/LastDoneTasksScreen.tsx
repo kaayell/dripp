@@ -1,18 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import {
-  Category,
-  loadCategories,
-  loadTasksWithMostRecentLog,
-  TaskWithMostRecentLog,
-} from '../../../db/queries';
+import { loadTasksWithMostRecentLog, TaskWithMostRecentLog } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { daysSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
-import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
-import { Stack, useFocusEffect } from 'expo-router';
-import CategoryFilter from '@/components/category/CategoryFilter';
-import { CloseButton } from '@/components/ui/CloseButton';
+import { useFocusEffect } from 'expo-router';
 
 function sortByLastDone(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[] {
   return [...tasks].sort((a, b) => {
@@ -25,25 +17,20 @@ function sortByLastDone(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[]
   });
 }
 
-export default function LastDoneTasksScreen() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+export default function LastDoneTasksScreen({
+  selectedCategoryId,
+}: {
+  selectedCategoryId: number | null;
+}) {
   const [tasks, setTasks] = useState<TaskWithMostRecentLog[]>([]);
 
   useFocusEffect(
     useCallback(() => {
-      Promise.all([loadCategories(), loadTasksWithMostRecentLog()])
-        .then(([loadedCategories, loadedTasks]) => {
-          setCategories(loadedCategories);
-          setTasks(sortByLastDone(loadedTasks));
-        })
+      loadTasksWithMostRecentLog()
+        .then((loadedTasks) => setTasks(sortByLastDone(loadedTasks)))
         .catch((e) => console.error('[LastDoneTasksScreen] load failed', e));
     }, []),
   );
-
-  const selectCategory = useCallback((categoryId: number | null) => {
-    setSelectedCategoryId(categoryId);
-  }, []);
 
   const tasksForCategory = useCallback(
     (categoryId: number | null) =>
@@ -57,59 +44,50 @@ export default function LastDoneTasksScreen() {
   );
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerLeft: () => <CloseButton />,
-          headerTitle: () => <Text style={styles.title}>Last Done</Text>,
-        }}
-      />
-      <SafeAreaScreen>
-        <ScrollView>
-          {visibleTasks.map((task) => {
-            const mostRecentTaskLog = task.mostRecentTaskLog;
-            return (
-              <View
-                key={task.id}
-                style={[
-                  styles.taskContainer,
-                  { borderColor: dimmed(task.color, 20), backgroundColor: dimmed(task.color, 5) },
-                ]}
-              >
-                <View style={styles.taskRow}>
-                  <View style={styles.taskDetail}>
-                    <Drop size={12} color={task.color} />
-                    <Text style={styles.taskLabel}>{task.name}</Text>
-                    <Text style={styles.taskCategoryLabel}>{task.category?.name}</Text>
-                  </View>
-                  <View style={styles.taskDetail}>
-                    <Text style={[styles.taskLabel, { color: task.color }]}>
-                      {mostRecentTaskLog ? daysSince(mostRecentTaskLog.date) : 'Never'}
-                    </Text>
-                  </View>
+    <View style={styles.screen}>
+      <Text style={styles.title}>Last Done</Text>
+      <ScrollView>
+        {visibleTasks.map((task) => {
+          const mostRecentTaskLog = task.mostRecentTaskLog;
+          return (
+            <View
+              key={task.id}
+              style={[
+                styles.taskContainer,
+                { borderColor: dimmed(task.color, 20), backgroundColor: dimmed(task.color, 5) },
+              ]}
+            >
+              <View style={styles.taskRow}>
+                <View style={styles.taskDetail}>
+                  <Drop size={12} color={task.color} />
+                  <Text style={styles.taskLabel}>{task.name}</Text>
+                  <Text style={styles.taskCategoryLabel}>{task.category?.name}</Text>
+                </View>
+                <View style={styles.taskDetail}>
+                  <Text style={[styles.taskLabel, { color: task.color }]}>
+                    {mostRecentTaskLog ? daysSince(mostRecentTaskLog.date) : 'Never'}
+                  </Text>
                 </View>
               </View>
-            );
-          })}
-        </ScrollView>
-        <View style={styles.categoryContainer}>
-          <CategoryFilter
-            categories={categories}
-            selectedCategoryId={selectedCategoryId}
-            onSelectCategory={selectCategory}
-          />
-        </View>
-      </SafeAreaScreen>
-    </>
+            </View>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    paddingHorizontal: Spacing.xl,
+    paddingTop: Spacing.xl,
+  },
   title: {
     fontSize: FontSize.title,
     fontWeight: FontWeight.bold,
     color: Colors.text,
-    paddingLeft: Spacing.xxl,
+    marginBottom: Spacing.xl,
   },
   taskContainer: {
     flexDirection: 'row',
@@ -140,10 +118,5 @@ const styles = StyleSheet.create({
     fontSize: FontSize.lg,
     fontWeight: FontWeight.medium,
     color: Colors.label,
-  },
-  categoryContainer: {
-    paddingTop: Spacing.xxl,
-    borderTopWidth: 1,
-    borderTopColor: Colors.border,
   },
 });

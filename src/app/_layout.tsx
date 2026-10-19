@@ -7,7 +7,7 @@ import '@/notifications/listeners';
 import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
 import { Colors, Spacing } from '@/constants/theme';
-import { ClockAlert, DatabaseBackup, Plus } from 'lucide-react-native';
+import { DatabaseBackup, Plus } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { backfillDatedReminders } from '@/notifications/reminders';
 import { useNotificationNavigation } from '@/notifications/useNotificationNavigation';
@@ -63,10 +63,6 @@ export default function Layout() {
                   icon={<DatabaseBackup color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
-                  onPress={() => router.push('/task/last-done')}
-                  icon={<ClockAlert color={Colors.icon} size={20} strokeWidth={2.25} />}
-                />
-                <IconButton
                   testID="add-task-button"
                   onPress={() => router.push('/task/add')}
                   icon={<Plus color={Colors.icon} size={22} strokeWidth={2.25} />}
@@ -77,13 +73,6 @@ export default function Layout() {
         />
         <Stack.Screen
           name="task/add"
-          options={{
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-          }}
-        />
-        <Stack.Screen
-          name="task/last-done"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',
