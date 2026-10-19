@@ -1,20 +1,12 @@
 import { useCallback } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
-import * as Haptics from 'expo-haptics';
-import Animated, {
-  SlideInRight,
-  SlideOutRight,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
+import AnimatedLabel from '@/components/ui/AnimatedLabel';
+import Animated, { SlideInRight, SlideOutRight } from 'react-native-reanimated';
 
 type Props = {
   tasks: Task[];
@@ -44,56 +36,19 @@ export default function CalendarLegend({ tasks, onToggle }: Props) {
     >
       {tasks.map((task) => (
         <Animated.View key={task.id} entering={SlideInRight} exiting={SlideOutRight}>
-          <AnimatedLabel task={task} onToggle={toggleTask} />
+          <AnimatedLabel
+            style={[styles.legendItem, { backgroundColor: dimmed(task.color, 10) }]}
+            onPress={() =>
+              router.push({ pathname: '/task/[taskId]', params: { taskId: String(task.id) } })
+            }
+            onLongPress={() => toggleTask(task.id)}
+          >
+            <Drop color={task.color} size={10} />
+            <Text style={styles.legendLabel}>{task.name}</Text>
+          </AnimatedLabel>
         </Animated.View>
       ))}
     </ScrollView>
-  );
-}
-
-function AnimatedLabel({ task, onToggle }: { task: Task; onToggle: (taskId: number) => void }) {
-  const pressAnim = useSharedValue(1);
-
-  const animatedStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: pressAnim.value }],
-    opacity: pressAnim.value ** 4,
-  }));
-
-  const onPressIn = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
-    pressAnim.value = withSpring(0.9);
-  };
-
-  const onPressOut = () => {
-    pressAnim.value = withSpring(1);
-  };
-
-  const onLongPress = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    pressAnim.value = withSequence(
-      withTiming(1.15, { duration: 100 }),
-      withTiming(1, { duration: 150 }),
-    );
-    onToggle(task.id);
-  };
-
-  return (
-    <Pressable
-      key={task.id}
-      onPressIn={onPressIn}
-      onPressOut={onPressOut}
-      onPress={() =>
-        router.push({ pathname: '/task/[taskId]', params: { taskId: String(task.id) } })
-      }
-      onLongPress={onLongPress}
-    >
-      <Animated.View
-        style={[styles.legendItem, { backgroundColor: dimmed(task.color, 10) }, animatedStyle]}
-      >
-        <Drop color={task.color} size={10} />
-        <Text style={styles.legendLabel}>{task.name}</Text>
-      </Animated.View>
-    </Pressable>
   );
 }
 

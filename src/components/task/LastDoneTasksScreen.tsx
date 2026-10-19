@@ -4,7 +4,8 @@ import { loadTasksWithMostRecentLog, TaskWithMostRecentLog } from '../../../db/q
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { timeSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
-import { useFocusEffect } from 'expo-router';
+import AnimatedLabel from '@/components/ui/AnimatedLabel';
+import { router, useFocusEffect } from 'expo-router';
 
 function sortByLastDone(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[] {
   return [...tasks].sort((a, b) => {
@@ -50,12 +51,15 @@ export default function LastDoneTasksScreen({
         {visibleTasks.map((task) => {
           const mostRecentTaskLog = task.mostRecentTaskLog;
           return (
-            <View
+            <AnimatedLabel
               key={task.id}
               style={[
                 styles.taskContainer,
                 { borderColor: dimmed(task.color, 20), backgroundColor: dimmed(task.color, 5) },
               ]}
+              onPress={() =>
+                router.push({ pathname: '/task/[taskId]', params: { taskId: String(task.id) } })
+              }
             >
               <View style={styles.taskRow}>
                 <View style={styles.taskDetail}>
@@ -69,7 +73,7 @@ export default function LastDoneTasksScreen({
                   </Text>
                 </View>
               </View>
-            </View>
+            </AnimatedLabel>
           );
         })}
       </ScrollView>
