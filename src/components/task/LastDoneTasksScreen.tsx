@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { loadTasksWithMostRecentLog, TaskWithMostRecentLog } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
-import { daysSince } from '@/constants/dates';
+import { timeSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import { useFocusEffect } from 'expo-router';
 
@@ -65,7 +65,7 @@ export default function LastDoneTasksScreen({
                 </View>
                 <View style={styles.taskDetail}>
                   <Text style={[styles.taskLabel, { color: task.color }]}>
-                    {mostRecentTaskLog ? daysSince(mostRecentTaskLog.date) : 'Never'}
+                    {mostRecentTaskLog ? timeSince(mostRecentTaskLog.date) : 'Never'}
                   </Text>
                 </View>
               </View>

@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   },
   legendRowContent: {
     paddingHorizontal: Spacing.sm,
-    paddingVertical: Spacing.xl,
+    paddingTop: Spacing.xl,
     gap: Spacing.md,
   },
   legendItem: {

@@ -89,7 +89,7 @@ function PageDot({ index, page }: { index: number; page: SharedValue<number> }) 
 
 const styles = StyleSheet.create({
   categoryContainer: {
-    paddingTop: Spacing.base,
+    paddingTop: Spacing.xl,
   },
   indicator: {
     flexDirection: 'row',

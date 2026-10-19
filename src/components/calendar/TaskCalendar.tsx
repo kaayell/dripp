@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { type LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { isSameMonth, parseISO } from 'date-fns';
 import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
@@ -42,8 +42,8 @@ type TaskCalendarProps = {
 export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: TaskCalendarProps) {
   const today = todayString();
   const [visibleMonth, setVisibleMonth] = useState(today);
-  const { width: windowWidth } = useWindowDimensions();
-  const width = Math.round(windowWidth) - 34;
+  const [width, setWidth] = useState(0);
+  const handleLayout = (e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width);
   const calendarRef = useRef<CalendarListRef>(null);
 
   const markedDates = useMemo(() => {
@@ -128,27 +128,31 @@ export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: T
   );
 
   return (
-    <CalendarList
-      ref={calendarRef}
-      theme={calendarTheme}
-      horizontal
-      pagingEnabled
-      animateScroll
-      calendarWidth={width}
-      calendarHeight={400}
-      showSixWeeks
-      staticHeader
-      hideArrows
-      renderHeader={renderHeader}
-      futureScrollRange={0}
-      hideExtraDays={false}
-      maxDate={today}
-      markedDates={markedDates}
-      dayComponent={TaskCalendarDay}
-      onMonthChange={handleMonthChange}
-      onDayPress={handleDayPress}
-      onDayLongPress={handleDayLongPress}
-    />
+    <View onLayout={handleLayout}>
+      {width > 0 && (
+        <CalendarList
+          ref={calendarRef}
+          theme={calendarTheme}
+          horizontal
+          pagingEnabled
+          animateScroll
+          calendarWidth={width}
+          calendarHeight={400}
+          showSixWeeks
+          staticHeader
+          hideArrows
+          renderHeader={renderHeader}
+          futureScrollRange={0}
+          hideExtraDays={false}
+          maxDate={today}
+          markedDates={markedDates}
+          dayComponent={TaskCalendarDay}
+          onMonthChange={handleMonthChange}
+          onDayPress={handleDayPress}
+          onDayLongPress={handleDayLongPress}
+        />
+      )}
+    </View>
   );
 }
 
