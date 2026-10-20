@@ -7,11 +7,15 @@ import {
   type TextProps,
   type TextStyle,
 } from 'react-native';
-import { Colors, FontSize, FontWeight } from '@/constants/theme';
-import { withFontFamily } from '@/constants/fonts';
+import { Colors, FontFamily, FontSize, FontWeight, type Typeface } from '@/constants/theme';
 
-function StyledText({ base, style, ...props }: TextProps & { base: StyleProp<TextStyle> }) {
-  return <Text {...props} style={withFontFamily([base, style])} />;
+function StyledText({
+  base,
+  typeface = 'sans',
+  style,
+  ...props
+}: TextProps & { base: StyleProp<TextStyle>; typeface?: Typeface }) {
+  return <Text {...props} style={[{ fontFamily: FontFamily[typeface] }, base, style]} />;
 }
 
 export function Title(props: TextProps) {
@@ -23,7 +27,7 @@ export function Heading(props: TextProps) {
 }
 
 export function Label(props: TextProps) {
-  return <StyledText base={styles.label} {...props} />;
+  return <StyledText base={styles.label} typeface="mono" {...props} />;
 }
 
 export function Subtitle(props: TextProps) {
@@ -31,7 +35,7 @@ export function Subtitle(props: TextProps) {
 }
 
 export function Value(props: TextProps) {
-  return <StyledText base={styles.value} {...props} />;
+  return <StyledText base={styles.value} typeface="mono" {...props} />;
 }
 
 export function ItemTitle(props: TextProps) {
@@ -39,7 +43,7 @@ export function ItemTitle(props: TextProps) {
 }
 
 export function Caption(props: TextProps) {
-  return <StyledText base={styles.caption} {...props} />;
+  return <StyledText base={styles.caption} typeface="mono" {...props} />;
 }
 
 export function ChipText(props: TextProps) {
@@ -58,12 +62,16 @@ export function ButtonText(props: TextProps) {
   return <StyledText base={styles.buttonText} {...props} />;
 }
 
+export function DayNumber(props: TextProps) {
+  return <StyledText base={styles.dayNumber} typeface="mono" {...props} />;
+}
+
 export function Body(props: TextProps) {
   return <StyledText base={styles.body} {...props} />;
 }
 
 export function Input({ style, ...props }: TextInputProps) {
-  return <TextInput {...props} style={withFontFamily(style)} />;
+  return <TextInput {...props} style={[{ fontFamily: FontFamily.sans }, style]} />;
 }
 
 const styles = StyleSheet.create({
@@ -89,5 +97,6 @@ const styles = StyleSheet.create({
   hint: { fontSize: FontSize.base, fontWeight: FontWeight.medium, color: Colors.label },
   errorText: { fontSize: FontSize.base, fontWeight: FontWeight.medium, color: Colors.error },
   buttonText: { fontSize: FontSize.lg, fontWeight: FontWeight.bold, color: Colors.text },
+  dayNumber: { fontSize: FontSize.md, color: Colors.text },
   body: { fontSize: FontSize.base, color: Colors.text },
 });

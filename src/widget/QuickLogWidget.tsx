@@ -4,6 +4,21 @@ import { Colors, dimmed } from '@/constants/theme';
 import { formatShortDate } from '@/constants/dates';
 import type { Task, TaskWithCategory } from '../../db/queries';
 
+const WidgetFont = {
+  sans: {
+    '400': 'Geist-Regular',
+    '500': 'Geist-Medium',
+    '600': 'Geist-SemiBold',
+    '700': 'Geist-Bold',
+  },
+  mono: {
+    '400': 'GeistMono-Regular',
+    '500': 'GeistMono-Medium',
+    '600': 'GeistMono-SemiBold',
+    '700': 'GeistMono-Bold',
+  },
+} as const;
+
 export const QUICK_LOG_WIDGET_NAME = 'QuickLog';
 export const TOGGLE_TASK_ACTION = 'TOGGLE_TASK';
 
@@ -46,11 +61,22 @@ export function QuickLogWidget({ data }: { data: QuickLogWidgetData }) {
       >
         <TextWidget
           text="Today"
-          style={{ fontSize: 15, fontWeight: '700', color: Colors.text, letterSpacing: 0.25 }}
+          style={{
+            fontSize: 15,
+            fontWeight: '700',
+            fontFamily: WidgetFont.sans['700'],
+            color: Colors.text,
+            letterSpacing: 0.25,
+          }}
         />
         <TextWidget
           text={formatShortDate(parseISO(date))}
-          style={{ fontSize: 11, fontWeight: '500', color: Colors.label }}
+          style={{
+            fontSize: 11,
+            fontWeight: '500',
+            fontFamily: WidgetFont.mono['500'],
+            color: Colors.label,
+          }}
         />
       </FlexWidget>
 
@@ -58,7 +84,12 @@ export function QuickLogWidget({ data }: { data: QuickLogWidgetData }) {
         <TextWidget
           text="No tasks here yet."
           clickAction="OPEN_APP"
-          style={{ fontSize: 14, color: Colors.label, paddingHorizontal: 6 }}
+          style={{
+            fontSize: 14,
+            fontFamily: WidgetFont.sans['400'],
+            color: Colors.label,
+            paddingHorizontal: 6,
+          }}
         />
       ) : (
         <ListWidget style={{ height: 'match_parent', width: 'match_parent' }}>
@@ -83,7 +114,13 @@ function CategoryLabel({ name }: { name: string }) {
         text={name.toUpperCase()}
         maxLines={1}
         truncate="END"
-        style={{ fontSize: 11, fontWeight: '700', color: Colors.label, letterSpacing: 1.25 }}
+        style={{
+          fontSize: 11,
+          fontWeight: '700',
+          fontFamily: WidgetFont.mono['700'],
+          color: Colors.label,
+          letterSpacing: 0.25,
+        }}
       />
     </FlexWidget>
   );
@@ -137,12 +174,21 @@ function TaskChip({ task, checked }: { task: Task; checked: boolean }) {
             style={{
               fontSize: 14,
               fontWeight: checked ? '700' : '500',
+              fontFamily: WidgetFont.sans[checked ? '700' : '500'],
               color: checked ? Colors.text : (dimmed(Colors.text, 50) as HexColor),
             }}
           />
         </FlexWidget>
         {checked && (
-          <TextWidget text="✓" style={{ fontSize: 13, fontWeight: '600', color: Colors.text }} />
+          <TextWidget
+            text="✓"
+            style={{
+              fontSize: 13,
+              fontWeight: '600',
+              fontFamily: WidgetFont.sans['600'],
+              color: Colors.text,
+            }}
+          />
         )}
       </FlexWidget>
     </FlexWidget>

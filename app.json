@@ -40,6 +40,16 @@
       [
         "react-native-android-widget",
         {
+          "fonts": [
+            "./assets/fonts/Geist-Regular.ttf",
+            "./assets/fonts/Geist-Medium.ttf",
+            "./assets/fonts/Geist-SemiBold.ttf",
+            "./assets/fonts/Geist-Bold.ttf",
+            "./assets/fonts/GeistMono-Regular.ttf",
+            "./assets/fonts/GeistMono-Medium.ttf",
+            "./assets/fonts/GeistMono-SemiBold.ttf",
+            "./assets/fonts/GeistMono-Bold.ttf"
+          ],
           "widgets": [
             {
               "name": "QuickLog",
@@ -53,6 +63,69 @@
               "updatePeriodMillis": 1800000
             }
           ]
+        }
+      ],
+      [
+        "expo-font",
+        {
+          "android": {
+            "fonts": [
+              {
+                "fontFamily": "Geist",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/Geist-Regular.ttf",
+                    "weight": 400
+                  },
+                  {
+                    "path": "./assets/fonts/Geist-Medium.ttf",
+                    "weight": 500
+                  },
+                  {
+                    "path": "./assets/fonts/Geist-SemiBold.ttf",
+                    "weight": 600
+                  },
+                  {
+                    "path": "./assets/fonts/Geist-Bold.ttf",
+                    "weight": 700
+                  }
+                ]
+              },
+              {
+                "fontFamily": "Geist Mono",
+                "fontDefinitions": [
+                  {
+                    "path": "./assets/fonts/GeistMono-Regular.ttf",
+                    "weight": 400
+                  },
+                  {
+                    "path": "./assets/fonts/GeistMono-Medium.ttf",
+                    "weight": 500
+                  },
+                  {
+                    "path": "./assets/fonts/GeistMono-SemiBold.ttf",
+                    "weight": 600
+                  },
+                  {
+                    "path": "./assets/fonts/GeistMono-Bold.ttf",
+                    "weight": 700
+                  }
+                ]
+              }
+            ]
+          },
+          "ios": {
+            "fonts": [
+              "./assets/fonts/Geist-Regular.ttf",
+              "./assets/fonts/Geist-Medium.ttf",
+              "./assets/fonts/Geist-SemiBold.ttf",
+              "./assets/fonts/Geist-Bold.ttf",
+              "./assets/fonts/GeistMono-Regular.ttf",
+              "./assets/fonts/GeistMono-Medium.ttf",
+              "./assets/fonts/GeistMono-SemiBold.ttf",
+              "./assets/fonts/GeistMono-Bold.ttf"
+            ]
+          }
         }
       ]
     ],

@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { Colors, FontWeight, Radius, Spacing } from '@/constants/theme';
 import Drop from '@/components/ui/Drop';
-import { Body } from '@/components/ui/Typography';
+import { DayNumber } from '@/components/ui/Typography';
 
 const COLS = 3;
 const TILE_SIZE = 10;
@@ -51,7 +51,7 @@ export default function CalendarDay({
           )}
         </View>
       )}
-      <Body
+      <DayNumber
         style={[
           styles.dayNum,
           isToday && { fontWeight: FontWeight.bold },
@@ -59,7 +59,7 @@ export default function CalendarDay({
         ]}
       >
         {date.day}
-      </Body>
+      </DayNumber>
     </Pressable>
   );
 }
@@ -85,9 +85,6 @@ const styles = StyleSheet.create({
     right: 3,
     width: DAY_NUM_SIZE,
     height: DAY_NUM_SIZE,
-    fontSize: FontSize.md,
-    fontWeight: FontWeight.regular,
-    color: Colors.text,
     lineHeight: DAY_NUM_SIZE,
     textAlign: 'right',
     textAlignVertical: 'center',

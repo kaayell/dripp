@@ -93,9 +93,9 @@ export const FontWeight = {
   bold: '700',
 } as const;
 
-type FontWeightValue = (typeof FontWeight)[keyof typeof FontWeight];
-export const FontFamily: Partial<Record<FontWeightValue, string>> = {};
+export const FontFamily = {
+  sans: 'Geist',
+  mono: 'Geist Mono',
+} as const;
 
-export function fontFamilyFor(weight: unknown): string | undefined {
-  return FontFamily[(weight ?? FontWeight.regular) as FontWeightValue];
-}
+export type Typeface = keyof typeof FontFamily;
