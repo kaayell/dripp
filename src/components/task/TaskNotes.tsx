@@ -1,10 +1,11 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { parseISO } from 'date-fns';
 import { TaskNote } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { CommonStyles } from '@/constants/styles';
 import { formatForDisplay } from '@/constants/dates';
+import { Body, Caption, Heading, Hint } from '@/components/ui/Typography';
 
 type TaskNotesProps = {
   taskId: number;
@@ -15,9 +16,9 @@ type TaskNotesProps = {
 export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Notes</Text>
+      <Heading style={styles.title}>Notes</Heading>
       {taskNotes.length === 0 ? (
-        <Text style={styles.empty}>Long-press a day to add a note</Text>
+        <Hint style={styles.empty}>Long-press a day to add a note</Hint>
       ) : (
         taskNotes.map(({ date, note }) => (
           <Pressable
@@ -26,8 +27,8 @@ export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
             style={({ pressed }) => [styles.row, pressed && { backgroundColor: dimmed(color, 5) }]}
           >
             <View style={styles.content}>
-              <Text style={styles.date}>{formatForDisplay(parseISO(date), 'MM/dd/yy')}</Text>
-              <Text style={styles.note}>{note}</Text>
+              <Caption style={styles.date}>{formatForDisplay(parseISO(date), 'MM/dd/yy')}</Caption>
+              <Body style={styles.note}>{note}</Body>
             </View>
           </Pressable>
         ))
@@ -42,16 +43,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.base,
   },
   title: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
     paddingBottom: Spacing.md,
     paddingLeft: Spacing.sm,
   },
   empty: {
-    fontSize: FontSize.base,
-    fontWeight: FontWeight.medium,
-    color: Colors.label,
     paddingVertical: Spacing.md,
     paddingLeft: Spacing.sm,
   },
@@ -71,8 +66,6 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.label,
     textTransform: 'uppercase',
   },
   note: {

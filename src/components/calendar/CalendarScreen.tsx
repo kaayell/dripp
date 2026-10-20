@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AppState, FlatList, StyleSheet, Text, View } from 'react-native';
+import { AppState, FlatList, StyleSheet, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Calendar } from 'react-native-calendars';
 import { loadTaskLogs, loadTasks, Task, TaskLogWithTask } from '../../../db/queries';
@@ -10,6 +10,7 @@ import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { startDatesForPastMonths, todayString, WEEKDAY_NAMES } from '@/constants/dates';
 import * as Haptics from 'expo-haptics';
+import { Caption } from '@/components/ui/Typography';
 
 const calendarTheme = {
   calendarBackground: Colors.background,
@@ -117,9 +118,9 @@ export default function CalendarScreen({
     <View style={{ flex: 1 }}>
       <View style={{ flexDirection: 'row', paddingVertical: Spacing.base }}>
         {WEEKDAY_NAMES.map((wd) => (
-          <Text key={wd} style={styles.weekdayLabel}>
+          <Caption key={wd} style={styles.weekdayLabel}>
             {wd}
-          </Text>
+          </Caption>
         ))}
       </View>
 
@@ -156,9 +157,6 @@ const styles = StyleSheet.create({
   weekdayLabel: {
     flex: 1,
     textAlign: 'center',
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.label,
     letterSpacing: 0.5,
   },
 });

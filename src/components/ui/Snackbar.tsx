@@ -1,9 +1,10 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import Animated, { FadeInDown, FadeOutDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CircleAlert, CircleCheck, X } from 'lucide-react-native';
 import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { CommonStyles } from '@/constants/styles';
+import { Body } from '@/components/ui/Typography';
 
 export type SnackbarMessage = { text: string; type: 'success' | 'error' };
 
@@ -28,7 +29,7 @@ export function Snackbar({
       ]}
     >
       <Icon color={color} size={20} strokeWidth={2.25} />
-      <Text style={styles.text}>{message.text}</Text>
+      <Body style={styles.text}>{message.text}</Body>
       <Pressable testID="snackbar-dismiss" onPress={onDismiss} hitSlop={12}>
         <X color={Colors.icon} size={18} strokeWidth={2.25} />
       </Pressable>

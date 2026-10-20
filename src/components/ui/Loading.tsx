@@ -1,5 +1,6 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Colors } from '@/constants/theme';
+import { Body } from '@/components/ui/Typography';
 
 export default function Loading() {
   return (
@@ -11,7 +12,7 @@ export default function Loading() {
         justifyContent: 'center',
       }}
     >
-      <Text style={{ color: Colors.text }}>Loading…</Text>
+      <Body style={{ color: Colors.text }}>Loading…</Body>
     </View>
   );
 }

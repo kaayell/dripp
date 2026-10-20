@@ -1,11 +1,8 @@
-import { Text, View } from 'react-native';
+import { View } from 'react-native';
 import { Colors, Spacing } from '@/constants/theme';
+import { Hint } from '@/components/ui/Typography';
 
-type Props = {
-  message: string;
-};
-
-export default function Error({ message }: Props) {
+export default function Error({ message }: { message: string }) {
   return (
     <View
       style={{
@@ -16,7 +13,7 @@ export default function Error({ message }: Props) {
         padding: Spacing.xxl,
       }}
     >
-      <Text style={{ color: Colors.label, textAlign: 'center' }}>{message}</Text>
+      <Hint style={{ textAlign: 'center' }}>{message}</Hint>
     </View>
   );
 }

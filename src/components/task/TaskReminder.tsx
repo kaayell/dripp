@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Bell, ChevronDown, Clock, Minus, Plus } from 'lucide-react-native';
 import type { ReminderInputValues } from '../../../db/queries';
@@ -17,6 +17,7 @@ import {
   WEEKDAY_NAMES,
 } from '@/constants/dates';
 import { computeNextReminder } from '@/notifications/reminderDates';
+import { Body, Caption, Label, Value } from '@/components/ui/Typography';
 
 function ordinal(dayOfMonth: number): string {
   return formatForDisplay(new Date(2000, 0, dayOfMonth), 'do');
@@ -81,16 +82,16 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
             style={[styles.segment, frequencyMode === mode && styles.segmentActive]}
             onPress={() => setFrequencyMode(mode)}
           >
-            <Text style={[styles.segmentText, frequencyMode === mode && styles.segmentTextActive]}>
+            <Body style={[styles.segmentText, frequencyMode === mode && styles.segmentTextActive]}>
               {mode[0].toUpperCase() + mode.slice(1)}
-            </Text>
+            </Body>
           </Pressable>
         ))}
       </View>
 
       <View style={styles.reminderFieldsRow}>
         <Pressable style={styles.reminderTimeButton} onPress={() => setShowTimePicker(true)}>
-          <Text style={styles.reminderTimeText}>{formatDisplayTime(reminderTime)}</Text>
+          <Value>{formatDisplayTime(reminderTime)}</Value>
           <Clock size={16} color={Colors.label} />
         </Pressable>
 
@@ -102,11 +103,11 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
             icon={<Minus size={16} color={Colors.text} />}
           />
 
-          <Text style={styles.stepperValue}>
+          <Value>
             {interval === 1
               ? `every ${frequencyUnit(frequencyMode)}`
               : `every ${interval} ${frequencyUnit(frequencyMode)}s`}
-          </Text>
+          </Value>
           <IconButton
             onPress={() => {
               setInterval((i) => i + 1);
@@ -135,7 +136,7 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
 
       {frequencyMode === DateFrequency.WEEKLY && (
         <>
-          <Text style={styles.sectionLabel}>Repeat on</Text>
+          <Label style={styles.sectionLabel}>Repeat on</Label>
           <View style={styles.weekdayRow}>
             {WEEKDAY_NAMES.map((value, index) => {
               const active = dayOfWeek === index;
@@ -145,9 +146,9 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
                   style={[styles.weekdayCircle, active && styles.weekdayCircleActive]}
                   onPress={() => setDayOfWeek(index)}
                 >
-                  <Text style={[styles.weekdayText, active && styles.weekdayTextActive]}>
+                  <Body style={[styles.weekdayText, active && styles.weekdayTextActive]}>
                     {value}
-                  </Text>
+                  </Body>
                 </Pressable>
               );
             })}
@@ -157,12 +158,12 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
 
       {frequencyMode === DateFrequency.MONTHLY && (
         <>
-          <Text style={styles.sectionLabel}>Repeat on</Text>
+          <Label style={styles.sectionLabel}>Repeat on</Label>
           <Pressable
             style={styles.reminderTimeButton}
             onPress={() => setShowDayOfMonthPicker(true)}
           >
-            <Text style={styles.reminderTimeText}>the {ordinal(dayOfMonth)}</Text>
+            <Value>the {ordinal(dayOfMonth)}</Value>
             <ChevronDown size={16} color={Colors.label} />
           </Pressable>
           <Modal
@@ -185,14 +186,9 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
                           setShowDayOfMonthPicker(false);
                         }}
                       >
-                        <Text
-                          style={[
-                            styles.dayOfMonthOptionText,
-                            active && styles.dayOfMonthOptionTextActive,
-                          ]}
-                        >
+                        <Value style={active && styles.dayOfMonthOptionTextActive}>
                           {ordinal(day)}
-                        </Text>
+                        </Value>
                       </Pressable>
                     );
                   })}
@@ -206,7 +202,7 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
       <View style={styles.summaryCard}>
         <Bell size={18} color={Colors.teal} />
         <View style={styles.summaryTextGroup}>
-          <Text style={styles.summaryTitle}>
+          <Body style={styles.summaryTitle}>
             {summarizeReminder(
               frequencyMode,
               interval,
@@ -214,8 +210,8 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
               dayOfWeek,
               dayOfMonth,
             )}
-          </Text>
-          <Text style={styles.summarySubtitle}>
+          </Body>
+          <Caption style={styles.summarySubtitle}>
             Next:{' '}
             {formatShortDate(
               computeNextReminder(reminderTime, {
@@ -225,7 +221,7 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
                 dayOfMonth,
               }),
             )}
-          </Text>
+          </Caption>
         </View>
       </View>
     </>
@@ -234,10 +230,6 @@ export function TaskReminder({ value, onChange }: ReminderFieldProps) {
 
 const styles = StyleSheet.create({
   sectionLabel: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: Colors.label,
-    textTransform: 'uppercase',
     marginBottom: Spacing.base,
     marginLeft: Spacing.xs,
   },
@@ -262,20 +254,10 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.base,
     paddingHorizontal: Spacing.xxl,
   },
-  reminderTimeText: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text,
-  },
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.base,
-  },
-  stepperValue: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text,
   },
   segmentedControl: {
     ...CommonStyles.surface,
@@ -342,11 +324,6 @@ const styles = StyleSheet.create({
   dayOfMonthOptionActive: {
     backgroundColor: Colors.tealTint,
   },
-  dayOfMonthOptionText: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text,
-  },
   dayOfMonthOptionTextActive: {
     color: Colors.teal,
   },
@@ -367,9 +344,7 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   summarySubtitle: {
-    fontSize: FontSize.sm,
     fontWeight: FontWeight.medium,
-    color: Colors.label,
     marginTop: Spacing.xs,
   },
 });

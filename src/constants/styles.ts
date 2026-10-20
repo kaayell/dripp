@@ -33,7 +33,6 @@ export const CommonStyles = StyleSheet.create({
   errorText: {
     fontSize: FontSize.md,
     fontWeight: FontWeight.semibold,
-    color: Colors.error,
     marginTop: -Spacing.lg,
     marginBottom: Spacing.xl,
   },

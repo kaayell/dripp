@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
@@ -7,6 +7,7 @@ import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import AnimatedLabel from '@/components/ui/AnimatedLabel';
 import Animated, { SlideInRight, SlideOutRight } from 'react-native-reanimated';
+import { Body } from '@/components/ui/Typography';
 
 type Props = {
   tasks: Task[];
@@ -44,7 +45,7 @@ export default function CalendarLegend({ tasks, onToggle }: Props) {
             onLongPress={() => toggleTask(task.id)}
           >
             <Drop color={task.color} size={10} />
-            <Text style={styles.legendLabel}>{task.name}</Text>
+            <Body style={styles.legendLabel}>{task.name}</Body>
           </AnimatedLabel>
         </Animated.View>
       ))}

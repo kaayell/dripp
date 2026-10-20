@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { loadTaskWithDetails, TaskWithDetails } from '../../../db/queries';
@@ -15,6 +15,7 @@ import { TaskNotes } from '@/components/task/TaskNotes';
 import { Bell, SquarePen } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { computeNextReminder } from '@/notifications/reminderDates';
+import { Body, Caption, ChipText, Title } from '@/components/ui/Typography';
 
 export default function TaskDetailScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
@@ -66,8 +67,8 @@ export default function TaskDetailScreen() {
           <View style={styles.metaContainer}>
             <Drop color={task.color} size={28} />
             <View style={styles.titleGroup}>
-              <Text style={styles.title}>{task.name}</Text>
-              <Text style={styles.category}>{task.category?.name ?? 'no category'}</Text>
+              <Title>{task.name}</Title>
+              <Body style={styles.category}>{task.category?.name ?? 'no category'}</Body>
             </View>
           </View>
           <View style={styles.timeLabels}>
@@ -81,15 +82,17 @@ export default function TaskDetailScreen() {
                   },
                 ]}
               >
-                <Text style={styles.lastDoneText}>{`${timeSince(task.taskLogs[0]!.date)}`}</Text>
+                <ChipText
+                  style={styles.lastDoneText}
+                >{`${timeSince(task.taskLogs[0]!.date)}`}</ChipText>
               </View>
             )}
             {nextReminder && (
               <View style={styles.nextReminder}>
                 <Bell color={Colors.label} size={13} strokeWidth={2.25} />
-                <Text style={styles.nextReminderText}>
+                <Caption style={styles.nextReminderText}>
                   {`${formatShortDate(nextReminder)} at ${formatDisplayTime(nextReminder)}`}
-                </Text>
+                </Caption>
               </View>
             )}
           </View>
@@ -130,11 +133,6 @@ const styles = StyleSheet.create({
     gap: Spacing.xl,
     flexShrink: 1,
   },
-  title: {
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
-  },
   titleGroup: {
     flexShrink: 1,
   },
@@ -156,10 +154,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.md,
   },
   lastDoneText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
     color: Colors.text,
-    textTransform: 'lowercase',
   },
   nextReminder: {
     flexDirection: 'row',
@@ -168,8 +163,6 @@ const styles = StyleSheet.create({
   },
   nextReminderText: {
     fontSize: FontSize.md,
-    fontWeight: FontWeight.semibold,
-    color: Colors.label,
   },
   taskDetailsContainer: {
     flexDirection: 'column',

@@ -1,18 +1,19 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { describeCounts } from '@/import-export/describeCounts.ts';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { Snackbar, SnackbarMessage } from '@/components/ui/Snackbar';
-import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors, dimmed, Spacing } from '@/constants/theme';
 import { CommonStyles } from '@/constants/styles';
 import { FileDown, FileUp } from 'lucide-react-native';
 import { AppData, exportAppData } from '../../../db/queries.ts';
 import { errorMessage } from '@/constants/error.ts';
 import { Directory } from 'expo-file-system';
 import { todayString } from '@/constants/dates';
+import { Subtitle, Title } from '@/components/ui/Typography';
 
 export default function ImportExportScreen() {
   const [busy, setBusy] = useState(false);
@@ -67,8 +68,8 @@ export default function ImportExportScreen() {
             <View style={[styles.icon, { backgroundColor: dimmed(Colors.teal, 10) }]}>
               <FileDown color={dimmed(Colors.teal, 90)} size={32} strokeWidth={2.25} />
             </View>
-            <Text style={styles.title}>Export</Text>
-            <Text style={styles.subtitle}>Save all tasks, logs and reminders.</Text>
+            <Title>Export</Title>
+            <Subtitle>Save all tasks, logs and reminders.</Subtitle>
           </View>
           <ActionButton testID="export-button" label="Export" onPress={onExport} disabled={busy} />
         </View>
@@ -78,8 +79,8 @@ export default function ImportExportScreen() {
             <View style={[styles.icon, { backgroundColor: dimmed(Colors.teal, 10) }]}>
               <FileUp color={dimmed(Colors.teal, 90)} size={32} strokeWidth={2.25} />
             </View>
-            <Text style={styles.title}>Import</Text>
-            <Text style={styles.subtitle}>Load data from a dripp export file.</Text>
+            <Title>Import</Title>
+            <Subtitle>Load data from a dripp export file.</Subtitle>
           </View>
           <ActionButton
             testID="import-button"
@@ -111,15 +112,5 @@ const styles = StyleSheet.create({
     ...CommonStyles.circle,
     width: 60,
     height: 60,
-  },
-  title: {
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
-  },
-  subtitle: {
-    fontSize: FontSize.base,
-    fontWeight: FontWeight.medium,
-    color: Colors.icon,
   },
 });

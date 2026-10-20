@@ -1,8 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Colors, FontSize, FontWeight, Radius } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
+import { Body } from '@/components/ui/Typography';
 
 type Marking = { color?: string; dim?: boolean; hasNote?: boolean };
 
@@ -37,7 +38,7 @@ export default function TaskCalendarDay({
           <Drop color={marking!.color} size={32} />
         </View>
       )}
-      <Text
+      <Body
         style={[
           styles.dayNum,
           marked && { fontWeight: FontWeight.bold },
@@ -45,7 +46,7 @@ export default function TaskCalendarDay({
         ]}
       >
         {date.day}
-      </Text>
+      </Body>
       {marking?.hasNote && <View style={[styles.noteDot, isDisabled && styles.noteDotDisabled]} />}
     </Pressable>
   );

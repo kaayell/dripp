@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import ColorPicker, { HueSlider, Panel1 } from 'reanimated-color-picker';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { Radius, Spacing } from '@/constants/theme';
 import { CommonStyles } from '@/constants/styles';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
+import { Heading } from '@/components/ui/Typography';
 
 type ColorPickerModalProps = {
   visible: boolean;
@@ -37,7 +38,7 @@ function ColorPickerSheet({ color, onSelect, onClose }: Omit<ColorPickerModalPro
       <Pressable testID="color-picker-backdrop" style={styles.backdrop} onPress={onClose} />
       <SafeAreaScreen sheet contentStyle={styles.sheet}>
         <View style={styles.header}>
-          <Text style={styles.title}>Custom Color</Text>
+          <Heading>Custom Color</Heading>
           <View style={[styles.preview, { backgroundColor: draft }]} />
         </View>
         <ColorPicker
@@ -82,11 +83,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingBottom: Spacing.xl,
-  },
-  title: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
   },
   preview: {
     width: 32,

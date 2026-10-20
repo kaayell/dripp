@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { Pressable, StyleSheet } from 'react-native';
+import { Colors, Radius, Spacing } from '@/constants/theme';
 import * as Haptics from 'expo-haptics';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import { ButtonText } from '@/components/ui/Typography';
 
 export function ActionButton({
   label,
@@ -48,7 +49,7 @@ export function ActionButton({
           animatedStyle,
         ]}
       >
-        <Text style={[styles.text, disabled && styles.textDisabled]}>{label}</Text>
+        <ButtonText style={[styles.text, disabled && styles.textDisabled]}>{label}</ButtonText>
       </Animated.View>
     </Pressable>
   );
@@ -69,8 +70,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.cellBg,
   },
   text: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
     color: Colors.background,
   },
   textDisabled: {

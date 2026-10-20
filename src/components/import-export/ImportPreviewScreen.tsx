@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { router, Stack } from 'expo-router';
 import { parseISO } from 'date-fns';
 import { Bell } from 'lucide-react-native';
@@ -23,6 +23,16 @@ import {
 import { errorMessage } from '@/constants/error.ts';
 import { File } from 'expo-file-system';
 import { ImportedData } from '@/import-export/importParser.ts';
+import {
+  Body,
+  Caption,
+  ErrorText,
+  Hint,
+  ItemTitle,
+  Label,
+  Subtitle,
+  Title,
+} from '@/components/ui/Typography';
 
 type Status = { kind: 'ready' | 'importing' } | { kind: 'done' | 'error'; message: string };
 
@@ -126,21 +136,19 @@ export default function ImportPreviewScreen() {
     />
   ) : status.kind === 'done' ? (
     <>
-      <Text style={styles.subtitle}>{status.message}</Text>
+      <Subtitle>{status.message}</Subtitle>
       <ActionButton testID="done-button" label="Done" onPress={() => router.dismissTo('/')} />
     </>
   ) : (
     <>
-      {status.kind === 'error' && <Text style={styles.error}>{status.message}</Text>}
+      {status.kind === 'error' && <ErrorText>{status.message}</ErrorText>}
       <ActionButton
         testID="merge-button"
         label="Merge with current data"
         onPress={() => doImport('merge')}
         disabled={status.kind === 'importing'}
       />
-      <Text style={styles.hint}>
-        Adds new tasks, categories and logs. Tasks already in dripp keep their settings.
-      </Text>
+      <Hint>Adds new tasks, categories and logs. Tasks already in dripp keep their settings.</Hint>
       <ActionButton
         testID="replace-button"
         label="Replace all data"
@@ -156,32 +164,32 @@ export default function ImportPreviewScreen() {
       <Stack.Screen options={{ headerLeft: () => <CloseButton /> }} />
       <SafeAreaScreen padded={false}>
         <ScrollView contentContainerStyle={styles.content}>
-          <Text style={styles.title}>Import data</Text>
+          <Title>Import data</Title>
           {data ? (
             <>
-              <Text style={styles.subtitle}>{describeCounts(data)}</Text>
+              <Subtitle>{describeCounts(data)}</Subtitle>
               {existing && (
-                <Text style={styles.hint}>
+                <Hint>
                   {pluralize(newTaskCount, 'new task')}, {data.tasks.length - newTaskCount} already
                   in dripp
-                </Text>
+                </Hint>
               )}
 
               {data.categories.length > 0 && (
                 <>
-                  <Text style={styles.sectionLabel}>Categories</Text>
+                  <Label style={styles.sectionLabel}>Categories</Label>
                   <View style={styles.chips}>
                     {data.categories.map((category) => (
                       <View key={category.name} style={styles.chip}>
-                        <Text style={styles.chipText}>{category.name}</Text>
-                        {isNewCategory(category.name) && <Text style={styles.newBadge}>New</Text>}
+                        <Body style={styles.chipText}>{category.name}</Body>
+                        {isNewCategory(category.name) && <Body style={styles.newBadge}>New</Body>}
                       </View>
                     ))}
                   </View>
                 </>
               )}
 
-              <Text style={styles.sectionLabel}>Tasks</Text>
+              <Label style={styles.sectionLabel}>Tasks</Label>
               {tasks.map((task) => (
                 <View
                   key={task.name}
@@ -192,15 +200,15 @@ export default function ImportPreviewScreen() {
                 >
                   <View style={styles.taskHeader}>
                     <Drop size={14} color={dimmed(task.color, 70)} />
-                    <Text style={styles.taskName}>{task.name}</Text>
+                    <ItemTitle style={styles.taskName}>{task.name}</ItemTitle>
                     {existing &&
                       (isNewTask(task.name) ? (
-                        <Text style={styles.newBadge}>New</Text>
+                        <Body style={styles.newBadge}>New</Body>
                       ) : (
-                        <Text style={styles.existingBadge}>In dripp</Text>
+                        <Caption>In dripp</Caption>
                       ))}
                   </View>
-                  <Text style={styles.taskDetail}>
+                  <Body style={styles.taskDetail}>
                     {[
                       task.category,
                       pluralize(task.logs.length, 'log'),
@@ -210,11 +218,11 @@ export default function ImportPreviewScreen() {
                     ]
                       .filter(Boolean)
                       .join(' · ')}
-                  </Text>
+                  </Body>
                   {task.reminder && (
                     <View style={styles.reminder}>
                       <Bell size={14} color={Colors.label} />
-                      <Text style={styles.taskDetail}>
+                      <Body style={styles.taskDetail}>
                         {summarizeReminder(
                           task.reminder.type as DateFrequency,
                           task.reminder.interval,
@@ -222,7 +230,7 @@ export default function ImportPreviewScreen() {
                           task.reminder.dayOfWeek ?? 0,
                           task.reminder.dayOfMonth ?? 1,
                         )}
-                      </Text>
+                      </Body>
                     </View>
                   )}
                 </View>
@@ -230,19 +238,17 @@ export default function ImportPreviewScreen() {
             </>
           ) : fileErrors.length > 0 ? (
             <>
-              <Text style={styles.subtitle}>
+              <Subtitle>
                 This file can't be imported. {pluralize(fileErrors.length, 'problem')} found:
-              </Text>
+              </Subtitle>
               {fileErrors.map((error, i) => (
-                <Text key={i} style={styles.error}>
-                  • {error}
-                </Text>
+                <ErrorText key={i}>• {error}</ErrorText>
               ))}
             </>
           ) : (
-            <Text style={styles.subtitle}>
+            <Subtitle>
               Choose a dripp export file to see what it contains before importing.
-            </Text>
+            </Subtitle>
           )}
         </ScrollView>
         <View style={styles.footer}>{footerContent}</View>
@@ -256,31 +262,7 @@ const styles = StyleSheet.create({
     padding: Spacing.xl,
     gap: Spacing.md,
   },
-  title: {
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
-  },
-  subtitle: {
-    fontSize: FontSize.base,
-    fontWeight: FontWeight.medium,
-    color: Colors.icon,
-  },
-  hint: {
-    fontSize: FontSize.base,
-    color: Colors.label,
-  },
-  error: {
-    fontSize: FontSize.base,
-    fontWeight: FontWeight.medium,
-    color: Colors.error,
-  },
   sectionLabel: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: Colors.label,
-    textTransform: 'uppercase',
-    letterSpacing: 0.75,
     marginTop: Spacing.xl,
   },
   chips: {
@@ -315,9 +297,6 @@ const styles = StyleSheet.create({
   },
   taskName: {
     flex: 1,
-    fontSize: FontSize.xl,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text,
   },
   taskDetail: {
     fontSize: FontSize.md,
@@ -332,11 +311,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: FontWeight.bold,
     color: Colors.teal,
-  },
-  existingBadge: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.label,
   },
   footer: {
     paddingHorizontal: Spacing.xl,

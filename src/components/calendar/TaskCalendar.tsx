@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { type LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
+import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { isSameMonth, parseISO } from 'date-fns';
-import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors, dimmed, FontSize, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog, TaskNote, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
@@ -10,6 +10,7 @@ import { IconButton } from '@/components/ui/IconButton';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
+import { Heading } from '@/components/ui/Typography';
 
 type CalendarListRef = { scrollToMonth: (date: string) => void };
 
@@ -103,7 +104,7 @@ export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: T
 
       return (
         <View style={styles.header}>
-          <Text style={styles.monthText}>{date.toString('MMMM yyyy')}</Text>
+          <Heading>{date.toString('MMMM yyyy')}</Heading>
           <View style={styles.arrows}>
             <IconButton
               onPress={() => goToMonth(-1)}
@@ -163,11 +164,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: Spacing.sm,
-  },
-  monthText: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
   },
   arrows: {
     flexDirection: 'row',

@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { createCategory } from '../../../db/queries';
-import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Spacing } from '@/constants/theme';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { TextField } from '@/components/ui/TextField';
+import { Heading } from '@/components/ui/Typography';
 
 export default function AddCategoryScreen() {
   const { pathname, taskId } = useLocalSearchParams<{ pathname?: string; taskId?: string }>();
@@ -33,7 +34,7 @@ export default function AddCategoryScreen() {
 
   return (
     <SafeAreaScreen sheet>
-      <Text style={styles.title}>Create Category</Text>
+      <Heading style={styles.title}>Create Category</Heading>
       <TextField
         value={name}
         onChangeText={(text) => {
@@ -53,9 +54,6 @@ export default function AddCategoryScreen() {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
     paddingBottom: Spacing.xl,
   },
 });

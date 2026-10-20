@@ -1,6 +1,7 @@
-import { Text, TextInput, type TextInputProps } from 'react-native';
+import { type TextInputProps } from 'react-native';
 import { Colors } from '@/constants/theme';
 import { CommonStyles } from '@/constants/styles';
+import { ErrorText, Input } from '@/components/ui/Typography';
 
 type TextFieldProps = TextInputProps & {
   error?: string | null;
@@ -9,12 +10,12 @@ type TextFieldProps = TextInputProps & {
 export function TextField({ error, style, ...props }: TextFieldProps) {
   return (
     <>
-      <TextInput
+      <Input
         placeholderTextColor={Colors.label}
         {...props}
         style={[CommonStyles.input, error && CommonStyles.inputError, style]}
       />
-      {error && <Text style={CommonStyles.errorText}>{error}</Text>}
+      {error && <ErrorText style={CommonStyles.errorText}>{error}</ErrorText>}
     </>
   );
 }

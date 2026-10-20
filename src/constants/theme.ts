@@ -92,3 +92,10 @@ export const FontWeight = {
   semibold: '600',
   bold: '700',
 } as const;
+
+type FontWeightValue = (typeof FontWeight)[keyof typeof FontWeight];
+export const FontFamily: Partial<Record<FontWeightValue, string>> = {};
+
+export function fontFamilyFor(weight: unknown): string | undefined {
+  return FontFamily[(weight ?? FontWeight.regular) as FontWeightValue];
+}

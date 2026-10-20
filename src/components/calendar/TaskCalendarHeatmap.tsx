@@ -1,9 +1,10 @@
 import { useMemo, useRef } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog } from '../../../db/queries';
 import { CalendarHeatmap } from 'react-native-chart-kit/v2';
+import { Body } from '@/components/ui/Typography';
 
 type TaskCalendarHeatmapProps = {
   color: string;
@@ -45,7 +46,7 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
             key={index}
             style={[styles.labelSlot, { top: LABEL_HEIGHT + index * STEP, height: CELL_SIZE }]}
           >
-            <Text style={styles.labelText}>{label}</Text>
+            <Body style={styles.labelText}>{label}</Body>
           </View>
         ))}
       </View>

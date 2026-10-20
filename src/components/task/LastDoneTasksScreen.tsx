@@ -1,11 +1,12 @@
 import { useCallback, useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { loadTasksWithMostRecentLog, TaskWithMostRecentLog } from '../../../db/queries';
-import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { dimmed, FontSize, Radius, Spacing } from '@/constants/theme';
 import { timeSince } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import AnimatedLabel from '@/components/ui/AnimatedLabel';
 import { router, useFocusEffect } from 'expo-router';
+import { Hint, ItemTitle, Title } from '@/components/ui/Typography';
 
 function sortByLastDone(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[] {
   return [...tasks].sort((a, b) => {
@@ -46,7 +47,7 @@ export default function LastDoneTasksScreen({
 
   return (
     <View style={styles.screen}>
-      <Text style={styles.title}>Last Done</Text>
+      <Title style={styles.title}>Last Done</Title>
       <ScrollView>
         {visibleTasks.map((task) => {
           const mostRecentTaskLog = task.mostRecentTaskLog;
@@ -64,13 +65,13 @@ export default function LastDoneTasksScreen({
               <View style={styles.taskRow}>
                 <View style={styles.taskDetail}>
                   <Drop size={12} color={task.color} />
-                  <Text style={styles.taskLabel}>{task.name}</Text>
-                  <Text style={styles.taskCategoryLabel}>{task.category?.name}</Text>
+                  <ItemTitle style={styles.taskLabel}>{task.name}</ItemTitle>
+                  <Hint style={styles.taskCategoryLabel}>{task.category?.name}</Hint>
                 </View>
                 <View style={styles.taskDetail}>
-                  <Text style={[styles.taskLabel, { color: task.color }]}>
+                  <ItemTitle style={[styles.taskLabel, { color: task.color }]}>
                     {mostRecentTaskLog ? timeSince(mostRecentTaskLog.date) : 'Never'}
-                  </Text>
+                  </ItemTitle>
                 </View>
               </View>
             </AnimatedLabel>
@@ -88,9 +89,6 @@ const styles = StyleSheet.create({
     paddingTop: Spacing.xl,
   },
   title: {
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
     marginBottom: Spacing.xl,
   },
   taskContainer: {
@@ -115,12 +113,8 @@ const styles = StyleSheet.create({
   },
   taskLabel: {
     fontSize: FontSize.xxl,
-    fontWeight: FontWeight.semibold,
-    color: Colors.text,
   },
   taskCategoryLabel: {
     fontSize: FontSize.lg,
-    fontWeight: FontWeight.medium,
-    color: Colors.label,
   },
 });

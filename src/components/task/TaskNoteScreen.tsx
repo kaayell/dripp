@@ -1,15 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { parseISO } from 'date-fns';
 import * as Haptics from 'expo-haptics';
 import { Check } from 'lucide-react-native';
 import { loadTaskLog, loadTaskNote, saveTaskNote, toggleTaskLog } from '../../../db/queries';
-import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
+import { Colors, Radius, Spacing } from '@/constants/theme';
 import { formatShortDate } from '@/constants/dates';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { ActionButton } from '@/components/ui/ActionButton';
 import { TextField } from '@/components/ui/TextField';
+import { Heading } from '@/components/ui/Typography';
 
 export default function TaskNoteScreen() {
   const params = useLocalSearchParams<{ taskId: string; date: string; color: string }>();
@@ -53,7 +54,7 @@ export default function TaskNoteScreen() {
   return (
     <SafeAreaScreen sheet>
       <View style={styles.titleRow}>
-        <Text style={styles.title}>{formatShortDate(parseISO(date))}</Text>
+        <Heading>{formatShortDate(parseISO(date))}</Heading>
         <Pressable
           onPress={toggleTask}
           hitSlop={12}
@@ -80,11 +81,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: Spacing.xxl,
-  },
-  title: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
   },
   checkbox: {
     width: 28,

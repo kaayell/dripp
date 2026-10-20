@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Switch, View } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { Pipette } from 'lucide-react-native';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
@@ -11,7 +11,7 @@ import type {
   TaskWithReminder,
 } from '../../../db/queries';
 import { loadCategories } from '../../../db/queries';
-import { Colors, FontSize, FontWeight, Radius, Spacing, TaskSwatchColors } from '@/constants/theme';
+import { Colors, FontWeight, Radius, Spacing, TaskSwatchColors } from '@/constants/theme';
 import { CommonStyles } from '@/constants/styles';
 import { CloseButton } from '@/components/ui/CloseButton';
 import { ActionButton } from '@/components/ui/ActionButton';
@@ -19,6 +19,7 @@ import { TextField } from '@/components/ui/TextField';
 import { TaskReminder } from '@/components/task/TaskReminder';
 import { ColorPickerModal } from '@/components/task/ColorPickerModal';
 import { ensureNotificationPermission, saveTaskReminder } from '@/notifications/reminders';
+import { ChipText, Label, Title } from '@/components/ui/Typography';
 
 export type TaskFormValues = TaskInputValues;
 
@@ -102,7 +103,7 @@ export default function TaskFormScreen({
         }}
       />
       <SafeAreaScreen scroll>
-        <Text style={styles.title}>{title}</Text>
+        <Title style={styles.title}>{title}</Title>
 
         <View style={styles.section}>
           <TextField
@@ -118,7 +119,7 @@ export default function TaskFormScreen({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Color</Text>
+          <Label>Color</Label>
           <View style={styles.swatchRow}>
             {TaskSwatchColors.map((swatch) => (
               <Pressable
@@ -153,7 +154,7 @@ export default function TaskFormScreen({
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionLabel}>Category</Text>
+          <Label>Category</Label>
           <View style={styles.categoryRow}>
             {categories.map((category) => {
               const active = category.id === categoryId;
@@ -163,9 +164,9 @@ export default function TaskFormScreen({
                   style={[styles.categoryChip, active && styles.categoryChipActive]}
                   onPress={() => setCategoryId(active ? null : category.id)}
                 >
-                  <Text style={[styles.categoryChipText, active && styles.categoryChipTextActive]}>
+                  <ChipText style={active && styles.categoryChipTextActive}>
                     {category.name}
-                  </Text>
+                  </ChipText>
                 </Pressable>
               );
             })}
@@ -178,14 +179,14 @@ export default function TaskFormScreen({
                 })
               }
             >
-              <Text style={styles.categoryChipText}>+ new category</Text>
+              <ChipText>+ new category</ChipText>
             </Pressable>
           </View>
         </View>
 
         <View style={styles.section}>
           <View style={styles.reminderRow}>
-            <Text style={styles.sectionLabel}>Reminder</Text>
+            <Label>Reminder</Label>
             <Switch
               style={{ transform: [{ scale: 1.25 }] }}
               value={reminderEnabled}
@@ -207,17 +208,7 @@ const styles = StyleSheet.create({
     gap: Spacing.base,
   },
   title: {
-    fontSize: FontSize.title,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
     paddingBottom: Spacing.xxl,
-  },
-  sectionLabel: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.bold,
-    color: Colors.label,
-    textTransform: 'uppercase',
-    letterSpacing: 0.75,
   },
   swatchRow: {
     flexDirection: 'row',
@@ -255,12 +246,6 @@ const styles = StyleSheet.create({
   categoryChipActive: {
     backgroundColor: Colors.text,
     borderColor: Colors.text,
-  },
-  categoryChipText: {
-    fontSize: FontSize.sm,
-    fontWeight: FontWeight.semibold,
-    color: Colors.label,
-    textTransform: 'lowercase',
   },
   categoryChipTextActive: {
     color: Colors.background,

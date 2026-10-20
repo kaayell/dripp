@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { parseISO } from 'date-fns';
 import {
@@ -13,6 +13,7 @@ import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constan
 import Drop from '@/components/ui/Drop';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen';
 import { formatForDisplay } from '@/constants/dates.ts';
+import { Body, ButtonText, Heading, Label } from '@/components/ui/Typography';
 
 export default function TaskPicker() {
   const { date, categoryId } = useLocalSearchParams<{ date: string; categoryId?: string }>();
@@ -56,9 +57,9 @@ export default function TaskPicker() {
   return (
     <SafeAreaScreen sheet>
       <View style={styles.headerRow}>
-        <Text style={styles.title}>{formatForDisplay(parseISO(date), 'EEEE, MMMM d')}</Text>
+        <Heading>{formatForDisplay(parseISO(date), 'EEEE, MMMM d')}</Heading>
         <Pressable onPress={() => router.back()} hitSlop={8}>
-          <Text style={styles.doneText}>Done</Text>
+          <ButtonText style={styles.doneText}>Done</ButtonText>
         </Pressable>
       </View>
 
@@ -68,7 +69,7 @@ export default function TaskPicker() {
       >
         {[...tasksByCategory].map(([categoryName, tasks]) => (
           <View key={categoryName} style={styles.categoryGroup}>
-            <Text style={styles.categoryTitle}>{categoryName}</Text>
+            <Label style={styles.categoryTitle}>{categoryName}</Label>
             {tasks.map((task) => {
               const existingId = taskLogs.find((t) => t.task_id === task.id)?.id;
               const checked = existingId != undefined;
@@ -87,11 +88,11 @@ export default function TaskPicker() {
                 >
                   <View style={styles.taskLabelRow}>
                     <Drop size={10} color={color} />
-                    <Text style={[styles.taskLabel, checked && styles.taskLabelActive]}>
+                    <Body style={[styles.taskLabel, checked && styles.taskLabelActive]}>
                       {task.name}
-                    </Text>
+                    </Body>
                   </View>
-                  {checked && <Text style={[styles.checkmark]}>✓</Text>}
+                  {checked && <Body style={[styles.checkmark]}>✓</Body>}
                 </Pressable>
               );
             })}
@@ -110,23 +111,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xs,
     paddingVertical: Spacing.base,
   },
-  title: {
-    fontSize: FontSize.xxl,
-    fontWeight: FontWeight.bold,
-    color: Colors.text,
-  },
   doneText: {
-    fontSize: FontSize.lg,
-    fontWeight: FontWeight.bold,
     color: Colors.teal,
   },
   categoryGroup: {
     paddingBottom: Spacing.xs,
   },
   categoryTitle: {
-    fontWeight: FontWeight.bold,
-    color: Colors.label,
-    textTransform: 'uppercase',
     fontSize: FontSize.base,
     letterSpacing: 1.25,
     paddingHorizontal: Spacing.xs,
