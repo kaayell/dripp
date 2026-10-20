@@ -34,7 +34,8 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
     });
   }, [taskLogs]);
 
-  const graphWidth = GRAPH_LABEL_WIDTH + 53 * STEP - GUTTER_SIZE + 2;
+  const weekCount = Math.ceil((NUM_DAYS + 6 - new Date().getDay()) / 7);
+  const graphWidth = GRAPH_LABEL_WIDTH + weekCount * STEP - GUTTER_SIZE + 2;
 
   return (
     <View style={styles.heatmapContainer}>
