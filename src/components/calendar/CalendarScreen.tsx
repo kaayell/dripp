@@ -10,25 +10,18 @@ import Loading from '@/components/ui/Loading';
 import { router, useFocusEffect } from 'expo-router';
 import { startDatesForPastMonths, todayString, WEEKDAY_NAMES } from '@/constants/dates';
 import * as Haptics from 'expo-haptics';
-import { Caption } from '@/components/ui/Typography';
+import { Caption, Heading } from '@/components/ui/Typography';
 
 const calendarTheme = {
   calendarBackground: Colors.background,
-  weekVerticalMargin: 2,
+  weekVerticalMargin: 0,
   'stylesheet.calendar.header': {
     header: {
-      paddingLeft: Spacing.base,
-      paddingVertical: 5,
       borderBottomWidth: 1,
       borderBottomColor: Colors.border,
       borderTopWidth: 1,
       borderTopColor: Colors.border,
       marginVertical: 5,
-    },
-    monthText: {
-      fontSize: FontSize.xxl,
-      fontWeight: FontWeight.semibold,
-      color: Colors.text,
     },
   },
   'stylesheet.calendar.main': {
@@ -110,6 +103,13 @@ export default function CalendarScreen({
     [today, visibleTasks],
   );
 
+  const renderMonthHeader = (date: any) => (
+    <View style={styles.header}>
+      <Heading style={styles.monthText}>{date?.toString('MMMM')}</Heading>
+      <Caption style={styles.yearText}>{date?.toString('yyyy')}</Caption>
+    </View>
+  );
+
   if (!loaded) {
     return <Loading />;
   }
@@ -140,6 +140,7 @@ export default function CalendarScreen({
               hideExtraDays
               disableMonthChange
               theme={calendarTheme}
+              renderHeader={renderMonthHeader}
               markedDates={markedDates as any}
               dayComponent={CalendarDay}
               onDayPress={handleDayPress}
@@ -154,6 +155,20 @@ export default function CalendarScreen({
 }
 
 const styles = StyleSheet.create({
+  header: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'baseline',
+    paddingHorizontal: Spacing.base,
+    paddingVertical: 5,
+  },
+  monthText: {
+    fontWeight: FontWeight.semibold,
+  },
+  yearText: {
+    fontSize: FontSize.base,
+  },
   weekdayLabel: {
     flex: 1,
     textAlign: 'center',

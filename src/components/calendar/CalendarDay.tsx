@@ -67,7 +67,6 @@ export default function CalendarDay({
 const styles = StyleSheet.create({
   dayWrap: {
     height: 56,
-    marginHorizontal: Spacing.xxs,
     borderRadius: Radius.sm,
     overflow: 'hidden',
     padding: Spacing.sm,
@@ -82,7 +81,7 @@ const styles = StyleSheet.create({
   dayNum: {
     position: 'absolute',
     top: 3,
-    right: 3,
+    right: 4,
     width: DAY_NUM_SIZE,
     height: DAY_NUM_SIZE,
     lineHeight: DAY_NUM_SIZE,
@@ -91,7 +90,8 @@ const styles = StyleSheet.create({
     borderRadius: Radius.sm,
   },
   dayCell: {
-    borderWidth: 0,
+    borderWidth: 2,
+    borderColor: Colors.background,
     backgroundColor: Colors.cellBg,
   },
   dayCellToday: {
