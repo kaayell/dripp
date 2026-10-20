@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import { Task, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
