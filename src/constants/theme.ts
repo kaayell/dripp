@@ -83,7 +83,7 @@ export const FontSize = {
   lg: 15,
   xl: 16,
   xxl: 20,
-  title: 24,
+  title: 30,
 } as const;
 
 export const FontWeight = {
