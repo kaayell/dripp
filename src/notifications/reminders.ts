@@ -18,7 +18,7 @@ import {
 } from '@/constants/notifications';
 import { parse } from 'date-fns';
 import { parseTime, formatForDisplay } from '@/constants/dates';
-import { computeReminderSchedule } from '@/notifications/reminderDates';
+import { computeNextReminder, computeReminderSchedule } from '@/notifications/reminderDates';
 
 const DATED_OCCURRENCES = 4;
 
@@ -118,6 +118,35 @@ async function existingTaskNotifications(
     .sort((a, b) => targetDate(a).localeCompare(targetDate(b)));
 }
 
+function parseTargetDate(targetDate: string, time: string): Date {
+  return parse(`${targetDate} ${time}`, 'yyyy-MM-dd HH:mm', new Date());
+}
+
+export async function loadNextReminderDate(
+  task: Task & { reminder?: Reminder | null },
+): Promise<Date | null> {
+  const reminder = task.reminder;
+  if (!reminder) return null;
+
+  try {
+    if (reminder.interval > 1) {
+      const next = (await existingTaskNotifications(task.id))
+        .map((n) => n.content.data?.targetDate)
+        .filter((d): d is string => typeof d === 'string')
+        .map((d) => parseTargetDate(d, reminder.time))
+        .find((date) => date.getTime() > Date.now());
+      if (next) return next;
+    } else {
+      const next = await Notifications.getNextTriggerDateAsync(buildRepeatingTrigger(reminder));
+      if (next != null) return new Date(next);
+    }
+  } catch (e) {
+    console.warn('[reminders] next trigger lookup failed', e);
+  }
+
+  return computeNextReminder(parseTime(reminder.time), reminder);
+}
+
 export async function ensureNotificationPermission(): Promise<boolean> {
   const settings = await Notifications.getPermissionsAsync();
   if (settings.granted) return true;
@@ -158,7 +187,7 @@ export async function backfillDatedReminders() {
     const lastTargetDate = scheduled.at(-1)?.content.data?.targetDate;
     const lastDate =
       typeof lastTargetDate === 'string'
-        ? parse(`${lastTargetDate} ${reminder.time}`, 'yyyy-MM-dd HH:mm', new Date())
+        ? parseTargetDate(lastTargetDate, reminder.time)
         : parseTime(reminder.time);
 
     const dates = computeReminderSchedule(lastDate, reminder, missing);

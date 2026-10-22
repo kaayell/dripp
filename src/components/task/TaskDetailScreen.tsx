@@ -7,7 +7,6 @@ import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme
 import {
   formatDisplayTime,
   formatShortDate,
-  parseTime,
   timeSince,
   todayString,
 } from '@/constants/dates';
@@ -20,13 +19,14 @@ import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
 import { TaskNotes } from '@/components/task/TaskNotes';
 import { Check, SquarePen } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
-import { computeNextReminder } from '@/notifications/reminderDates';
+import { loadNextReminderDate } from '@/notifications/reminders';
 import { Label, Title } from '@/components/ui/Typography';
 
 export default function TaskDetailScreen() {
   const { taskId } = useLocalSearchParams<{ taskId: string }>();
   const [task, setTask] = useState<TaskWithDetails | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [nextReminder, setNextReminder] = useState<Date | null>(null);
 
   const refresh = useCallback(async () => {
     const loadedTask = await loadTaskWithDetails(Number(taskId));
@@ -35,6 +35,7 @@ export default function TaskDetailScreen() {
       return;
     }
     setTask(loadedTask);
+    setNextReminder(await loadNextReminderDate(loadedTask));
   }, [taskId]);
 
   useFocusEffect(
@@ -56,9 +57,6 @@ export default function TaskDetailScreen() {
     return <Loading />;
   }
 
-  const nextReminder = task.reminder
-    ? computeNextReminder(parseTime(task.reminder.time), task.reminder)
-    : null;
   const today = todayString();
   const doneToday = task.taskLogs.some((log) => log.date === today);
   const categoryName = task.category?.name;
