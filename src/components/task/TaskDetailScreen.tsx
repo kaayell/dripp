@@ -4,7 +4,6 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { loadTaskWithDetails, TaskWithDetails, toggleTaskLog } from '../../../db/queries';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
-import { CommonStyles } from '@/constants/styles';
 import {
   formatDisplayTime,
   formatShortDate,
@@ -125,9 +124,6 @@ export default function TaskDetailScreen() {
         </View>
         <View style={styles.taskDetailsContainer}>
           <View style={styles.detailCard}>
-            <TaskCalendarHeatmap color={task.color} taskLogs={task.taskLogs} />
-          </View>
-          <View style={styles.detailCard}>
             <TaskCalendar
               taskId={task.id}
               color={task.color}
@@ -135,10 +131,9 @@ export default function TaskDetailScreen() {
               taskNotes={task.taskNotes}
               onToggle={refresh}
             />
-          </View>
-          <View style={styles.detailCard}>
             <TaskNotes taskId={task.id} color={task.color} taskNotes={task.taskNotes} />
           </View>
+          <TaskCalendarHeatmap color={task.color} taskLogs={task.taskLogs} />
         </View>
       </SafeAreaScreen>
     </>
@@ -198,7 +193,9 @@ const styles = StyleSheet.create({
     gap: Spacing.xl,
   },
   detailCard: {
-    ...CommonStyles.surface,
-    overflow: 'hidden',
+    gap: Spacing.xl,
+    paddingBottom: Spacing.xl,
+    borderBottomColor: Colors.text,
+    borderBottomWidth: 2,
   },
 });

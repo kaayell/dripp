@@ -3,9 +3,11 @@ import { StyleSheet, View } from 'react-native';
 type Props = {
   color?: string;
   size: number;
+  strokeColor?: string;
+  strokeWidth?: number;
 };
 
-export default function Drop({ color, size }: Props) {
+export default function Drop({ color, size, strokeColor, strokeWidth = 1.5 }: Props) {
   return (
     <View
       style={[
@@ -18,6 +20,7 @@ export default function Drop({ color, size }: Props) {
           borderBottomRightRadius: size / 2,
           backgroundColor: color,
         },
+        strokeColor && { borderWidth: strokeWidth, borderColor: strokeColor },
       ]}
     />
   );

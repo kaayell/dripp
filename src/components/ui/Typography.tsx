@@ -42,6 +42,10 @@ export function ItemTitle(props: TextProps) {
   return <StyledText base={styles.itemTitle} {...props} />;
 }
 
+export function SectionTitle(props: TextProps) {
+  return <StyledText base={styles.sectionTitle} typeface="mono" {...props} />;
+}
+
 export function Caption(props: TextProps) {
   return <StyledText base={styles.caption} typeface="mono" {...props} />;
 }
@@ -87,6 +91,12 @@ const styles = StyleSheet.create({
   subtitle: { fontSize: FontSize.base, fontWeight: FontWeight.medium, color: Colors.icon },
   value: { fontSize: FontSize.lg, fontWeight: FontWeight.semibold, color: Colors.text },
   itemTitle: { fontSize: FontSize.xl, fontWeight: FontWeight.semibold, color: Colors.text },
+  sectionTitle: {
+    fontSize: FontSize.xl,
+    fontWeight: FontWeight.semibold,
+    color: Colors.text,
+    textTransform: 'uppercase',
+  },
   caption: { fontSize: FontSize.sm, fontWeight: FontWeight.semibold, color: Colors.label },
   chipText: {
     fontSize: FontSize.sm,

@@ -2,29 +2,37 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import { type LayoutChangeEvent, StyleSheet, View } from 'react-native';
 import { CalendarList, type DateData } from 'react-native-calendars';
 import { isSameMonth, parseISO } from 'date-fns';
-import { Colors, dimmed, FontSize, Spacing } from '@/constants/theme';
+import { Colors, FontFamily, FontSize, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog, TaskNote, toggleTaskLog } from '../../../db/queries';
 import TaskCalendarDay from './TaskCalendarDay';
 import { IconButton } from '@/components/ui/IconButton';
-import { ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { MoveLeft, MoveRight } from 'lucide-react-native';
 import * as Haptics from 'expo-haptics';
 import { router } from 'expo-router';
-import { Heading } from '@/components/ui/Typography';
+import { SectionTitle } from '@/components/ui/Typography';
 
 type CalendarListRef = { scrollToMonth: (date: string) => void };
 
 const calendarTheme = {
-  calendarBackground: Colors.cellBg,
-  dayTextColor: Colors.text,
-  textDisabledColor: Colors.disabled,
-  monthTextColor: Colors.text,
-  weekVerticalMargin: 2,
+  calendarBackground: Colors.background,
+  weekVerticalMargin: 0,
+  'stylesheet.calendar.main': {
+    container: { paddingLeft: 0, paddingRight: 0 },
+  },
   'stylesheet.calendar.header': {
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingLeft: 0,
+      paddingRight: 0,
+    },
     dayHeader: {
-      width: 38,
-      fontSize: FontSize.sm,
+      flex: 1,
       textAlign: 'center',
+      fontSize: FontSize.sm,
+      fontFamily: FontFamily.mono,
       textTransform: 'uppercase',
       color: Colors.label,
       paddingBottom: Spacing.sm,
@@ -49,16 +57,13 @@ export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: T
 
   const markedDates = useMemo(() => {
     const marks: Record<string, { color?: string; hasNote?: boolean }> = Object.fromEntries(
-      taskLogs.map(({ date }) => {
-        const isVisibleMonth = isSameMonth(parseISO(date), parseISO(visibleMonth));
-        return [date, { color: dimmed(color, isVisibleMonth ? 60 : 15) }];
-      }),
+      taskLogs.map(({ date }) => [date, { color }]),
     );
     taskNotes.forEach(({ date }) => {
       marks[date] = { ...marks[date], hasNote: true };
     });
     return marks;
-  }, [taskLogs, taskNotes, color, visibleMonth]);
+  }, [taskLogs, taskNotes, color]);
 
   const handleMonthChange = (month: DateData) => {
     setVisibleMonth(month.dateString);
@@ -104,17 +109,17 @@ export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: T
 
       return (
         <View style={styles.header}>
-          <Heading>{date.toString('MMMM yyyy')}</Heading>
+          <SectionTitle>{date.toString('MMMM yyyy')}</SectionTitle>
           <View style={styles.arrows}>
             <IconButton
               onPress={() => goToMonth(-1)}
-              icon={<ChevronLeft color={Colors.icon} size={20} strokeWidth={2.25} />}
+              icon={<MoveLeft color={Colors.icon} size={20} strokeWidth={2.25} />}
             />
             <IconButton
               onPress={() => goToMonth(1)}
               disabled={isMaxMonth}
               icon={
-                <ChevronRight
+                <MoveRight
                   color={isMaxMonth ? Colors.disabled : Colors.icon}
                   size={20}
                   strokeWidth={2.25}
@@ -134,11 +139,12 @@ export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: T
         <CalendarList
           ref={calendarRef}
           theme={calendarTheme}
+          calendarStyle={styles.calendar}
+          headerStyle={styles.calendarHeader}
           horizontal
           pagingEnabled
           animateScroll
           calendarWidth={width}
-          calendarHeight={400}
           showSixWeeks
           staticHeader
           hideArrows
@@ -158,12 +164,20 @@ export function TaskCalendar({ taskId, color, taskLogs, taskNotes, onToggle }: T
 }
 
 const styles = StyleSheet.create({
+  calendar: {
+    paddingLeft: 0,
+    paddingRight: 0,
+  },
+  calendarHeader: {
+    paddingHorizontal: 0,
+  },
   header: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
   },
   arrows: {
     flexDirection: 'row',

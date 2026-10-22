@@ -2,10 +2,9 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { router } from 'expo-router';
 import { parseISO } from 'date-fns';
 import { TaskNote } from '../../../db/queries';
-import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
-import { CommonStyles } from '@/constants/styles';
+import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { formatForDisplay } from '@/constants/dates';
-import { Body, Caption, Heading, Hint } from '@/components/ui/Typography';
+import { Body, Caption, Hint, SectionTitle } from '@/components/ui/Typography';
 
 type TaskNotesProps = {
   taskId: number;
@@ -16,7 +15,10 @@ type TaskNotesProps = {
 export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
   return (
     <View style={styles.container}>
-      <Heading style={styles.title}>Notes</Heading>
+      <View style={styles.titleRow}>
+        <SectionTitle>Notes</SectionTitle>
+        <Caption style={styles.count}>{taskNotes.length}</Caption>
+      </View>
       {taskNotes.length === 0 ? (
         <Hint style={styles.empty}>Long-press a day to add a note</Hint>
       ) : (
@@ -27,7 +29,17 @@ export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
             style={({ pressed }) => [styles.row, pressed && { backgroundColor: dimmed(color, 5) }]}
           >
             <View style={styles.content}>
-              <Caption style={styles.date}>{formatForDisplay(parseISO(date), 'MM/dd/yy')}</Caption>
+              <View style={styles.dateContainer}>
+                {formatForDisplay(parseISO(date), 'EEE,MM.dd')
+                  .split(',')
+                  .map((section) => {
+                    return (
+                      <Caption key={section} style={styles.date}>
+                        {section}
+                      </Caption>
+                    );
+                  })}
+              </View>
               <Body style={styles.note}>{note}</Body>
             </View>
           </Pressable>
@@ -39,39 +51,51 @@ export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingVertical: Spacing.xl,
-    paddingHorizontal: Spacing.base,
+    paddingVertical: Spacing.sm,
   },
-  title: {
-    paddingBottom: Spacing.md,
-    paddingLeft: Spacing.sm,
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    paddingBottom: Spacing.xs,
+    paddingHorizontal: Spacing.xs,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.border,
+  },
+  count: {
+    fontSize: FontSize.md,
   },
   empty: {
-    paddingVertical: Spacing.md,
-    paddingLeft: Spacing.sm,
+    paddingTop: Spacing.sm,
+    paddingLeft: Spacing.xs,
   },
   row: {
-    ...CommonStyles.surface,
-    borderRadius: Radius.md,
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.lg,
-    paddingVertical: Spacing.base,
-    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xs,
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.border,
     marginBottom: Spacing.md,
   },
   content: {
     flex: 1,
-    gap: Spacing.xs,
+    flexDirection: 'row',
+    gap: Spacing.lg,
   },
   date: {
     fontSize: FontSize.md,
     textTransform: 'uppercase',
+    paddingRight: Spacing.lg,
   },
   note: {
     fontSize: FontSize.lg,
     fontWeight: FontWeight.medium,
     color: Colors.text,
     lineHeight: 21,
+  },
+  dateContainer: {
+    flexDirection: 'column',
   },
 });
