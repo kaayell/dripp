@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
@@ -7,7 +7,7 @@ import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constan
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import AnimatedLabel from '@/components/ui/AnimatedLabel';
-import Animated, { SlideInRight, SlideOutRight } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { Body } from '@/components/ui/Typography';
 
 type Props = {
@@ -16,6 +16,13 @@ type Props = {
 };
 
 export default function CalendarLegend({ tasks, onToggle }: Props) {
+  const scrollRef = useRef<ScrollView>(null);
+  const taskIds = tasks.map((task) => task.id).join(',');
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ x: 0, animated: false });
+  }, [taskIds]);
+
   const toggleTask = useCallback(
     (taskId: number) => {
       const today = todayString();
@@ -31,13 +38,19 @@ export default function CalendarLegend({ tasks, onToggle }: Props) {
 
   return (
     <ScrollView
+      ref={scrollRef}
       horizontal
       showsHorizontalScrollIndicator={false}
       style={styles.legendRow}
       contentContainerStyle={styles.legendRowContent}
     >
       {tasks.map((task) => (
-        <Animated.View key={task.id} entering={SlideInRight} exiting={SlideOutRight}>
+        <Animated.View
+          key={task.id}
+          entering={FadeIn.duration(200)}
+          exiting={FadeOut.duration(150)}
+          layout={LinearTransition.duration(200)}
+        >
           <AnimatedLabel
             style={[styles.legendItem, { backgroundColor: dimmed(task.color, 10) }]}
             onPress={() =>
