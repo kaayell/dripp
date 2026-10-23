@@ -12,7 +12,7 @@ import { Category, loadCategories } from '../../db/queries.ts';
 import CategoryFilter from '@/components/category/CategoryFilter.tsx';
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import CalendarScreen from '@/components/calendar/CalendarScreen.tsx';
-import LastDoneTasksScreen from '@/components/task/LastDoneTasksScreen.tsx';
+import TasksScreen from '@/components/task/TasksScreen.tsx';
 import { Colors, Radius, Spacing } from '@/constants/theme.ts';
 
 const PAGE_COUNT = 2;
@@ -51,7 +51,7 @@ export default function HomeScreen() {
           <CalendarScreen selectedCategoryId={selectedCategoryId} />
         </View>
         <View style={{ width }}>
-          <LastDoneTasksScreen selectedCategoryId={selectedCategoryId} />
+          <TasksScreen selectedCategoryId={selectedCategoryId} />
         </View>
       </Animated.ScrollView>
       <View style={styles.categoryContainer}>
