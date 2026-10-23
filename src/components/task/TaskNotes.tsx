@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { ChevronDown, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { parseISO } from 'date-fns';
 import { TaskNote } from '../../../db/queries';
@@ -13,15 +15,28 @@ type TaskNotesProps = {
 };
 
 export function TaskNotes({ taskId, color, taskNotes }: TaskNotesProps) {
+  const [expanded, setExpanded] = useState(false);
+  const hasNotes = taskNotes.length > 0;
+  const Chevron = expanded ? ChevronDown : ChevronRight;
+
   return (
     <View style={styles.container}>
-      <View style={styles.titleRow}>
+      <Pressable
+        disabled={!hasNotes}
+        hitSlop={8}
+        onPress={() => setExpanded((v) => !v)}
+        style={styles.titleRow}
+      >
         <SectionTitle>Notes</SectionTitle>
-        <Caption style={styles.count}>{taskNotes.length}</Caption>
-      </View>
-      {taskNotes.length === 0 ? (
+        <View style={styles.titleMeta}>
+          <Caption style={styles.count}>{taskNotes.length}</Caption>
+          {hasNotes && <Chevron color={Colors.label} size={16} strokeWidth={2.25} />}
+        </View>
+      </Pressable>
+      {!hasNotes ? (
         <Hint style={styles.empty}>Long-press a day to add a note</Hint>
       ) : (
+        expanded &&
         taskNotes.map(({ date, note }) => (
           <Pressable
             key={date}
@@ -59,8 +74,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingBottom: Spacing.xs,
     paddingHorizontal: Spacing.xs,
-    borderBottomWidth: 2,
+    borderBottomWidth: 1,
     borderBottomColor: Colors.border,
+  },
+  titleMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
   },
   count: {
     fontSize: FontSize.md,

@@ -107,6 +107,9 @@ const styles = StyleSheet.create({
     alignItems: 'baseline',
     justifyContent: 'space-between',
     paddingHorizontal: Spacing.xs,
+    paddingBottom: Spacing.xs,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
   },
   statsRow: {
     flexDirection: 'row',

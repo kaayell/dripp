@@ -116,9 +116,7 @@ export default function TaskDetailScreen() {
           </View>
         </View>
         <View style={styles.taskDetailsContainer}>
-          <View
-            style={[styles.detailCard, { borderBottomWidth: 2, borderBottomColor: Colors.text }]}
-          >
+          <View style={styles.detailCard}>
             <TaskCalendar
               taskId={task.id}
               color={task.color}
