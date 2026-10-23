@@ -4,18 +4,13 @@ import { router, Stack, useFocusEffect, useLocalSearchParams } from 'expo-router
 import { SafeAreaScreen } from '@/components/ui/SafeAreaScreen.tsx';
 import { loadTaskWithDetails, TaskWithDetails, toggleTaskLog } from '../../../db/queries';
 import { Colors, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
-import {
-  formatDisplayTime,
-  formatShortDate,
-  timeSince,
-  todayString,
-} from '@/constants/dates';
+import { formatDisplayTime, formatShortDate, timeSince, todayString } from '@/constants/dates';
 import * as Haptics from 'expo-haptics';
 import { CloseButton } from '@/components/ui/CloseButton';
 import Drop from '@/components/ui/Drop';
 import Loading from '@/components/ui/Loading';
 import { TaskCalendar } from '@/components/calendar/TaskCalendar';
-import { TaskCalendarHeatmap } from '@/components/calendar/TaskCalendarHeatmap';
+import { TaskActivity } from '@/components/task/TaskActivity';
 import { TaskNotes } from '@/components/task/TaskNotes';
 import { Check, SquarePen } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
@@ -121,7 +116,9 @@ export default function TaskDetailScreen() {
           </View>
         </View>
         <View style={styles.taskDetailsContainer}>
-          <View style={styles.detailCard}>
+          <View
+            style={[styles.detailCard, { borderBottomWidth: 2, borderBottomColor: Colors.text }]}
+          >
             <TaskCalendar
               taskId={task.id}
               color={task.color}
@@ -131,7 +128,9 @@ export default function TaskDetailScreen() {
             />
             <TaskNotes taskId={task.id} color={task.color} taskNotes={task.taskNotes} />
           </View>
-          <TaskCalendarHeatmap color={task.color} taskLogs={task.taskLogs} />
+          <View style={styles.detailCard}>
+            <TaskActivity color={task.color} taskLogs={task.taskLogs} taskNotes={task.taskNotes} />
+          </View>
         </View>
       </SafeAreaScreen>
     </>
@@ -193,7 +192,5 @@ const styles = StyleSheet.create({
   detailCard: {
     gap: Spacing.xl,
     paddingBottom: Spacing.xl,
-    borderBottomColor: Colors.text,
-    borderBottomWidth: 2,
   },
 });

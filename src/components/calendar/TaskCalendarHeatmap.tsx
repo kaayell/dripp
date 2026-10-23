@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import { Colors, dimmed, FontSize, FontWeight, Spacing } from '@/constants/theme';
+import { Colors, dimmed, FontFamily, FontSize, FontWeight, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import { TaskLog } from '../../../db/queries';
 import { CalendarHeatmap } from 'react-native-chart-kit/v2';
@@ -71,12 +71,12 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
           colors={[color]}
           activeCell={{ date: today, scale: 1.3, strokeColor: Colors.teal, strokeWidth: 2 }}
           theme={{
-            background: Colors.cellBg,
-            plotBackground: Colors.cellBg,
+            background: Colors.background,
             grid: Colors.border,
             axis: Colors.border,
             text: Colors.label,
             mutedText: Colors.disabled,
+            typography: { fontFamily: FontFamily.mono },
           }}
         />
       </ScrollView>
@@ -87,7 +87,7 @@ export function TaskCalendarHeatmap({ color, taskLogs }: TaskCalendarHeatmapProp
 const styles = StyleSheet.create({
   heatmapContainer: {
     flexDirection: 'row',
-    padding: Spacing.lg,
+    paddingHorizontal: Spacing.xs,
   },
   labelColumn: {
     width: 30,
@@ -104,6 +104,7 @@ const styles = StyleSheet.create({
   labelText: {
     fontSize: FontSize.xs,
     fontWeight: FontWeight.bold,
+    fontFamily: FontFamily.mono,
     color: Colors.disabled,
   },
 });
