@@ -3,6 +3,7 @@ import {
   type FormatDistanceFn,
   formatDistanceStrict,
   type FormatDistanceToken,
+  type Locale,
   parse,
   parseISO,
   startOfMonth,
@@ -56,13 +57,24 @@ const formatShortDistance: FormatDistanceFn = (token, count, options) => {
   return options.comparison && options.comparison > 0 ? `in ${value}` : `${value} ago`;
 };
 
+const shortLocale: Locale = { ...enUS, formatDistance: formatShortDistance };
+
 export function timeSince(dateString: string): string {
   const today = todayString();
   if (dateString === today) return 'today';
   return formatDistanceStrict(parseISO(dateString), parseISO(today), {
     addSuffix: true,
-    locale: { ...enUS, formatDistance: formatShortDistance },
+    locale: shortLocale,
   });
+}
+
+export function timeSinceParts(dateString: string): { value: string; suffix: string | null } {
+  const today = todayString();
+  if (dateString === today) return { value: 'today', suffix: null };
+  const date = parseISO(dateString);
+  const reference = parseISO(today);
+  const value = formatDistanceStrict(date, reference, { locale: shortLocale });
+  return { value, suffix: date < reference ? 'ago' : 'from now' };
 }
 
 export function startDatesForPastMonths(pastMonths: number): string[] {

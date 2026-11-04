@@ -1,58 +1,57 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { loadTasksWithMostRecentLog, TaskWithMostRecentLog } from '../../../db/queries';
+import {
+  loadTasksWithMostRecentLog,
+  TaskWithMostRecentLog,
+  toggleTaskLog,
+} from '../../../db/queries';
 import { Colors, dimmed, FontSize, Radius, Spacing } from '@/constants/theme';
-import { timeSince } from '@/constants/dates';
+import { timeSinceParts, todayString } from '@/constants/dates';
+import * as Haptics from 'expo-haptics';
 import Drop from '@/components/ui/Drop';
 import AnimatedLabel from '@/components/ui/AnimatedLabel';
 import { router, useFocusEffect } from 'expo-router';
-import { Caption, ChipText, Hint, ItemTitle, Label, Title } from '@/components/ui/Typography';
+import { ArrowDown, ArrowUp, Bell, Check } from 'lucide-react-native';
+import { Caption, ChipText, ItemTitle, Label, Title } from '@/components/ui/Typography';
 import { CommonStyles } from '@/constants/styles';
 
-type SortOption = 'lastDone' | 'category';
+type SortDirection = 'asc' | 'desc';
 
-const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'lastDone', label: 'Last Done' },
-  { value: 'category', label: 'Category' },
-];
-
-function sortByCategory(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[] {
-  return [...tasks].sort((a, b) => {
-    const aName = a.category?.name;
-    const bName = b.category?.name;
-    // uncategorized tasks sort last
-    if (!aName) return bName ? 1 : 0;
-    if (!bName) return -1;
-    return aName.localeCompare(bName, undefined, { sensitivity: 'base' });
-  });
-}
-
-function sortByLastDone(tasks: TaskWithMostRecentLog[]): TaskWithMostRecentLog[] {
+function sortByLastDone(tasks: TaskWithMostRecentLog[], direction: SortDirection) {
+  const sign = direction === 'asc' ? 1 : -1;
   return [...tasks].sort((a, b) => {
     const aDate = a.mostRecentTaskLog?.date;
     const bDate = b.mostRecentTaskLog?.date;
     // never-tracked tasks sort last
     if (!aDate) return bDate ? 1 : 0;
     if (!bDate) return -1;
-    return aDate < bDate ? -1 : aDate > bDate ? 1 : 0;
+    return sign * (aDate < bDate ? -1 : aDate > bDate ? 1 : 0);
   });
 }
 
-const SORTERS: Record<SortOption, (tasks: TaskWithMostRecentLog[]) => TaskWithMostRecentLog[]> = {
-  category: sortByCategory,
-  lastDone: sortByLastDone,
-};
-
 export default function TasksScreen({ selectedCategoryId }: { selectedCategoryId: number | null }) {
   const [tasks, setTasks] = useState<TaskWithMostRecentLog[]>([]);
-  const [sortBy, setSortBy] = useState<SortOption | null>('lastDone');
+  const [sortActive, setSortActive] = useState(true);
+  const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+
+  const refresh = useCallback(async () => {
+    setTasks(await loadTasksWithMostRecentLog());
+  }, []);
 
   useFocusEffect(
     useCallback(() => {
-      loadTasksWithMostRecentLog()
-        .then(setTasks)
-        .catch((e) => console.error('[TasksScreen] load failed', e));
-    }, []),
+      refresh().catch((e) => console.error('[TasksScreen] load failed', e));
+    }, [refresh]),
+  );
+
+  const toggleToday = useCallback(
+    (taskId: number) => {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+      toggleTaskLog(taskId, todayString())
+        .then(refresh)
+        .catch((e) => console.error('[TasksScreen] toggle failed', e));
+    },
+    [refresh],
   );
 
   const tasksForCategory = useCallback(
@@ -63,8 +62,8 @@ export default function TasksScreen({ selectedCategoryId }: { selectedCategoryId
 
   const visibleTasks = useMemo(() => {
     const filtered = tasksForCategory(selectedCategoryId);
-    return sortBy ? SORTERS[sortBy](filtered) : filtered;
-  }, [tasksForCategory, selectedCategoryId, sortBy]);
+    return sortActive ? sortByLastDone(filtered, sortDirection) : filtered;
+  }, [tasksForCategory, selectedCategoryId, sortActive, sortDirection]);
 
   return (
     <View style={styles.screen}>
@@ -73,49 +72,82 @@ export default function TasksScreen({ selectedCategoryId }: { selectedCategoryId
         <Caption style={{ fontSize: FontSize.lg }}>{visibleTasks.length}</Caption>
       </View>
       <View style={styles.sortRow}>
-        {SORT_OPTIONS.map((option) => {
-          const active = option.value === sortBy;
-          return (
-            <Pressable
-              key={option.value}
-              style={[styles.sortChip, active && styles.sortChipActive]}
-              onPress={() => setSortBy(active ? null : option.value)}
-            >
-              <ChipText style={active && styles.sortChipTextActive}>{option.label}</ChipText>
-            </Pressable>
-          );
-        })}
+        <Pressable
+          style={[styles.sortChip, sortActive && styles.sortChipActive]}
+          onPress={() => setSortActive((active) => !active)}
+        >
+          <ChipText style={[styles.sortChipText, sortActive && styles.sortChipTextActive]}>
+            Last Done
+          </ChipText>
+        </Pressable>
+        {sortActive && (
+          <Pressable
+            hitSlop={8}
+            style={[styles.sortChip, styles.sortDirectionButton]}
+            onPress={() => setSortDirection((d) => (d === 'asc' ? 'desc' : 'asc'))}
+          >
+            {sortDirection === 'asc' ? (
+              <ArrowDown size={14} color={Colors.text} />
+            ) : (
+              <ArrowUp size={14} color={Colors.text} />
+            )}
+            <ChipText style={styles.sortDirectionText}>
+              {sortDirection === 'asc' ? 'Oldest first' : 'Newest first'}
+            </ChipText>
+          </Pressable>
+        )}
       </View>
       <ScrollView>
         {visibleTasks.map((task) => {
           const mostRecentTaskLog = task.mostRecentTaskLog;
+          const lastDone = mostRecentTaskLog
+            ? timeSinceParts(mostRecentTaskLog.date)
+            : { value: 'Never', suffix: null };
+          const doneToday = mostRecentTaskLog?.date === todayString();
           return (
             <AnimatedLabel
               key={task.id}
               style={[
                 styles.taskContainer,
-                { borderColor: dimmed(task.color, 20), backgroundColor: dimmed(task.color, 5) },
+                { borderColor: dimmed(task.color, 40), backgroundColor: dimmed(task.color, 5) },
               ]}
               onPress={() =>
                 router.push({ pathname: '/task/[taskId]', params: { taskId: String(task.id) } })
               }
             >
-              <View style={styles.taskRow}>
-                <View style={styles.taskDetail}>
+              <View style={styles.taskRowContainer}>
+                <View style={styles.taskDescriptions}>
                   <View style={{ flexDirection: 'column' }}>
-                    {task.category && (
-                      <Label style={styles.taskCategoryLabel}>{task.category?.name}</Label>
-                    )}
                     <View style={styles.taskTitle}>
                       <Drop size={12} color={task.color} />
                       <ItemTitle style={styles.taskLabel}>{task.name}</ItemTitle>
+                      {task.reminder && <Bell size={16} color={Colors.label} strokeWidth={3} />}
                     </View>
+                    {task.category && (
+                      <Label style={styles.taskCategoryLabel}>{task.category?.name}</Label>
+                    )}
                   </View>
                 </View>
-                <View style={styles.taskDetail}>
-                  <ItemTitle style={[styles.taskLabel, { color: task.color }]}>
-                    {mostRecentTaskLog ? timeSince(mostRecentTaskLog.date) : 'Never'}
-                  </ItemTitle>
+                <View style={styles.taskActions}>
+                  <View style={styles.lastDone}>
+                    <ItemTitle style={[styles.taskLabel, { color: task.color }]}>
+                      {lastDone.value}
+                    </ItemTitle>
+                    {lastDone.suffix && (
+                      <Label style={styles.taskCategoryLabel}>{lastDone.suffix}</Label>
+                    )}
+                  </View>
+                  <Pressable
+                    hitSlop={8}
+                    onPress={() => toggleToday(task.id)}
+                    style={[
+                      styles.checkbox,
+                      { borderColor: dimmed(task.color, 50) },
+                      doneToday && { backgroundColor: task.color },
+                    ]}
+                  >
+                    {doneToday && <Check color={Colors.background} size={24} strokeWidth={4} />}
+                  </Pressable>
                 </View>
               </View>
             </AnimatedLabel>
@@ -162,6 +194,19 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     paddingHorizontal: Spacing.lg,
   },
+  sortChipText: {
+    fontWeight: '700',
+  },
+  sortDirectionButton: {
+    marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+  },
+  sortDirectionText: {
+    color: Colors.text,
+    fontWeight: '700',
+  },
   sortChipActive: {
     backgroundColor: Colors.text,
     borderColor: Colors.text,
@@ -173,26 +218,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderRadius: Radius.xl,
     borderWidth: 1,
-    padding: Spacing.xl,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.lg,
     marginBottom: Spacing.xl,
   },
-  taskRow: {
+  taskRowContainer: {
     flex: 1,
     flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: Spacing.base,
   },
-  taskDetail: {
+  taskDescriptions: {
     flexDirection: 'row',
-    gap: Spacing.base,
+    alignItems: 'center',
+  },
+  taskActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xl,
+  },
+  checkbox: {
+    width: 36,
+    height: 36,
+    borderRadius: Radius.sm,
+    borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  lastDone: {
+    alignItems: 'flex-end',
   },
   taskLabel: {
     fontSize: FontSize.xxl,
   },
   taskCategoryLabel: {
-    fontSize: FontSize.lg,
+    fontSize: FontSize.base,
+    letterSpacing: 0.5,
   },
 });

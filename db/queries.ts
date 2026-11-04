@@ -18,6 +18,7 @@ export type TaskWithCategory = Task & { category: Category | null };
 export type TaskWithMostRecentLog = Task & {
   category: Category | null;
   mostRecentTaskLog: TaskLog | null;
+  reminder: Reminder | null;
 };
 
 export type Reminder = typeof reminders.$inferSelect;
@@ -109,6 +110,7 @@ export async function loadTasksWithMostRecentLog(): Promise<TaskWithMostRecentLo
       mostRecentTaskLog: {
         orderBy: { date: 'desc' },
       },
+      reminder: true,
     },
   });
 }

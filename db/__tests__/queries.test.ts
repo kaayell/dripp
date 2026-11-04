@@ -240,6 +240,32 @@ describe('loadTasksWithMostRecentLog', () => {
     });
     expect(result[1].mostRecentTaskLog).toBe(null);
   });
+
+  it('includes each task with its reminder', async () => {
+    const [dripTask] = await db
+      .insert(tasks)
+      .values({ name: 'drip', color: '#ffffff', categoryId: null })
+      .returning();
+
+    await db.insert(tasks).values({ name: 'mop', color: '#000000', categoryId: null });
+
+    const [reminder] = await db
+      .insert(reminders)
+      .values({
+        taskId: dripTask.id,
+        time: '09:00',
+        type: 'daily',
+        interval: 1,
+        dayOfWeek: null,
+        dayOfMonth: null,
+      })
+      .returning();
+
+    const result = await loadTasksWithMostRecentLog();
+    expect(result).toHaveLength(2);
+    expect(result[0].reminder).toEqual(reminder);
+    expect(result[1].reminder).toBe(null);
+  });
 });
 
 describe('createTask', () => {
