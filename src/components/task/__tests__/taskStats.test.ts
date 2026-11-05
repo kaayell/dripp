@@ -9,7 +9,7 @@ describe('computeTaskStats', () => {
       last30Days: 0,
       lastYear: 0,
       averageGapDays: null,
-      gaps: [],
+      logs: [],
     });
   });
 
@@ -35,8 +35,8 @@ describe('computeTaskStats', () => {
 
   it('lists gaps between entries, newest first', () => {
     expect(computeTaskStats(['2026-10-05', '2026-10-01', '2026-10-13'], today).logs).toEqual([
-      { date: '2026-10-13', previousDate: '2026-10-05', days: 8 },
-      { date: '2026-10-05', previousDate: '2026-10-01', days: 4 },
+      { date: '2026-10-13', previousDate: '2026-10-05', gap: 8 },
+      { date: '2026-10-05', previousDate: '2026-10-01', gap: 4 },
     ]);
   });
 });
