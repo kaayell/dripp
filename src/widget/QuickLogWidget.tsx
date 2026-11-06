@@ -57,25 +57,18 @@ export function QuickLogWidget({ data }: { data: QuickLogWidgetData }) {
           alignItems: 'center',
           paddingHorizontal: 4,
           paddingBottom: 6,
+          borderBottomColor: Colors.border,
+          borderBottomWidth: 1,
         }}
       >
         <TextWidget
-          text="Today"
-          style={{
-            fontSize: 15,
-            fontWeight: '700',
-            fontFamily: WidgetFont.sans['700'],
-            color: Colors.text,
-            letterSpacing: 0.25,
-          }}
-        />
-        <TextWidget
           text={formatShortDate(parseISO(date))}
           style={{
-            fontSize: 11,
-            fontWeight: '500',
-            fontFamily: WidgetFont.mono['500'],
-            color: Colors.label,
+            fontSize: 14,
+            fontWeight: '700',
+            fontFamily: WidgetFont.mono['700'],
+            color: Colors.text,
+            letterSpacing: 0.5,
           }}
         />
       </FlexWidget>
