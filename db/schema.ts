@@ -32,6 +32,7 @@ export const tasks = sqliteTable(
     name: text().notNull(),
     color: text().notNull(),
     categoryId: integer('category_id').references(() => categories.id),
+    hidden: integer({ mode: 'boolean' }).notNull().default(false),
   },
   (table) => [uniqueIndex('tasksNameUniqueIndex').on(lower(table.name))],
 );

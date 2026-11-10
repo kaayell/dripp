@@ -1,0 +1,1 @@
+ALTER TABLE `tasks` ADD `hidden` integer DEFAULT false NOT NULL;

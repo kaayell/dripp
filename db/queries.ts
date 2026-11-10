@@ -28,7 +28,7 @@ type AuditFields = keyof typeof timestamps;
 
 export type ReminderInputValues = Omit<Reminder, 'id' | 'taskId' | AuditFields>;
 
-export type TaskInputValues = Omit<Task, 'id' | AuditFields>;
+export type TaskInputValues = Omit<Task, 'id' | 'hidden' | AuditFields>;
 
 type Audited = Partial<Pick<Task, AuditFields>>;
 export type ExportedCategory = Pick<Category, 'name'> & Audited;
@@ -36,6 +36,7 @@ export type ExportedTaskLog = Pick<TaskLog, 'date'> & Audited;
 export type ExportedTaskNote = Pick<TaskNote, 'date' | 'note'> & Audited;
 export type ExportedReminder = Omit<Reminder, 'id' | 'taskId' | AuditFields> & Audited;
 export type ExportedTask = Pick<Task, 'name' | 'color'> &
+  Partial<Pick<Task, 'hidden'>> &
   Audited & {
     category: string | null;
     logs: ExportedTaskLog[];
@@ -125,6 +126,10 @@ export async function updateTask(taskId: number, task: TaskInputValues): Promise
   return updated;
 }
 
+export async function setTaskHidden(taskId: number, hidden: boolean): Promise<void> {
+  await db.update(tasks).set({ hidden }).where(eq(tasks.id, taskId));
+}
+
 export async function loadTaskReminder(taskId: number): Promise<Reminder | undefined> {
   return await db.query.reminders.findFirst({
     where: { taskId },
@@ -209,7 +214,7 @@ export async function exportAppData(): Promise<AppData> {
       orderBy: { id: 'asc' },
     }),
     db.query.tasks.findMany({
-      columns: { name: true, color: true, ...audited },
+      columns: { name: true, color: true, hidden: true, ...audited },
       with: {
         category: { columns: { name: true } },
         taskLogs: { columns: { date: true, ...audited }, orderBy: { date: 'asc' } },

@@ -19,6 +19,7 @@ import {
   loadTaskWithDetails,
   removeTaskLog,
   saveTaskNote,
+  setTaskHidden,
   setTaskReminder,
   exportAppData,
   toggleTaskLog,
@@ -306,6 +307,33 @@ describe('updateTask', () => {
     expect(updated).toMatchObject({ name: 'mop', color: '#000000', categoryId: category.id });
     expect(updated.id).toEqual(task.id);
     expect(await loadTasks()).toHaveLength(1);
+  });
+});
+
+describe('setTaskHidden', () => {
+  it('defaults new tasks to visible', async () => {
+    const task = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
+
+    expect(task.hidden).toBe(false);
+  });
+
+  it('hides and shows a task', async () => {
+    const task = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
+
+    await setTaskHidden(task.id, true);
+    expect((await loadTask(task.id))?.hidden).toBe(true);
+
+    await setTaskHidden(task.id, false);
+    expect((await loadTask(task.id))?.hidden).toBe(false);
+  });
+
+  it('is kept when the task is edited', async () => {
+    const task = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
+    await setTaskHidden(task.id, true);
+
+    const updated = await updateTask(task.id, { name: 'mop', color: '#000000', categoryId: null });
+
+    expect(updated.hidden).toBe(true);
   });
 });
 
@@ -687,7 +715,7 @@ describe('exportAppData', () => {
       .insert(tasks)
       .values([
         { name: 'walk', color: '#e18b60', categoryId: bod.id },
-        { name: 'mop', color: '#64a1ee', categoryId: home.id },
+        { name: 'mop', color: '#64a1ee', categoryId: home.id, hidden: true },
       ])
       .returning();
     await db.insert(taskLog).values([
@@ -715,6 +743,7 @@ describe('exportAppData', () => {
         {
           name: 'walk',
           color: '#e18b60',
+          hidden: false,
           category: 'bod',
           logs: [
             { date: '2026-09-01', ...audit },
@@ -727,6 +756,7 @@ describe('exportAppData', () => {
         {
           name: 'mop',
           color: '#64a1ee',
+          hidden: true,
           category: 'home',
           logs: [{ date: '2026-09-02', ...audit }],
           notes: [],

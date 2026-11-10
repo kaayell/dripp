@@ -38,6 +38,7 @@ const file: AppData = {
     {
       name: 'water',
       color: '#60e165',
+      hidden: true,
       category: 'garden',
       logs: [{ date: '2026-08-11', ...audit }],
       reminder: {
@@ -61,6 +62,7 @@ async function storedTasks() {
   return rows.map((task) => ({
     name: task.name,
     color: task.color,
+    hidden: task.hidden,
     category: task.category?.name ?? null,
     dates: task.taskLogs.map((log) => log.date),
     reminder: task.reminder?.type ?? null,
@@ -78,6 +80,7 @@ describe('importAppData replace', () => {
       {
         name: 'feed',
         color: '#daa932',
+        hidden: false,
         category: 'cats',
         dates: ['2026-08-10', '2026-08-12'],
         reminder: null,
@@ -85,6 +88,7 @@ describe('importAppData replace', () => {
       {
         name: 'water',
         color: '#60e165',
+        hidden: true,
         category: 'garden',
         dates: ['2026-08-11'],
         reminder: 'monthly',
@@ -144,6 +148,7 @@ describe('importAppData merge', () => {
       {
         name: 'Feed',
         color: '#ffffff',
+        hidden: false,
         category: 'CATS',
         dates: ['2026-08-10', '2026-08-12'],
         reminder: null,
@@ -151,6 +156,7 @@ describe('importAppData merge', () => {
       {
         name: 'water',
         color: '#60e165',
+        hidden: true,
         category: 'garden',
         dates: ['2026-08-11'],
         reminder: 'monthly',

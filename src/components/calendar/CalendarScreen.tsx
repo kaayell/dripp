@@ -5,6 +5,7 @@ import { Calendar } from 'react-native-calendars';
 import {
   loadTaskLogs,
   loadTasksWithCategory,
+  setTaskHidden,
   TaskLogWithTask,
   TaskWithCategory,
 } from '../../../db/queries';
@@ -68,15 +69,31 @@ export default function CalendarScreen() {
     return () => subscription.remove();
   }, [refresh]);
 
+  const toggleHidden = useCallback(
+    (taskId: number) => {
+      const task = tasks.find((t) => t.id === taskId);
+      if (!task) return;
+      const hidden = !task.hidden;
+      setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, hidden } : t)));
+      setTaskHidden(taskId, hidden).catch((e) => {
+        console.error('[CalendarScreen] visibility toggle failed', e);
+        refresh().catch(() => {});
+      });
+    },
+    [tasks, refresh],
+  );
+
   const markedDates = useMemo(() => {
+    const hiddenTaskIds = new Set(tasks.filter((t) => t.hidden).map((t) => t.id));
     const marks: Record<string, { items: { id: number; color: string }[] }> = {};
 
     taskLogs.forEach(({ date, task }) => {
+      if (hiddenTaskIds.has(task.id)) return;
       if (!marks[date]) marks[date] = { items: [] };
       marks[date].items.push({ id: task.id, color: task.color });
     });
     return marks;
-  }, [taskLogs]);
+  }, [tasks, taskLogs]);
 
   const handleDayPress = useCallback(
     (day: DateData) => {
@@ -136,7 +153,7 @@ export default function CalendarScreen() {
         />
       </View>
 
-      <CalendarLegend tasks={tasks} onToggle={refresh} />
+      <CalendarLegend tasks={tasks} onToggle={refresh} onToggleHidden={toggleHidden} />
     </View>
   );
 }
