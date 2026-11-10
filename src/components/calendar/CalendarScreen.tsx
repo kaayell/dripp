@@ -2,7 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState, FlatList, StyleSheet, View } from 'react-native';
 import type { DateData } from 'react-native-calendars';
 import { Calendar } from 'react-native-calendars';
-import { loadTaskLogs, loadTasks, Task, TaskLogWithTask } from '../../../db/queries';
+import {
+  loadTaskLogs,
+  loadTasksWithCategory,
+  TaskLogWithTask,
+  TaskWithCategory,
+} from '../../../db/queries';
 import CalendarDay from './CalendarDay';
 import CalendarLegend from './CalendarLegend';
 import { Colors, FontSize, FontWeight, Spacing } from '@/constants/theme';
@@ -36,14 +41,17 @@ export default function CalendarScreen({
 }: {
   selectedCategoryId: number | null;
 }) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTasks] = useState<TaskWithCategory[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
   const [loaded, setLoaded] = useState(false);
   const today = todayString();
   const months = startDatesForPastMonths(12);
 
   const refresh = useCallback(async () => {
-    const [loadedTasks, loadedTaskLogs] = await Promise.all([loadTasks(), loadTaskLogs()]);
+    const [loadedTasks, loadedTaskLogs] = await Promise.all([
+      loadTasksWithCategory(),
+      loadTaskLogs(),
+    ]);
     setTasks(loadedTasks);
     setTaskLogs(loadedTaskLogs);
   }, []);

@@ -1,27 +1,30 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { StyleSheet } from 'react-native';
+import { useCallback, useState } from 'react';
+import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
+import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
-import { Task, toggleTaskLog } from '../../../db/queries';
+import { TaskWithCategory, toggleTaskLog } from '../../../db/queries';
 import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constants/theme';
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import AnimatedLabel from '@/components/ui/AnimatedLabel';
-import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
-import { Body } from '@/components/ui/Typography';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { Body, Label } from '@/components/ui/Typography';
 
 type Props = {
-  tasks: Task[];
+  tasks: TaskWithCategory[];
   onToggle?: () => void;
 };
 
 export default function CalendarLegend({ tasks, onToggle }: Props) {
-  const scrollRef = useRef<ScrollView>(null);
-  const taskIds = tasks.map((task) => task.id).join(',');
+  const [expanded, setExpanded] = useState(false);
+  const { height: windowHeight } = useWindowDimensions();
+  const targetHeight = expanded ? windowHeight * 0.35 : 96;
+  const Chevron = expanded ? ChevronDown : ChevronUp;
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({ x: 0, animated: false });
-  }, [taskIds]);
+  const listStyle = useAnimatedStyle(() => ({
+    height: withTiming(targetHeight, { duration: 200 }),
+  }));
 
   const toggleTask = useCallback(
     (taskId: number) => {
@@ -36,59 +39,98 @@ export default function CalendarLegend({ tasks, onToggle }: Props) {
 
   if (tasks.length === 0) return null;
 
+  const tasksByCategory = tasks.reduce((acc, task) => {
+    const key = task.category?.name ?? 'uncategorized';
+    const group = acc.get(key);
+    if (group) group.push(task);
+    else acc.set(key, [task]);
+    return acc;
+  }, new Map<string, TaskWithCategory[]>());
+
   return (
-    <ScrollView
-      ref={scrollRef}
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      style={styles.legendRow}
-      contentContainerStyle={styles.legendRowContent}
-    >
-      {tasks.map((task) => (
-        <Animated.View
-          key={task.id}
-          entering={FadeIn.duration(200)}
-          exiting={FadeOut.duration(150)}
-          layout={LinearTransition.duration(200)}
+    <View style={styles.container}>
+      <Pressable hitSlop={8} onPress={() => setExpanded((v) => !v)} style={styles.expandButton}>
+        <Chevron color={Colors.label} size={18} strokeWidth={2.25} />
+      </Pressable>
+
+      <Animated.View style={listStyle}>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={styles.legendContent}
         >
-          <AnimatedLabel
-            style={[styles.legendItem, { backgroundColor: dimmed(task.color, 10) }]}
-            onPress={() =>
-              router.push({ pathname: '/task/[taskId]', params: { taskId: String(task.id) } })
-            }
-            onLongPress={() => toggleTask(task.id)}
-          >
-            <Drop color={task.color} size={10} />
-            <Body style={styles.legendLabel}>{task.name}</Body>
-          </AnimatedLabel>
-        </Animated.View>
-      ))}
-    </ScrollView>
+          {[...tasksByCategory].map(([categoryName, tasks]) => (
+            <View key={categoryName} style={styles.categoryGroup}>
+              <Label style={styles.categoryTitle}>{categoryName}</Label>
+
+              <View style={styles.taskRow}>
+                {tasks.map((task) => (
+                  <View key={task.id} style={styles.taskCell}>
+                    <AnimatedLabel
+                      style={[styles.taskContent, { backgroundColor: dimmed(task.color, 10) }]}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/task/[taskId]',
+                          params: { taskId: String(task.id) },
+                        })
+                      }
+                      onLongPress={() => toggleTask(task.id)}
+                    >
+                      <Drop color={task.color} size={10} />
+                      <Body style={styles.taskLabel}>{task.name}</Body>
+                    </AnimatedLabel>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  legendRow: {
-    flexGrow: 0,
+  container: {
     borderTopWidth: 1,
     borderTopColor: Colors.border,
   },
-  legendRowContent: {
+  expandButton: {
+    alignItems: 'center',
+    paddingVertical: Spacing.sm,
+  },
+  legendContent: {
     paddingHorizontal: Spacing.sm,
-    paddingTop: Spacing.xl,
     gap: Spacing.md,
   },
-  legendItem: {
+  categoryGroup: {
+    paddingBottom: Spacing.sm,
+  },
+  categoryTitle: {
+    fontSize: FontSize.md,
+    letterSpacing: 0.25,
+    paddingHorizontal: Spacing.xs,
+    paddingVertical: Spacing.sm,
+  },
+  taskRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    rowGap: Spacing.md,
+  },
+  taskCell: {
+    width: '50%',
+    paddingHorizontal: Spacing.xs,
+  },
+  taskContent: {
     flexDirection: 'row',
     alignItems: 'baseline',
     gap: Spacing.sm,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.sm,
-    borderRadius: Radius.full,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderRadius: Radius.md,
     borderWidth: 1,
     borderColor: Colors.border,
   },
-  legendLabel: {
+  taskLabel: {
     fontSize: FontSize.base,
     fontWeight: FontWeight.semibold,
     color: dimmed(Colors.text, 70),
