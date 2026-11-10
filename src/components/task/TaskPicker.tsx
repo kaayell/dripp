@@ -16,7 +16,7 @@ import { formatForDisplay } from '@/constants/dates.ts';
 import { Body, ButtonText, Heading, Label } from '@/components/ui/Typography';
 
 export default function TaskPicker() {
-  const { date, categoryId } = useLocalSearchParams<{ date: string; categoryId?: string }>();
+  const { date } = useLocalSearchParams<{ date: string }>();
   const [tasks, setTasks] = useState<TaskWithCategory[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLog[]>([]);
   const { height: windowHeight } = useWindowDimensions();
@@ -30,11 +30,7 @@ export default function TaskPicker() {
       .catch((e) => console.error('[TaskPicker] load failed', e));
   }, []);
 
-  const visibleTasks = categoryId
-    ? tasks.filter((task) => String(task.categoryId) === categoryId)
-    : tasks;
-
-  const tasksByCategory = visibleTasks.reduce((acc, task) => {
+  const tasksByCategory = tasks.reduce((acc, task) => {
     const key = task.category?.name ?? 'uncategorized';
     const group = acc.get(key);
     if (group) group.push(task);

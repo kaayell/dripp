@@ -36,11 +36,7 @@ const calendarTheme = {
   },
 } as any;
 
-export default function CalendarScreen({
-  selectedCategoryId,
-}: {
-  selectedCategoryId: number | null;
-}) {
+export default function CalendarScreen() {
   const [tasks, setTasks] = useState<TaskWithCategory[]>([]);
   const [taskLogs, setTaskLogs] = useState<TaskLogWithTask[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -72,29 +68,15 @@ export default function CalendarScreen({
     return () => subscription.remove();
   }, [refresh]);
 
-  const tasksForCategory = useCallback(
-    (categoryId: number | null) =>
-      categoryId == null ? tasks : tasks.filter((task) => task.categoryId === categoryId),
-    [tasks],
-  );
-
-  const visibleTasks = useMemo(
-    () => tasksForCategory(selectedCategoryId),
-    [tasksForCategory, selectedCategoryId],
-  );
-
   const markedDates = useMemo(() => {
-    const visibleTaskIds = new Set(visibleTasks.map((task) => task.id));
     const marks: Record<string, { items: { id: number; color: string }[] }> = {};
 
     taskLogs.forEach(({ date, task }) => {
-      if (!visibleTaskIds.has(task.id)) return;
-
       if (!marks[date]) marks[date] = { items: [] };
       marks[date].items.push({ id: task.id, color: task.color });
     });
     return marks;
-  }, [visibleTasks, taskLogs]);
+  }, [taskLogs]);
 
   const handleDayPress = useCallback(
     (day: DateData) => {
@@ -102,13 +84,10 @@ export default function CalendarScreen({
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
       router.push({
         pathname: '/task/picker',
-        params: {
-          date: day.dateString,
-          categoryId: selectedCategoryId,
-        },
+        params: { date: day.dateString },
       });
     },
-    [today, visibleTasks],
+    [today],
   );
 
   const renderMonthHeader = (date: any) => (
@@ -157,7 +136,7 @@ export default function CalendarScreen({
         />
       </View>
 
-      <CalendarLegend tasks={visibleTasks} onToggle={refresh} />
+      <CalendarLegend tasks={tasks} onToggle={refresh} />
     </View>
   );
 }

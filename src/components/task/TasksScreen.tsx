@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import {
+  Category,
+  loadCategories,
   loadTasksWithMostRecentLog,
   TaskWithMostRecentLog,
   toggleTaskLog,
@@ -14,6 +16,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { ArrowDown, ArrowUp, Bell, Check } from 'lucide-react-native';
 import { Caption, ChipText, ItemTitle, Label, Title } from '@/components/ui/Typography';
 import { CommonStyles } from '@/constants/styles';
+import CategoryFilter from '@/components/category/CategoryFilter';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -29,13 +32,20 @@ function sortByLastDone(tasks: TaskWithMostRecentLog[], direction: SortDirection
   });
 }
 
-export default function TasksScreen({ selectedCategoryId }: { selectedCategoryId: number | null }) {
+export default function TasksScreen() {
   const [tasks, setTasks] = useState<TaskWithMostRecentLog[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
   const [sortActive, setSortActive] = useState(true);
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
 
   const refresh = useCallback(async () => {
-    setTasks(await loadTasksWithMostRecentLog());
+    const [loadedTasks, loadedCategories] = await Promise.all([
+      loadTasksWithMostRecentLog(),
+      loadCategories(),
+    ]);
+    setTasks(loadedTasks);
+    setCategories(loadedCategories);
   }, []);
 
   useFocusEffect(
@@ -154,11 +164,21 @@ export default function TasksScreen({ selectedCategoryId }: { selectedCategoryId
           );
         })}
       </ScrollView>
+      <View style={styles.categoryContainer}>
+        <CategoryFilter
+          categories={categories}
+          selectedCategoryId={selectedCategoryId}
+          onSelectCategory={setSelectedCategoryId}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  categoryContainer: {
+    paddingTop: Spacing.xl,
+  },
   screen: {
     flex: 1,
     paddingHorizontal: Spacing.lg,
