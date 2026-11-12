@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { db } from './client';
 import { categories, reminders, taskLog, taskNotes, tasks, timestamps } from './schema';
 
@@ -126,8 +126,9 @@ export async function updateTask(taskId: number, task: TaskInputValues): Promise
   return updated;
 }
 
-export async function setTaskHidden(taskId: number, hidden: boolean): Promise<void> {
-  await db.update(tasks).set({ hidden }).where(eq(tasks.id, taskId));
+export async function setTasksHidden(taskIds: number[], hidden: boolean): Promise<void> {
+  if (taskIds.length === 0) return;
+  await db.update(tasks).set({ hidden }).where(inArray(tasks.id, taskIds));
 }
 
 export async function loadTaskReminder(taskId: number): Promise<Reminder | undefined> {

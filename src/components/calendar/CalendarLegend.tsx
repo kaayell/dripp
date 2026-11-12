@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
-import { ChevronDown, ChevronUp, Eye, EyeOff } from 'lucide-react-native';
+import { ChevronDown, ChevronUp } from 'lucide-react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import { router } from 'expo-router';
 import { TaskWithCategory, toggleTaskLog } from '../../../db/queries';
@@ -8,13 +8,14 @@ import { Colors, dimmed, FontSize, FontWeight, Radius, Spacing } from '@/constan
 import { todayString } from '@/constants/dates';
 import Drop from '@/components/ui/Drop';
 import AnimatedLabel from '@/components/ui/AnimatedLabel';
+import VisibilityToggle from '@/components/ui/VisibilityToggle';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { Body, Label } from '@/components/ui/Typography';
 
 type Props = {
   tasks: TaskWithCategory[];
   onToggle?: () => void;
-  onToggleHidden: (taskId: number) => void;
+  onToggleHidden: (taskIds: number[], hidden: boolean) => void;
 };
 
 export default function CalendarLegend({ tasks, onToggle, onToggleHidden }: Props) {
@@ -64,62 +65,69 @@ export default function CalendarLegend({ tasks, onToggle, onToggleHidden }: Prop
 
       <Animated.View style={listStyle}>
         <ScrollView showsVerticalScrollIndicator={false}>
-          {[...tasksByCategory].map(([categoryName, tasks]) => (
-            <View key={categoryName} style={styles.categoryGroup}>
-              <View style={styles.categoryRow}>
-                <Label style={styles.categoryTitle}>{categoryName}</Label>
-              </View>
+          {[...tasksByCategory].map(([categoryName, tasks]) => {
+            const categoryHidden = tasks.every((t) => t.hidden);
+            return (
+              <View key={categoryName} style={styles.categoryGroup}>
+                <View style={styles.categoryRow}>
+                  <Label style={styles.categoryTitle}>{categoryName}</Label>
+                  <VisibilityToggle
+                    hidden={categoryHidden}
+                    color={Colors.label}
+                    onPress={() =>
+                      onToggleHidden(
+                        tasks.map((t) => t.id),
+                        !categoryHidden,
+                      )
+                    }
+                  />
+                </View>
 
-              <View style={styles.taskRow}>
-                {tasks.map((task) => {
-                  const hidden = task.hidden;
-                  const VisibilityIcon = hidden ? EyeOff : Eye;
-                  return (
-                    <View key={task.id} style={styles.taskCell}>
-                      <AnimatedLabel
-                        style={[
-                          styles.taskContent,
-                          { backgroundColor: dimmed(task.color, 10) },
-                          hidden && styles.taskContentHidden,
-                        ]}
-                        onPress={() =>
-                          router.push({
-                            pathname: '/task/[taskId]',
-                            params: { taskId: String(task.id) },
-                          })
-                        }
-                        onLongPress={() => toggleTask(task.id)}
-                      >
-                        <Drop
-                          color={hidden ? 'transparent' : task.color}
-                          size={12}
-                          strokeColor={hidden ? task.color : undefined}
-                        />
-                        <Body
-                          style={[styles.taskLabel, hidden && { color: Colors.label }]}
-                          numberOfLines={1}
+                <View style={styles.taskRow}>
+                  {tasks.map((task) => {
+                    const hidden = task.hidden;
+                    return (
+                      <View key={task.id} style={styles.taskCell}>
+                        <AnimatedLabel
+                          style={[
+                            styles.taskContent,
+                            { backgroundColor: dimmed(task.color, 10) },
+                            hidden && styles.taskContentHidden,
+                          ]}
+                          onPress={() =>
+                            router.push({
+                              pathname: '/task/[taskId]',
+                              params: { taskId: String(task.id) },
+                            })
+                          }
+                          onLongPress={() => toggleTask(task.id)}
                         >
-                          {task.name}
-                        </Body>
-                        <Pressable
-                          hitSlop={8}
-                          style={styles.visibilityButton}
-                          onPress={() => onToggleHidden(task.id)}
-                          accessibilityLabel={hidden ? `Show ${task.name}` : `Hide ${task.name}`}
-                        >
-                          <VisibilityIcon
-                            color={hidden ? Colors.label : Colors.text}
-                            size={20}
-                            strokeWidth={1.75}
+                          <Drop
+                            color={hidden ? 'transparent' : task.color}
+                            size={12}
+                            strokeColor={hidden ? task.color : undefined}
                           />
-                        </Pressable>
-                      </AnimatedLabel>
-                    </View>
-                  );
-                })}
+                          <Body
+                            style={[styles.taskLabel, hidden && { color: Colors.label }]}
+                            numberOfLines={1}
+                          >
+                            {task.name}
+                          </Body>
+                          <VisibilityToggle
+                            hidden={hidden}
+                            color={Colors.text}
+                            hiddenColor={Colors.label}
+                            style={styles.visibilityButton}
+                            onPress={() => onToggleHidden([task.id], !hidden)}
+                          />
+                        </AnimatedLabel>
+                      </View>
+                    );
+                  })}
+                </View>
               </View>
-            </View>
-          ))}
+            );
+          })}
         </ScrollView>
       </Animated.View>
     </View>
@@ -148,31 +156,35 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'baseline',
-    padding: Spacing.xs,
+    alignItems: 'center',
+    paddingRight: Spacing.md,
+    paddingLeft: Spacing.sm,
+    paddingBottom: Spacing.lg,
   },
   categoryGroup: {
-    paddingBottom: Spacing.xl,
+    paddingVertical: Spacing.md,
   },
   categoryTitle: {
     fontSize: FontSize.base,
-    letterSpacing: 0.5,
+    letterSpacing: 0.25,
   },
   taskRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    rowGap: Spacing.md,
+    rowGap: Spacing.sm,
   },
   taskCell: {
     width: '49%',
   },
   taskContent: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    gap: Spacing.md,
+    alignItems: 'center',
+    gap: Spacing.lg,
     padding: Spacing.lg,
     borderRadius: Radius.md,
+    borderColor: Colors.border,
+    borderWidth: 0.5,
   },
   taskContentHidden: {
     backgroundColor: Colors.cellBg,

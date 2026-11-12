@@ -24,7 +24,6 @@ export default function AnimatedLabel({ children, style, onPress, onLongPress }:
   }));
 
   const handlePressIn = () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft);
     pressAnim.value = withSpring(0.9);
   };
 

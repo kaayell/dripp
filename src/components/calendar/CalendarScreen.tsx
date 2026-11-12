@@ -5,7 +5,7 @@ import { Calendar } from 'react-native-calendars';
 import {
   loadTaskLogs,
   loadTasksWithCategory,
-  setTaskHidden,
+  setTasksHidden,
   TaskLogWithTask,
   TaskWithCategory,
 } from '../../../db/queries';
@@ -70,17 +70,15 @@ export default function CalendarScreen() {
   }, [refresh]);
 
   const toggleHidden = useCallback(
-    (taskId: number) => {
-      const task = tasks.find((t) => t.id === taskId);
-      if (!task) return;
-      const hidden = !task.hidden;
-      setTasks((prev) => prev.map((t) => (t.id === taskId ? { ...t, hidden } : t)));
-      setTaskHidden(taskId, hidden).catch((e) => {
+    (taskIds: number[], hidden: boolean) => {
+      const ids = new Set(taskIds);
+      setTasks((prev) => prev.map((t) => (ids.has(t.id) ? { ...t, hidden } : t)));
+      setTasksHidden(taskIds, hidden).catch((e) => {
         console.error('[CalendarScreen] visibility toggle failed', e);
         refresh().catch(() => {});
       });
     },
-    [tasks, refresh],
+    [refresh],
   );
 
   const markedDates = useMemo(() => {

@@ -19,7 +19,7 @@ import {
   loadTaskWithDetails,
   removeTaskLog,
   saveTaskNote,
-  setTaskHidden,
+  setTasksHidden,
   setTaskReminder,
   exportAppData,
   toggleTaskLog,
@@ -310,30 +310,39 @@ describe('updateTask', () => {
   });
 });
 
-describe('setTaskHidden', () => {
+describe('setTasksHidden', () => {
   it('defaults new tasks to visible', async () => {
     const task = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
 
     expect(task.hidden).toBe(false);
   });
 
-  it('hides and shows a task', async () => {
-    const task = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
-
-    await setTaskHidden(task.id, true);
-    expect((await loadTask(task.id))?.hidden).toBe(true);
-
-    await setTaskHidden(task.id, false);
-    expect((await loadTask(task.id))?.hidden).toBe(false);
-  });
-
   it('is kept when the task is edited', async () => {
     const task = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
-    await setTaskHidden(task.id, true);
+    await setTasksHidden([task.id], true);
 
     const updated = await updateTask(task.id, { name: 'mop', color: '#000000', categoryId: null });
 
     expect(updated.hidden).toBe(true);
+  });
+
+  it('hides and shows only the given tasks', async () => {
+    const a = await createTask({ name: 'drip', color: '#ffffff', categoryId: null });
+    const b = await createTask({ name: 'mop', color: '#ffffff', categoryId: null });
+    const c = await createTask({ name: 'walk', color: '#ffffff', categoryId: null });
+
+    await setTasksHidden([a.id, b.id], true);
+    expect((await loadTask(a.id))?.hidden).toBe(true);
+    expect((await loadTask(b.id))?.hidden).toBe(true);
+    expect((await loadTask(c.id))?.hidden).toBe(false);
+
+    await setTasksHidden([a.id, b.id], false);
+    expect((await loadTask(a.id))?.hidden).toBe(false);
+    expect((await loadTask(b.id))?.hidden).toBe(false);
+  });
+
+  it('does nothing for an empty list', async () => {
+    await expect(setTasksHidden([], true)).resolves.toBeUndefined();
   });
 });
 
