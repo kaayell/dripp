@@ -1,7 +1,6 @@
 appId: com.kaayell.dripp
 ---
-- launchApp:
-    clearState: true
+- runFlow: ../subflows/launch-clean.yaml
 - runFlow:
     file: ../subflows/create-task.yaml
     env:

@@ -1,0 +1,11 @@
+appId: com.kaayell.dripp
+---
+- retry:
+    maxRetries: 2
+    commands:
+      - launchApp:
+          clearState: true
+      - extendedWaitUntil:
+          visible:
+            id: "add-task-button"
+          timeout: 20000
