@@ -2,8 +2,8 @@ import { differenceInCalendarDays, parseISO } from 'date-fns';
 
 export type TaskLogStat = {
   date: string;
-  previousDate: string;
-  gap: number;
+  previousDate: string | null;
+  gap: number | null;
 };
 
 export type TaskStats = {
@@ -21,21 +21,22 @@ export function computeTaskStats(dates: string[], today: string): TaskStats {
   const countWithin = (windowDays: number) =>
     days.filter((d) => {
       const ago = differenceInCalendarDays(todayDate, parseISO(d));
-      return ago >= 0 && ago < windowDays;
+      return ago >= 0 && ago <= windowDays;
     }).length;
 
   const taskLogs: TaskLogStat[] = days
-    .slice(1)
     .map((date, i) => {
+      const previousDate = i > 0 ? days[i - 1] : null;
       return {
         date,
-        previousDate: days[i],
-        gap: differenceInCalendarDays(parseISO(date), parseISO(days[i])),
+        previousDate,
+        gap: previousDate ? differenceInCalendarDays(parseISO(date), parseISO(previousDate)) : null,
       };
     })
     .reverse();
+  const gaps = taskLogs.map((log) => log.gap).filter((gap): gap is number => gap !== null);
   const averageGapDays =
-    taskLogs.length > 0 ? taskLogs.reduce((sum, gap) => sum + gap.gap, 0) / taskLogs.length : null;
+    gaps.length > 0 ? gaps.reduce((sum, gap) => sum + gap, 0) / gaps.length : null;
 
   return {
     total: days.length,

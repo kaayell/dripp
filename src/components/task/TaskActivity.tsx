@@ -78,7 +78,7 @@ export function TaskActivity({ color, taskLogs, taskNotes }: TaskActivityProps) 
                   <StickyNote color={Colors.label} size={14} strokeWidth={2.25} />
                 )}
               </View>
-              <Label style={{ color }}>{`+${gap.gap}d`}</Label>
+              {gap.gap && <Label style={{ color }}>{`+${gap.gap}d`}</Label>}
             </View>
           ))}
           {hasMoreLogs && (

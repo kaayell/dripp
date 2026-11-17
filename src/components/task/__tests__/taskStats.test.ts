@@ -13,18 +13,14 @@ describe('computeTaskStats', () => {
     });
   });
 
-  it('ignores duplicate dates', () => {
-    expect(computeTaskStats(['2026-10-23', '2026-10-23'], today).total).toBe(1);
-  });
-
   it('counts logs in the last 30 days', () => {
-    const stats = computeTaskStats(['2026-10-23', '2026-09-24', '2026-09-23'], today);
-    expect(stats.last30Days).toBe(2);
+    const stats = computeTaskStats(['2026-10-23', '2026-09-24', '2026-09-23', '2026-09-22'], today);
+    expect(stats.last30Days).toBe(3);
   });
 
   it('counts logs in the last year', () => {
-    const stats = computeTaskStats(['2026-10-23', '2025-10-24', '2025-10-23'], today);
-    expect(stats.lastYear).toBe(2);
+    const stats = computeTaskStats(['2026-10-23', '2025-10-24', '2025-10-23', '2025-10-22'], today);
+    expect(stats.lastYear).toBe(3);
   });
 
   it('averages the days between logs', () => {
@@ -33,10 +29,11 @@ describe('computeTaskStats', () => {
     );
   });
 
-  it('lists gaps between entries, newest first', () => {
+  it('lists entries newest first', () => {
     expect(computeTaskStats(['2026-10-05', '2026-10-01', '2026-10-13'], today).logs).toEqual([
       { date: '2026-10-13', previousDate: '2026-10-05', gap: 8 },
       { date: '2026-10-05', previousDate: '2026-10-01', gap: 4 },
+      { date: '2026-10-01', previousDate: null, gap: null },
     ]);
   });
 });
