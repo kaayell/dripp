@@ -54,7 +54,7 @@ export default function Layout() {
         }}
       >
         <Stack.Screen
-          name="index"
+          name="(tabs)"
           options={{
             headerRight: () => (
               <View style={{ flexDirection: 'row', gap: Spacing.xl }}>
