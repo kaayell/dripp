@@ -15,7 +15,8 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.kaayell.dripp"
+      "package": "com.kaayell.dripp",
+      "allowBackup": true
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -127,7 +128,8 @@
             ]
           }
         }
-      ]
+      ],
+      "./plugins/withAndroidBackup"
     ],
     "extra": {
       "eas": {
