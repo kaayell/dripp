@@ -42,6 +42,7 @@ export default function CalendarLegend({ tasks, onToggle, onToggleHidden }: Prop
   if (tasks.length === 0) return null;
 
   const visibleCount = tasks.length - tasks.filter((t) => t.hidden).length;
+  const allHidden = visibleCount === 0;
 
   const tasksByCategory = tasks.reduce((acc, task) => {
     const key = task.category?.name ?? 'uncategorized';
@@ -54,9 +55,22 @@ export default function CalendarLegend({ tasks, onToggle, onToggleHidden }: Prop
   return (
     <View style={styles.container}>
       <Pressable hitSlop={8} onPress={() => setExpanded((v) => !v)} style={styles.header}>
-        <Label>
-          {visibleCount} of {tasks.length} on calendar
-        </Label>
+        <View style={styles.headerLeft}>
+          <Label>
+            {visibleCount} of {tasks.length} on calendar
+          </Label>
+          <VisibilityToggle
+            hidden={allHidden}
+            color={Colors.teal}
+            size={18}
+            onPress={() =>
+              onToggleHidden(
+                tasks.map((t) => t.id),
+                !allHidden,
+              )
+            }
+          />
+        </View>
         <View style={styles.expandToggle}>
           <Label style={[{ color: Colors.teal }]}>{expanded ? 'less' : 'more'}</Label>
           <Chevron color={Colors.teal} size={18} strokeWidth={2.25} />
@@ -160,6 +174,11 @@ const styles = StyleSheet.create({
     paddingRight: Spacing.md,
     paddingLeft: Spacing.sm,
     paddingBottom: Spacing.lg,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.lg,
   },
   categoryGroup: {
     paddingVertical: Spacing.md,
