@@ -40,3 +40,19 @@ export function computeReminderSchedule(
   }
   return result;
 }
+
+type ReminderSettings = Pick<Reminder, 'time' | 'type' | 'interval' | 'dayOfWeek' | 'dayOfMonth'>;
+
+export function isSameReminder(
+  a: ReminderSettings | null | undefined,
+  b: ReminderSettings | null | undefined,
+): boolean {
+  if (!a || !b) return !a && !b;
+  return (
+    a.time === b.time &&
+    a.type === b.type &&
+    a.interval === b.interval &&
+    (a.dayOfWeek ?? null) === (b.dayOfWeek ?? null) &&
+    (a.dayOfMonth ?? null) === (b.dayOfMonth ?? null)
+  );
+}

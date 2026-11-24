@@ -19,6 +19,7 @@ import { TextField } from '@/components/ui/TextField';
 import { TaskReminder } from '@/components/task/TaskReminder';
 import { ColorPickerModal } from '@/components/task/ColorPickerModal';
 import { ensureNotificationPermission, saveTaskReminder } from '@/notifications/reminders';
+import { isSameReminder } from '@/notifications/reminderDates';
 import { ChipText, Label, Title } from '@/components/ui/Typography';
 
 export type TaskFormValues = TaskInputValues;
@@ -87,13 +88,16 @@ export default function TaskFormScreen({
         color,
         categoryId,
       });
-      await saveTaskReminder(savedTask.id, reminderEnabled ? reminder : null);
+      const nextReminder = reminderEnabled ? reminder : null;
+      if (!isSameReminder(task?.reminder, nextReminder)) {
+        await saveTaskReminder(savedTask.id, nextReminder);
+      }
       router.back();
     } catch (e) {
       setSubmitting(false);
       setError('Task already exists');
     }
-  }, [canSubmit, onSubmit, name, color, categoryId, reminder, reminderEnabled]);
+  }, [canSubmit, onSubmit, name, color, categoryId, reminder, reminderEnabled, task?.reminder]);
 
   return (
     <>

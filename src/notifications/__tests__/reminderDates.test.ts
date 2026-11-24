@@ -1,5 +1,5 @@
 import { format } from 'date-fns';
-import { computeNextReminder, computeReminderSchedule } from '../reminderDates';
+import { computeNextReminder, computeReminderSchedule, isSameReminder } from '../reminderDates';
 
 const fmt = (date: Date) => format(date, 'yyyy-MM-dd HH:mm');
 
@@ -144,5 +144,39 @@ describe('computeReminderSchedule', () => {
       );
       expect(result.map(fmt)).toEqual(['2026-11-30 09:00', '2027-01-31 09:00', '2027-03-31 09:00']);
     });
+  });
+});
+
+describe('isSameReminder', () => {
+  const base = {
+    time: '09:00',
+    type: 'weekly' as const,
+    interval: 2,
+    dayOfWeek: 2,
+    dayOfMonth: null,
+  };
+
+  it('returns true for same', () => {
+    expect(isSameReminder(base, { ...base })).toBe(true);
+  });
+
+  it('handles partial null and undefined', () => {
+    expect(isSameReminder(base, { ...base, dayOfMonth: undefined as unknown as null })).toBe(true);
+  });
+
+  it.each([
+    ['time', { time: '10:00' }],
+    ['type', { type: 'daily' as const }],
+    ['interval', { interval: 1 }],
+    ['dayOfWeek', { dayOfWeek: 3 }],
+    ['dayOfMonth', { dayOfMonth: 5 }],
+  ])('detects a changed %s', (_field, change) => {
+    expect(isSameReminder(base, { ...base, ...change })).toBe(false);
+  });
+
+  it('handles missing reminders', () => {
+    expect(isSameReminder(null, undefined)).toBe(true);
+    expect(isSameReminder(base, null)).toBe(false);
+    expect(isSameReminder(undefined, base)).toBe(false);
   });
 });
