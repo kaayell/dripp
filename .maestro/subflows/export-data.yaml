@@ -2,12 +2,17 @@ appId: com.kaayell.dripp
 ---
 # Exports through the system folder picker into /sdcard/Documents.
 - tapOn:
-    id: "import-export-button"
+    id: "settings-button"
+- tapOn:
+    id: "settings-import-export"
 - tapOn:
     id: "export-button"
 - tapOn: "Documents"
 - tapOn: "USE THIS FOLDER"
 - tapOn: "ALLOW"
 - assertVisible: "Saved dripp-export-.*\\.json \\(${EXPECTED_COUNTS}\\)"
+- tapOn:
+    id: "close-button"
+# close settings
 - tapOn:
     id: "close-button"

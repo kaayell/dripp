@@ -8,7 +8,7 @@ import '@/notifications/listeners';
 import Error from '@/components/ui/Error';
 import Loading from '@/components/ui/Loading';
 import { Colors, Spacing } from '@/constants/theme';
-import { ArrowUpDown, DatabaseBackup, Plus } from 'lucide-react-native';
+import { Plus, Settings } from 'lucide-react-native';
 import { IconButton } from '@/components/ui/IconButton';
 import { backfillDatedReminders } from '@/notifications/reminders';
 import { useNotificationNavigation } from '@/notifications/useNotificationNavigation';
@@ -59,13 +59,9 @@ export default function Layout() {
             headerRight: () => (
               <View style={{ flexDirection: 'row', gap: Spacing.xl }}>
                 <IconButton
-                  onPress={() => router.push('/category/reorder')}
-                  icon={<ArrowUpDown color={Colors.icon} size={20} strokeWidth={2.25} />}
-                />
-                <IconButton
-                  testID="import-export-button"
-                  onPress={() => router.push('/import-export')}
-                  icon={<DatabaseBackup color={Colors.icon} size={20} strokeWidth={2.25} />}
+                  testID="settings-button"
+                  onPress={() => router.push('/settings')}
+                  icon={<Settings color={Colors.icon} size={20} strokeWidth={2.25} />}
                 />
                 <IconButton
                   testID="add-task-button"
@@ -78,6 +74,13 @@ export default function Layout() {
         />
         <Stack.Screen
           name="task/add"
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+          }}
+        />
+        <Stack.Screen
+          name="settings/index"
           options={{
             presentation: 'modal',
             animation: 'slide_from_bottom',

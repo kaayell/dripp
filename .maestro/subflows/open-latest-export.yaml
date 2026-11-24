@@ -1,7 +1,9 @@
 appId: com.kaayell.dripp
 ---
 - tapOn:
-    id: "import-export-button"
+    id: "settings-button"
+- tapOn:
+    id: "settings-import-export"
 - tapOn:
     id: "import-button"
 - tapOn:
