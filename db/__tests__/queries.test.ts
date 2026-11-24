@@ -17,6 +17,7 @@ import {
   loadTasksWithCategory,
   loadTasksWithMostRecentLog,
   loadTaskWithDetails,
+  reorderCategories,
   removeTaskLog,
   saveTaskNote,
   setTasksHidden,
@@ -48,6 +49,17 @@ describe('loadCategories', () => {
 
     expect(result.map((c) => c.name).sort()).toEqual(['bod', 'hoose']);
   });
+
+  it('returns categories ordered by sort order', async () => {
+    await db.insert(categories).values([
+      { name: 'bod', sortOrder: 2 },
+      { name: 'hoose', sortOrder: 1 },
+    ]);
+
+    const result = await loadCategories();
+
+    expect(result.map((c) => c.name)).toEqual(['hoose', 'bod']);
+  });
 });
 
 describe('createCategory', () => {
@@ -57,6 +69,27 @@ describe('createCategory', () => {
     expect(created).toMatchObject({ name: 'bod' });
     expect(created.id).toEqual(expect.any(Number));
     expect(await loadCategories()).toHaveLength(1);
+  });
+
+  it('appends new categories to the end of the order', async () => {
+    await db.insert(categories).values({ name: 'bod', sortOrder: 5 });
+
+    const created = await createCategory('hoose');
+
+    expect(created.sortOrder).toBe(6);
+    expect((await loadCategories()).map((c) => c.name)).toEqual(['bod', 'hoose']);
+  });
+});
+
+describe('reorderCategories', () => {
+  it('saves the given order', async () => {
+    const bod = await createCategory('bod');
+    const hoose = await createCategory('hoose');
+    const cats = await createCategory('cats');
+
+    await reorderCategories([cats.id, bod.id, hoose.id]);
+
+    expect((await loadCategories()).map((c) => c.name)).toEqual(['cats', 'bod', 'hoose']);
   });
 });
 
@@ -194,6 +227,26 @@ describe('loadTasksWithCategory', () => {
       { ...mop, category: home },
       { ...party, category: null },
     ]);
+  });
+
+  it('orders tasks by category sort order', async () => {
+    const [bod, home] = await db
+      .insert(categories)
+      .values([
+        { name: 'bod', sortOrder: 2 },
+        { name: 'home', sortOrder: 1 },
+      ])
+      .returning();
+    const [drip, mop] = await db
+      .insert(tasks)
+      .values([
+        { name: 'drip', color: '#ffffff', categoryId: bod.id },
+        { name: 'mop', color: '#64a1ee', categoryId: home.id },
+      ])
+      .returning();
+
+    expect((await loadTasksWithCategory()).map((t) => t.id)).toEqual([mop.id, drip.id]);
+    expect((await loadTasks()).map((t) => t.id)).toEqual([mop.id, drip.id]);
   });
 });
 

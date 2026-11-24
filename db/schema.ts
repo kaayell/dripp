@@ -20,6 +20,7 @@ export const categories = sqliteTable(
     id: integer().primaryKey({ autoIncrement: true }),
     ...timestamps,
     name: text().notNull(),
+    sortOrder: integer('sort_order').notNull().default(0),
   },
   (table) => [uniqueIndex('categoriesNameUniqueIndex').on(lower(table.name))],
 );

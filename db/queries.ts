@@ -1,5 +1,6 @@
-import { and, eq, inArray } from 'drizzle-orm';
+import { and, asc, eq, inArray, sql } from 'drizzle-orm';
 import { db } from './client';
+import type { AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
 import { categories, reminders, taskLog, taskNotes, tasks, timestamps } from './schema';
 
 export type Category = typeof categories.$inferSelect;
@@ -50,12 +51,28 @@ export type AppData = {
 };
 
 export async function loadCategories(): Promise<Category[]> {
-  return db.select().from(categories);
+  return db.select().from(categories).orderBy(asc(categories.sortOrder), asc(categories.id));
 }
 
+export const nextCategorySortOrder = sql<number>`(select coalesce(max(${categories.sortOrder}), 0) + 1 from ${categories})`;
+
 export async function createCategory(name: string): Promise<Category> {
-  const [created] = await db.insert(categories).values({ name }).returning();
+  const [created] = await db
+    .insert(categories)
+    .values({ name, sortOrder: nextCategorySortOrder })
+    .returning();
   return created;
+}
+
+export async function reorderCategories(categoryIds: number[]): Promise<void> {
+  await db.transaction(async (tx) => {
+    for (const [index, id] of categoryIds.entries()) {
+      await tx
+        .update(categories)
+        .set({ sortOrder: index + 1 })
+        .where(eq(categories.id, id));
+    }
+  });
 }
 
 export async function loadTask(taskId: number): Promise<TaskWithReminder | undefined> {
@@ -91,16 +108,22 @@ export async function loadTasksWithDatedReminders(): Promise<TaskWithReminder[]>
   });
 }
 
+function categorySortOrder(categoryId: AnySQLiteColumn) {
+  return sql`(select ${categories.sortOrder} from ${categories} where ${categories.id} = ${categoryId})`;
+}
+
 export async function loadTasks(): Promise<Task[]> {
   return await db.query.tasks.findMany({
-    orderBy: (t, { sql }) => sql`${t.categoryId} asc nulls last`,
+    orderBy: (t, { sql }) =>
+      sql`${categorySortOrder(t.categoryId)} asc nulls last, ${t.categoryId} asc`,
   });
 }
 
 export async function loadTasksWithCategory(): Promise<TaskWithCategory[]> {
   return await db.query.tasks.findMany({
     with: { category: true },
-    orderBy: (t, { sql }) => sql`${t.categoryId} asc nulls last`,
+    orderBy: (t, { sql }) =>
+      sql`${categorySortOrder(t.categoryId)} asc nulls last, ${t.categoryId} asc`,
   });
 }
 
@@ -212,7 +235,7 @@ export async function exportAppData(): Promise<AppData> {
   const [allCategories, allTasks] = await Promise.all([
     db.query.categories.findMany({
       columns: { name: true, ...audited },
-      orderBy: { id: 'asc' },
+      orderBy: { sortOrder: 'asc', id: 'asc' },
     }),
     db.query.tasks.findMany({
       columns: { name: true, color: true, hidden: true, ...audited },

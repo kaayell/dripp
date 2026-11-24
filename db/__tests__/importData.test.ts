@@ -133,6 +133,18 @@ describe('importAppData replace', () => {
 });
 
 describe('importAppData merge', () => {
+  it('appends new categories after existing ones in file order', async () => {
+    await db.insert(categories).values({ name: 'bod', sortOrder: 1 });
+
+    await importAppData(
+      { categories: [{ name: 'garden' }, { name: 'cats' }, { name: 'BOD' }], tasks: [] },
+      'merge',
+    );
+
+    const rows = await db.select().from(categories).orderBy(categories.sortOrder);
+    expect(rows.map((c) => c.name)).toEqual(['bod', 'garden', 'cats']);
+  });
+
   it('adds new rows and matches existing categories and tasks by name', async () => {
     const [cats] = await db.insert(categories).values({ name: 'CATS' }).returning();
     const [feed] = await db

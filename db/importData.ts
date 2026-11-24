@@ -1,6 +1,6 @@
 import { db } from './client';
 import { categories, reminders, taskLog, taskNotes, tasks } from './schema';
-import { AppData } from './queries.ts';
+import { AppData, nextCategorySortOrder } from './queries.ts';
 
 export type ImportMode = 'replace' | 'merge';
 
@@ -32,7 +32,10 @@ async function mergeInto(tx: Transaction, data: AppData): Promise<ImportResult> 
   );
   for (const category of data.categories) {
     if (categoryIds.has(category.name.toLowerCase())) continue;
-    const [created] = await tx.insert(categories).values(category).returning();
+    const [created] = await tx
+      .insert(categories)
+      .values({ ...category, sortOrder: nextCategorySortOrder })
+      .returning();
     categoryIds.set(created.name.toLowerCase(), created.id);
     result.categories++;
   }
